@@ -43,8 +43,8 @@ void * initializeKernelBinary()
 
 int main()
 {	
+	load_idt();
 	((EntryPoint)sampleCodeModuleAddress)();
-	scr_print("Hefesto");
 	while(1) _hlt();
 	return 0;
 }
