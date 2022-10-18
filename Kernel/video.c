@@ -184,6 +184,17 @@ void scr_printChar(char c) {
         return;
     }
 
+    if (c == '\b') { // Pensado solo para shell
+        if (penX < CHAR_WIDTH && penY > 0) { 
+            penY -= CHAR_HEIGHT;
+            penX = scr_getWidth() - CHAR_WIDTH;
+        } else {
+            penX -= CHAR_WIDTH;
+        }
+        scr_drawRect(penX, penY, CHAR_WIDTH, CHAR_HEIGHT, (Color){0, 0, 0});
+        return;
+    }
+
     if (c >= FIRST_CHAR && c <= LAST_CHAR) {
 	    const char* data = font + 32*(c-33);
 	    for (int h=0; h<16; h++) {
