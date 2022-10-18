@@ -1,10 +1,11 @@
 /* sampleCodeModule.c */
 #include <stdint.h>
-extern uint64_t write(int fd, const void * buf, uint64_t count);
-char * v = (char*)0xB8000 + 79 * 2;
+#include <unistd.h>
+#include <stdio.h>
+#include <shell.h>
 
 int main() {
 	//All the following code may be removed 
-	write(1, "Novardo!", 10);
+	run_shell();
 	return 0xDEADBEEF;
 }
