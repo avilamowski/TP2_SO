@@ -7,5 +7,7 @@
 
 int putchar(int c);
 int puts(const char * s);
+int getchar();
+int scanf(char * fmt, ...);
 
 #endif

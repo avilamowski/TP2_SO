@@ -4,6 +4,6 @@
 #include <stdint.h>
 
 uint64_t write(int fd, const void * buf, uint64_t count);
-uint64_t read(int fd, void * buf, uint64_t count);
+uint64_t read(int fd);
 
 #endif

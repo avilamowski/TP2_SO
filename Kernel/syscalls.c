@@ -17,7 +17,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
 // Read char
 char syscall_0(uint32_t fd){
     switch (fd){
-        case 1:
+        case 0:
             return getAscii();
     }
 }
