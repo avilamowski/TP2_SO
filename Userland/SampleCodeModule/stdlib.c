@@ -1,6 +1,46 @@
 #include <stdlib.h>
-#define isNumber(n) (n >= '0' && n <= '9')
-#define isHex(n) (n >= 'A' && n <= 'F')
+#include <stdio.h>
+
+#define isNumber(n) ((n) >= '0' && (n) <= '9')
+#define isHex(n) ((n) >= 'A' && (n) <= 'F')
+
+static unsigned int log(int n, int base) {
+    unsigned int count = 1;
+    while (n /= base)
+        count++;
+    return count;
+}
+
+char* itoa(int n, char* buffer, int base)
+{
+ 
+    if (n == 0)
+    {
+        buffer[0] = '0';
+        buffer[1] = '\0';
+        return buffer;
+    }
+ 
+    unsigned int len = 0;
+    int i = 0;
+    if (n < 0 && base == 10)
+    {
+        n = -n;
+        buffer[i] = '-';
+        len++;
+        i++;
+    }
+ 
+    len += log(n, base);
+    while (n != 0)
+    {
+        int r = n % base;
+        buffer[len - i++ - 1] = (r > 9)? (r-10) + 'A' : r + '0';
+        n /= base;
+    }
+    buffer[i] = '\0'; // Append string terminator
+    return buffer;
+}
 
 int atoi(char * s)
 {

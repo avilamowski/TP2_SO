@@ -24,7 +24,7 @@ void init() {
     commands[0] = (Command){"help", "Listado de comandos", &help, NO_PARAMS};
     commands[1] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", 0, NO_PARAMS};
     commands[2] = (Command){"time", "Despliega la hora actual", NO_PARAMS};
-    commands[3] = (Command){ "div", "Divide dos numeros", 0, DUAL_PARAM};
+    commands[3] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
     commands[4] = (Command){ "???", "que es esto!", 0, NO_PARAMS};
     commands[5] = (Command){ "tron.elf", "el tron", 0, NO_PARAMS};
     commands[6] = (Command){ "font-size", "hola", 0, SINGLE_PARAM};
@@ -72,12 +72,10 @@ static int getCommandIndex(char * command) {
 
 void help() {
     for (int i = 0; i < QTY_COMMANDS; i++)
-    {
-        // TODO: Mejorar con printf
-        puts(commands[i].name);
-        puts(": ");
-        puts(commands[i].description);
-        puts("\r\n");
-    }
+        printf("%s: %s\r\n", commands[i].name, commands[i].description);
+}
 
+int div(int num, int div) {
+    printf("%d/%d=%d\r\n", num, div, num/div);
+    return 1;
 }

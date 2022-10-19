@@ -45,9 +45,6 @@ int main()
 {	
 	load_idt();
 	((EntryPoint)sampleCodeModuleAddress)();
-	/*scr_drawRect(10,10,8,32,(Color){255,255,0});
-	scr_drawRect(0,0,8,16,(Color){200,200,50});
-	scr_drawRect(90,90,8,8,(Color){0,255,0});*/
 	while(1) _hlt();
 	return 0;
 }
