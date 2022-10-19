@@ -77,7 +77,7 @@ int scanf(char * fmt, ...) {
     char * fmtPtr = fmt;
     char * end;
     bIdx = 0;
-    while (*fmtPtr) {
+    while (*fmtPtr && buffer[bIdx]) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
             switch (*fmtPtr) {

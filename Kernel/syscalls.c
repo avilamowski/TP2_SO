@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <video.h>
 #include <keyboard.h>
+#include <lib.h>
 static char syscall_0(uint32_t fd);
 static uint64_t syscall_1(uint32_t fd, const char *buff , uint64_t count);
+static uint32_t syscall_3();
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5) {
 	switch (nr) {
@@ -10,6 +12,8 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
             return syscall_0((uint32_t)arg0);
 		case 1:
 			return syscall_1((uint32_t)arg0, (char *)arg1, (uint64_t)arg2);
+        case 3:
+            return syscall_3();
 	}
 	return -1;
 }
@@ -37,4 +41,10 @@ uint64_t syscall_1(uint32_t fd, const char *buff , uint64_t count){
     scr_setPenColor(color);
     scr_print(buff);
     return count;
+}
+
+uint32_t syscall_3(){
+    char h, m, s;
+    getTime(&h, &m, &s);
+    return s + m * 60 + ((h - 3) % 24) * 3600;
 }

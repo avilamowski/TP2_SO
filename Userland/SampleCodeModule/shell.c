@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <shell.h>
+#include <stdint.h>
 
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
 #define QTY_COMMANDS 8
@@ -23,7 +24,7 @@ static Command commands[QTY_COMMANDS];
 void init() {
     commands[0] = (Command){"help", "Listado de comandos", &help, NO_PARAMS};
     commands[1] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", 0, NO_PARAMS};
-    commands[2] = (Command){"time", "Despliega la hora actual", NO_PARAMS};
+    commands[2] = (Command){"time", "Despliega la hora actual", &time, NO_PARAMS};
     commands[3] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
     commands[4] = (Command){ "???", "que es esto!", 0, NO_PARAMS};
     commands[5] = (Command){ "tron.elf", "el tron", 0, NO_PARAMS};
@@ -78,4 +79,10 @@ void help() {
 int div(int num, int div) {
     printf("%d/%d=%d\r\n", num, div, num/div);
     return 1;
+}
+
+void time(){
+    uint32_t secs = getSeconds();
+    int h = secs / 3600, m = secs % 3600 / 60, s = secs % 3600 % 60;
+    printf("%d:%d:%d\r\n", h, m, s);
 }
