@@ -3,9 +3,10 @@
 #include <string.h>
 #include <shell.h>
 #include <stdint.h>
+#include <unistd.h>
 
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
-#define QTY_COMMANDS 8
+#define QTY_COMMANDS 10
 typedef struct Command {
     char * name;
     char * description;
@@ -30,7 +31,7 @@ void init() {
     commands[5] = (Command){ "tron.elf", "el tron", 0, NO_PARAMS};
     commands[6] = (Command){ "font-size", "hola", 0, SINGLE_PARAM};
     commands[7] = (Command){ "printmem", "hola", 0, SINGLE_PARAM};
-    commands[8] = (Command){ "clear", "hola", 0, NO_PARAMS};
+    commands[8] = (Command){ "clear", "hola", &clear, NO_PARAMS};
 }
 
 void run_shell() {

@@ -12,6 +12,9 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
             return syscall_0((uint32_t)arg0);
 		case 1:
 			return syscall_1((uint32_t)arg0, (char *)arg1, (uint64_t)arg2);
+        case 2:
+            syscall_2();
+            return 0;
         case 3:
             return syscall_3();
 	}
@@ -43,8 +46,13 @@ uint64_t syscall_1(uint32_t fd, const char *buff , uint64_t count){
     return count;
 }
 
+void syscall_2(){
+    scr_clear();
+}
+
 uint32_t syscall_3(){
     char h, m, s;
     getTime(&h, &m, &s);
     return s + m * 60 + ((h - 3) % 24) * 3600;
 }
+
