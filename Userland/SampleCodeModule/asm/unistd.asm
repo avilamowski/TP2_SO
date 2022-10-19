@@ -2,6 +2,7 @@ GLOBAL write
 GLOBAL read
 GLOBAL getSeconds
 GLOBAL clear
+GLOBAL getInfoReg
 
 read:
     mov rax, 0
@@ -20,5 +21,10 @@ clear:
 
 getSeconds:
     mov rax, 3
+    int 80h
+    ret
+
+getInfoReg:
+    mov rax, 4
     int 80h
     ret

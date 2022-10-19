@@ -7,4 +7,5 @@ uint64_t write(int fd, const void * buf, uint64_t count);
 uint64_t read(int fd);
 uint32_t getSeconds();
 int clear(void);
+uint64_t * getInfoReg();
 #endif

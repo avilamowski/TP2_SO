@@ -4,7 +4,9 @@
 #include <lib.h>
 static char syscall_0(uint32_t fd);
 static uint64_t syscall_1(uint32_t fd, const char *buff , uint64_t count);
+static void syscall_2();
 static uint32_t syscall_3();
+uint64_t * syscall_4();
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5) {
 	switch (nr) {
@@ -17,6 +19,8 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
             return 0;
         case 3:
             return syscall_3();
+        case 4:
+            return syscall_4();
 	}
 	return -1;
 }
@@ -27,6 +31,7 @@ char syscall_0(uint32_t fd){
         case 0:
             return getAscii();
     }
+    return 0;
 }
 
 // Write
@@ -54,5 +59,9 @@ uint32_t syscall_3(){
     char h, m, s;
     getTime(&h, &m, &s);
     return s + m * 60 + ((h - 3) % 24) * 3600;
+}
+
+uint64_t * syscall_4() {
+    return getRegisterArray();
 }
 

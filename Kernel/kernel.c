@@ -33,12 +33,11 @@ void * getStackBase()
 	);
 }
 
-void * initializeKernelBinary()
+void initializeKernelBinary()
 {
 	void * moduleAddresses[] = { sampleCodeModuleAddress, sampleDataModuleAddress };
 	loadModules(&endOfKernelBinary, moduleAddresses);
 	clearBSS(&bss, &endOfKernel - &bss);
-	return getStackBase();
 }
 
 int main()
