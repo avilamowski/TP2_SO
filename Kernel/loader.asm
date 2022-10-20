@@ -2,6 +2,7 @@ global loader
 global reboot_main
 extern main
 extern initializeKernelBinary
+extern getStackBase
 
 loader:
 	call initializeKernelBinary	; Set up the kernel binary, and get thet stack address
