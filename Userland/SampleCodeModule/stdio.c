@@ -27,7 +27,6 @@ int getchar() {
 int printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
-    //TODO implementar el buffer de teclado
 
     char * buffer[256] = {0};
     char * fmtPtr = fmt;

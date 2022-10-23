@@ -5,7 +5,6 @@
 #include <shell.h>
 
 int main() {
-	//All the following code may be removed 
 	run_shell();
 	return 0xDEADBEEF;
 }

@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
+#define ERROR_COLOR {0x00, 0x00, 0xFF}
+
 typedef struct {
 	uint8_t b;
 	uint8_t g;
@@ -43,4 +46,5 @@ void print(const char* s);
 Returns the new pen position as a 32 bit number, where the 16 lowest bits are the x and the upper 16 bits are the y. */
 void println(const char* s);
 
+int printf(char * fmt, ...);
 #endif

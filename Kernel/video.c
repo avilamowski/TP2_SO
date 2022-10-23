@@ -3,9 +3,9 @@
 #include <font.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdarg.h>
 
 #define RGB_SIZE 3
-#define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
 #define MAX_RESOLUTION (64 * 128)
 
 struct vbe_mode_info_structure {
@@ -191,4 +191,37 @@ void printN(const char* s, uint32_t n) {
 void println(const char* s) {
     print(s);
     printNewline();
+}
+
+int printf(char * fmt, ...) {
+    va_list v;
+    va_start(v, fmt);
+
+    char * buffer[256] = {0};
+    char * fmtPtr = fmt;
+    char * end;
+    while (*fmtPtr) {
+ 	    if (*fmtPtr == '%') {
+            fmtPtr++;
+            switch (*fmtPtr) {
+                case 'c':
+                    printChar(va_arg(v, char *));
+                    break;
+                case 'd':
+                    print(itoa(va_arg(v, int *), buffer, 10));
+                    break;
+                case 'x':
+                    print(itoa(va_arg(v, int *), buffer, 16));
+                    break;
+                case 's':
+                    print((char *) va_arg(v, char *));
+                    break;
+            }
+        } else {
+            printChar(*fmtPtr);
+        }
+        fmtPtr++;
+    }
+    va_end(v);
+    return 1;
 }

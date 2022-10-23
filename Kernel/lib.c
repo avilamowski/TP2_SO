@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+static unsigned int log(int n, int base);
+
 void * memset(void * destination, int32_t c, uint64_t length)
 {
 	uint8_t chr = (uint8_t)c;
@@ -47,4 +49,42 @@ void * memcpy(void * destination, const void * source, uint64_t length)
 	}
 
 	return destination;
+}
+
+static unsigned int log(int n, int base) {
+    unsigned int count = 1;
+    while (n /= base)
+        count++;
+    return count;
+}
+
+char* itoa(int n, char* buffer, int base)
+{
+ 
+    if (n == 0)
+    {
+        buffer[0] = '0';
+        buffer[1] = '\0';
+        return buffer;
+    }
+ 
+    unsigned int len = 0;
+    int i = 0;
+    if (n < 0 && base == 10)
+    {
+        n = -n;
+        buffer[i] = '-';
+        len++;
+        i++;
+    }
+ 
+    len += log(n, base);
+    while (n != 0)
+    {
+        int r = n % base;
+        buffer[len - i++ - 1] = (r > 9)? (r-10) + 'A' : r + '0';
+        n /= base;
+    }
+    buffer[i] = '\0'; // Append string terminator
+    return buffer;
 }

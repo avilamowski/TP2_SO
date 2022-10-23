@@ -14,7 +14,8 @@ GLOBAL _irq04Handler
 GLOBAL _irq05Handler
 GLOBAL _syscallHandler
 
-GLOBAL _exception0Handler
+GLOBAL _ex00Handler
+GLOBAL _ex06Handler
 
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
@@ -109,7 +110,12 @@ SECTION .text
 
 
 %macro exceptionHandler 1
-	pushState
+	pushState ; Se cargan 15 registros en stack
+
+	mov rsi, rsp
+	add rsi, 15*8 ; Dir de retorno 
+	mov rdx, rsp
+	add rdx, 18*8 ; Dir de stack
 
 	mov rdi, %1 ; pasaje de parametro
 	call exceptionDispatcher
@@ -117,7 +123,6 @@ SECTION .text
 	popState
 	iretq
 %endmacro
-
 
 _hlt:
 	sti
@@ -199,8 +204,12 @@ _syscallHandler:
 	iretq
 
 ;Zero Division Exception
-_exception0Handler:
+_ex00Handler:
 	exceptionHandler 0
+
+;Invalid Op Code Exception
+_ex06Handler:
+	exceptionHandler 6
 
 haltcpu:
 	cli
