@@ -51,7 +51,7 @@ void run_shell() {
         int qtyParams = scanf("%s %d %d", command, &arg1, &arg2); // TODO: Validar
         index = getCommandIndex(command);
         if (index == -1) {
-            puts("Comando invalido!\r\n");
+            puts("Comando invalido!\n");
             continue;
         }
         switch (commands[index].ftype)

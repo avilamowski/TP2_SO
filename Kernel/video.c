@@ -6,7 +6,7 @@
 
 #define RGB_SIZE 3
 #define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
-
+#define MAX_RESOLUTION (64 * 128)
 
 struct vbe_mode_info_structure {
     uint16_t attributes;        // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -47,21 +47,26 @@ struct vbe_mode_info_structure {
 } __attribute__ ((packed));
 
 struct vbe_mode_info_structure* _screenData = (void*)0x5C00;
-
-static void* getPtrToPixel(uint16_t x, uint16_t y) {
-    return (void*)(_screenData->framebuffer + RGB_SIZE * (x + (y * (uint64_t)_screenData->width)));
-}
-
 uint16_t _X = 0, _Y = 0;
 Color _fontColor = DEFAULT_COLOR;
 uint8_t _charWidth = CHAR_WIDTH_12;
 uint8_t _charHeight = CHAR_HEIGHT_12;
 char * _font = font_12;
+char _charBuffer[MAX_RESOLUTION];
+uint16_t _bufferIdx = 0;
+
+static void renderFonts();
+static void* getPtrToPixel(uint16_t x, uint16_t y);
+
+static void* getPtrToPixel(uint16_t x, uint16_t y) {
+    return (void*)(_screenData->framebuffer + RGB_SIZE * (x + (y * (uint64_t)_screenData->width)));
+}
 
 void videoClear() {
     void * pos = getPtrToPixel(0,0);
     memset(pos, 0, RGB_SIZE * (uint64_t)_screenData->width * _screenData->height);
     _X = _Y = 0;
+    _bufferIdx = 0;
 }
 
 uint8_t coordinatesValid(uint16_t x, uint16_t y) {
@@ -105,14 +110,16 @@ void setFontColor(Color color) {
 }
 
 void setFontSize(fontSize f){
-    if (f == 0) {
-        _font = font_12;
-    } else {
-        _font = font_24;
-    }
-    //_font = fonts[f];
+    _font = fonts[f];
     _charWidth = charWidths[f];
     _charHeight = charHeights[f];
+    renderFonts();
+}
+
+static void renderFonts() {
+    int buffIdx = _bufferIdx;
+    videoClear();
+    printN(_charBuffer, buffIdx);
 }
 
 void printNewline(void) {
@@ -128,11 +135,6 @@ void printNewline(void) {
 }
 
 void printChar(char c) {
-    if (c == '\n') {
-        printNewline();
-        return;
-    }
-
     if (c == '\b') { // Pensado solo para shell
         if (_X < _charWidth && _Y > 0) { 
             _Y -= _charHeight;
@@ -141,9 +143,16 @@ void printChar(char c) {
             _X -= _charWidth;
         }
         drawRect(_X, _Y, _charWidth, _charHeight, (Color){0, 0, 0});
+        _bufferIdx--;
         return;
     }
 
+    _charBuffer[_bufferIdx++] = c;
+    if (c == '\n') {
+        printNewline();
+        return;
+    }
+    
     if (c >= FIRST_CHAR && c <= LAST_CHAR) {
 	    const char* data = _font + _charHeight * _charWidth * (c-FIRST_CHAR) / 8;
 	    for (int h=0; h<_charHeight; h++) {
@@ -164,7 +173,6 @@ void printChar(char c) {
             }
     	}
     }
-
     _X += _charWidth;
     if (_X > _screenData->width - _charWidth)
         printNewline();
@@ -172,6 +180,11 @@ void printChar(char c) {
 
 void print(const char* s) {
     while (*s)
+        printChar(*s++);
+}
+
+void printN(const char* s, uint32_t n) {
+    while (n-- && *s)
         printChar(*s++);
 }
 
