@@ -9,5 +9,7 @@ void * memcpy(void * destination, const void * source, uint64_t length);
 char getKeyPressed();
 char *cpuVendor(char *result);
 void getTime(char * h, char * m, char * s);
+uint64_t * getRegisterArray();
+
 #endif
 

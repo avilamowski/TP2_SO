@@ -3,16 +3,13 @@
 
 #include <stdint.h>
 
-/* The width of a character in pixels. */
-#define CHAR_WIDTH 8 
-/* The height of a character in pixels. */
-#define CHAR_HEIGHT 16
-
 typedef struct {
 	uint8_t b;
 	uint8_t g;
 	uint8_t r;
 } Color;
+
+typedef enum {FONT_12 = 0, FONT_24} fontSize;
 
 /* Clears the whole screen to black. */
 void videoClear();
@@ -28,6 +25,9 @@ void setPenPosition(uint16_t x, uint16_t y);
 
 /* Sets the pen color for drawing characters on the screen as a console. */
 void setFontColor(Color color);
+
+/* Sets the font size for drawing characters on the screen as a console. */
+void setFontSize(fontSize f);
 
 /* Advances the pen to the beginning of the next line. */
 void printNewline(void);

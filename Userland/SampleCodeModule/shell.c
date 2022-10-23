@@ -22,6 +22,7 @@ static void help();
 static int div(int num, int div);
 static void time();
 static void infoReg();
+static void fontSize(uint8_t size);
 
 static int getCommandIndex(char * command);
 
@@ -34,7 +35,7 @@ void init() {
     commands[3] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
     commands[4] = (Command){ "???", "que es esto!", 0, NO_PARAMS};
     commands[5] = (Command){ "tron.elf", "el tron", 0, NO_PARAMS};
-    commands[6] = (Command){ "font-size", "hola", 0, SINGLE_PARAM};
+    commands[6] = (Command){ "font-size", "hola", &fontSize, SINGLE_PARAM};
     commands[7] = (Command){ "printmem", "hola", 0, SINGLE_PARAM};
     commands[8] = (Command){ "clear", "hola", &clear, NO_PARAMS};
 }
@@ -98,4 +99,8 @@ static void infoReg() {
     uint64_t * regs = getInfoReg();
     for (int i = 0; i < sizeof(reg_names)/sizeof(char *); i++)
         printf("%s: %d\n", reg_names[i], regs[i]);
+}
+
+static void fontSize(uint8_t size) {
+    setFontSize(size);
 }

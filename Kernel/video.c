@@ -7,6 +7,7 @@
 #define RGB_SIZE 3
 #define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
 
+
 struct vbe_mode_info_structure {
     uint16_t attributes;        // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
     uint8_t window_a;           // deprecated
@@ -53,7 +54,9 @@ static void* getPtrToPixel(uint16_t x, uint16_t y) {
 
 uint16_t _X = 0, _Y = 0;
 Color _fontColor = DEFAULT_COLOR;
-uint8_t _charScaleFactor = 1;
+uint8_t _charWidth = CHAR_WIDTH_12;
+uint8_t _charHeight = CHAR_HEIGHT_12;
+char * _font = font_12;
 
 void videoClear() {
     void * pos = getPtrToPixel(0,0);
@@ -90,8 +93,8 @@ void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color col
 }
 
 void setPosition(uint16_t x, uint16_t y) {
-    uint16_t maxX = _screenData->width - CHAR_WIDTH;
-    uint16_t maxY = _screenData->height - CHAR_HEIGHT;
+    uint16_t maxX = _screenData->width - _charWidth;
+    uint16_t maxY = _screenData->height - _charHeight;
 
     _X = x < maxX ? x : maxX;
     _Y = y < maxY ? y : maxY;
@@ -101,15 +104,26 @@ void setFontColor(Color color) {
     _fontColor = color;
 }
 
+void setFontSize(fontSize f){
+    if (f == 0) {
+        _font = font_12;
+    } else {
+        _font = font_24;
+    }
+    //_font = fonts[f];
+    _charWidth = charWidths[f];
+    _charHeight = charHeights[f];
+}
+
 void printNewline(void) {
     _X = 0; 
 
-    if (_Y + 2 * CHAR_HEIGHT <= _screenData->height) {
-        _Y += CHAR_HEIGHT;
+    if (_Y + 2 * _charHeight <= _screenData->height) {
+        _Y += _charHeight;
     } else {
-        uint64_t len = RGB_SIZE * ((uint64_t)_screenData->width * (_screenData->height - CHAR_HEIGHT));
-        memcpy(getPtrToPixel(0,0), getPtrToPixel(0, CHAR_HEIGHT), len);
-        memset(getPtrToPixel(0, _screenData->height - CHAR_HEIGHT), 0, RGB_SIZE * (uint64_t)_screenData->width * CHAR_HEIGHT);
+        uint64_t len = RGB_SIZE * ((uint64_t)_screenData->width * (_screenData->height - _charHeight));
+        memcpy(getPtrToPixel(0,0), getPtrToPixel(0, _charHeight), len);
+        memset(getPtrToPixel(0, _screenData->height - _charHeight), 0, RGB_SIZE * (uint64_t)_screenData->width * _charHeight);
     }
 }
 
@@ -120,26 +134,25 @@ void printChar(char c) {
     }
 
     if (c == '\b') { // Pensado solo para shell
-        if (_X < CHAR_WIDTH && _Y > 0) { 
-            _Y -= CHAR_HEIGHT;
-            _X = _screenData->width - CHAR_WIDTH;
+        if (_X < _charWidth && _Y > 0) { 
+            _Y -= _charHeight;
+            _X = _screenData->width - _charWidth;
         } else {
-            _X -= CHAR_WIDTH;
+            _X -= _charWidth;
         }
-        drawRect(_X, _Y, CHAR_WIDTH, CHAR_HEIGHT, (Color){0, 0, 0});
+        drawRect(_X, _Y, _charWidth, _charHeight, (Color){0, 0, 0});
         return;
     }
 
     if (c >= FIRST_CHAR && c <= LAST_CHAR) {
-	    const char* data = font + 32*(c-33);
-	    for (int h=0; h<16; h++) {
-    		//Color* ptr = (Color*)getPtrToPixel(_X, _Y + h);
+	    const char* data = _font + _charHeight * _charWidth * (c-FIRST_CHAR) / 8;
+	    for (int h=0; h<_charHeight; h++) {
+    		Color* ptr = (Color*)getPtrToPixel(_X, _Y + h);
             uint8_t mask = 1;
-            for (uint8_t i = 0; i < CHAR_WIDTH; i++)
+            for (uint8_t i = 0; i < _charWidth; i++) // TODO: Ver si se puede optimizar
             {
                 if (*data & mask) {
-                    drawRect(_X + i, _Y + h , 1, 1, _fontColor);
-                    //ptr[i] = _fontColor;
+                    ptr[i] = _fontColor;
                 }
                 
                 if (mask & 0b10000000) {
@@ -149,12 +162,11 @@ void printChar(char c) {
                     mask <<= 1;
                 }
             }
-            data++;
     	}
     }
 
-    _X += CHAR_WIDTH;
-    if (_X > _screenData->width - CHAR_WIDTH)
+    _X += _charWidth;
+    if (_X > _screenData->width - _charWidth)
         printNewline();
 }
 

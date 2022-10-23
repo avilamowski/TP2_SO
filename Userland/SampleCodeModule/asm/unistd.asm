@@ -3,6 +3,7 @@ GLOBAL read
 GLOBAL getSeconds
 GLOBAL clear
 GLOBAL getInfoReg
+GLOBAL setFontSize
 
 read:
     mov rax, 0
@@ -26,5 +27,10 @@ getSeconds:
 
 getInfoReg:
     mov rax, 4
+    int 80h
+    ret
+
+setFontSize:
+    mov rax, 5
     int 80h
     ret
