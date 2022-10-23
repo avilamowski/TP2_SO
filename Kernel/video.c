@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#define RGB_SIZE 3
+#define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
+
 struct vbe_mode_info_structure {
     uint16_t attributes;        // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
     uint8_t window_a;           // deprecated
@@ -42,190 +45,125 @@ struct vbe_mode_info_structure {
     uint8_t reserved1[206];
 } __attribute__ ((packed));
 
-struct vbe_mode_info_structure* screenData = (void*)0x5C00;
+struct vbe_mode_info_structure* _screenData = (void*)0x5C00;
 
 static void* getPtrToPixel(uint16_t x, uint16_t y) {
-    return (void*)(screenData->framebuffer + 3 * (x + (y * (uint64_t)screenData->width)));
+    return (void*)(_screenData->framebuffer + RGB_SIZE * (x + (y * (uint64_t)_screenData->width)));
 }
 
-uint16_t penX = 0, penY = 0;
-Color penColor = {0x7F, 0x7F, 0x7F};
+uint16_t _X = 0, _Y = 0;
+Color _fontColor = DEFAULT_COLOR;
+uint8_t _charScaleFactor = 1;
 
-uint16_t scr_getWidth(void) {
-    return screenData->width;
+void videoClear() {
+    void * pos = getPtrToPixel(0,0);
+    memset(pos, 0, RGB_SIZE * (uint64_t)_screenData->width * _screenData->height);
+    _X = _Y = 0;
 }
 
-uint16_t scr_getHeight(void) {
-    return screenData->height;
+uint8_t coordinatesValid(uint16_t x, uint16_t y) {
+    return x < _screenData->width && y < _screenData->height;
 }
 
-uint16_t scr_getPenX(void) {
-    return penX;
+void setPixel(uint16_t x, uint16_t y, Color color) {
+    if (coordinatesValid(x,y))
+        *((Color*) getPtrToPixel(x,y)) = color;
 }
 
-uint16_t scr_getPenY(void) {
-    return penY;
-}
-
-void scr_clear(void) {
-    uint8_t* pos = (uint8_t*)((uint64_t)screenData->framebuffer);
-    for (uint32_t len = 3 * (uint32_t)screenData->width * screenData->height; len; len--, pos++)
-        *pos = 0;
-    penX = 0;
-    penY = 0;
-}
-
-void scr_setPixel(uint16_t x, uint16_t y, Color color) {
-    if (x >= screenData->width || y >= screenData->height)
-        return;
-
-    Color* pos = (Color*)getPtrToPixel(x, y);
-    *pos = color;
-}
-
-void scr_drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color color) {
-    if (x >= screenData->width || y >= screenData->height)
+void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color color) {
+    if (!coordinatesValid(x, y))
         return;
     
-    uint16_t maxWidth = screenData->width - x;
+    uint16_t maxWidth = _screenData->width - x;
     if (width > maxWidth) width = maxWidth;
     
-    uint16_t maxHeight = screenData->height - y;
+    uint16_t maxHeight = _screenData->height - y;
     if (height > maxHeight) height = maxHeight;
 
     Color* ptr = (Color*)getPtrToPixel(x, y);
-    unsigned int adv = screenData->width - width;
+    uint16_t lineDiff = _screenData->width - width;
     for (int i=0; i<height; i++) {
         for (int c=0; c<width; c++)
             *(ptr++) = color;
-        ptr += adv;
+        ptr += lineDiff;
     }
 }
 
-void scr_drawLine(uint16_t fromX, uint16_t fromY, uint16_t toX, uint16_t toY, Color color) {
-    unsigned int dx = toX < fromX ? (fromX - toX) : (toX - fromX);
-    unsigned int dy = toY < fromY ? (fromY - toY) : (toY - fromY);
-    
-    // Lines can be drawn by iterating either horizontally or vertically. We check which way is best by comparing dx and dy.
-    if (dy < dx) {
-        // We draw the line iterating horizontally.
-        // We ensure fromX < toX by swapping the points if necessary.
-        if (fromX > toX) {
-            uint16_t tmp = fromX;
-            fromX = toX;
-            toX = tmp;
-            tmp = fromY;
-            fromY = toY;
-            toY = tmp;
-        }
+void setPosition(uint16_t x, uint16_t y) {
+    uint16_t maxX = _screenData->width - CHAR_WIDTH;
+    uint16_t maxY = _screenData->height - CHAR_HEIGHT;
 
-        if (fromX >= screenData->width) return;
+    _X = x < maxX ? x : maxX;
+    _Y = y < maxY ? y : maxY;
+}
 
-        double m = (double)(toY - fromY) / (double)(toX - fromX);
-        double b = fromY - m*fromX;
-        if (toX >= screenData->width) toX = screenData->width - 1;
+void setFontColor(Color color) {
+    _fontColor = color;
+}
 
-        for (uint16_t x = fromX; x <= toX; x++)
-            scr_setPixel(x, (uint16_t)(m*x+b + 0.5), color);
+void printNewline(void) {
+    _X = 0; 
+
+    if (_Y + 2 * CHAR_HEIGHT <= _screenData->height) {
+        _Y += CHAR_HEIGHT;
     } else {
-        // We draw the line iterating vertically.
-        // We ensure fromY < toY by swapping the points if necessary.
-        if (fromY > toY) {
-            uint16_t tmp = fromX;
-            fromX = toX;
-            toX = tmp;
-            tmp = fromY;
-            fromY = toY;
-            toY = tmp;
-        }
-
-        if (fromY >= screenData->height) return;
-
-        double m = (double)(toX - fromX) / (double)(toY - fromY);
-        double b = fromX - m*fromY;
-        if (toY >= screenData->height) toY = screenData->height - 1;
-
-        for (uint16_t y = fromY; y <= toY; y++)
-            scr_setPixel((uint16_t)(m*y+b + 0.5), y, color);
+        uint64_t len = RGB_SIZE * ((uint64_t)_screenData->width * (_screenData->height - CHAR_HEIGHT));
+        memcpy(getPtrToPixel(0,0), getPtrToPixel(0, CHAR_HEIGHT), len);
+        memset(getPtrToPixel(0, _screenData->height - CHAR_HEIGHT), 0, RGB_SIZE * (uint64_t)_screenData->width * CHAR_HEIGHT);
     }
 }
 
-void scr_setPenPosition(uint16_t x, uint16_t y) {
-    // We clamp the pen (x,y) to ensure there is enough space to draw a char in that position.
-    uint16_t maxX = screenData->width - CHAR_WIDTH;
-    uint16_t maxY = screenData->height - CHAR_HEIGHT;
-
-    penX = x < maxX ? x : maxX;
-    penY = y < maxY ? y : maxY;
-}
-
-void scr_setPenColor(Color color) {
-    penColor = color;
-}
-
-void scr_printNewline(void) {
-    penX = 0; // pen x is set to full left.
-
-    // If there is space for another line, we simply advance the pen y. Otherwise, we move up the entire screen and clear the lower part.
-    if (penY + (2*CHAR_HEIGHT) <= screenData->height) {
-        penY += CHAR_HEIGHT;
-    } else {
-        void* dst = (void*)((uint64_t)screenData->framebuffer);
-        void* src = (void*)(dst + 3 * (CHAR_HEIGHT * (uint64_t)screenData->width));
-        uint64_t len = 3 * ((uint64_t)screenData->width * (screenData->height - CHAR_HEIGHT));
-        memcpy(dst, src, len);
-        memset(dst+len, 0, 3 * (uint64_t)screenData->width * CHAR_HEIGHT);
-    }
-}
-
-void scr_printChar(char c) {
+void printChar(char c) {
     if (c == '\n') {
-        scr_printNewline();
+        printNewline();
         return;
     }
 
     if (c == '\b') { // Pensado solo para shell
-        if (penX < CHAR_WIDTH && penY > 0) { 
-            penY -= CHAR_HEIGHT;
-            penX = scr_getWidth() - CHAR_WIDTH;
+        if (_X < CHAR_WIDTH && _Y > 0) { 
+            _Y -= CHAR_HEIGHT;
+            _X = _screenData->width - CHAR_WIDTH;
         } else {
-            penX -= CHAR_WIDTH;
+            _X -= CHAR_WIDTH;
         }
-        scr_drawRect(penX, penY, CHAR_WIDTH, CHAR_HEIGHT, (Color){0, 0, 0});
+        drawRect(_X, _Y, CHAR_WIDTH, CHAR_HEIGHT, (Color){0, 0, 0});
         return;
     }
 
     if (c >= FIRST_CHAR && c <= LAST_CHAR) {
 	    const char* data = font + 32*(c-33);
 	    for (int h=0; h<16; h++) {
-    		Color* pos = (Color*)getPtrToPixel(penX, penY+h);
-    		if (*data & 0b00000001) pos[0] = penColor;
-    		if (*data & 0b00000010) pos[1] = penColor;
-    		if (*data & 0b00000100) pos[2] = penColor;
-    		if (*data & 0b00001000) pos[3] = penColor;
-    		if (*data & 0b00010000) pos[4] = penColor;
-    		if (*data & 0b00100000) pos[5] = penColor;
-    		if (*data & 0b01000000) pos[6] = penColor;
-    		if (*data & 0b10000000) pos[7] = penColor;
-    		data++;
-    		if (*data & 0b00000001) pos[8] = penColor;
-    		data++;
+    		//Color* ptr = (Color*)getPtrToPixel(_X, _Y + h);
+            uint8_t mask = 1;
+            for (uint8_t i = 0; i < CHAR_WIDTH; i++)
+            {
+                if (*data & mask) {
+                    drawRect(_X + i, _Y + h , 1, 1, _fontColor);
+                    //ptr[i] = _fontColor;
+                }
+                
+                if (mask & 0b10000000) {
+                    mask = 0b00000001;
+                    data++;
+                } else {
+                    mask <<= 1;
+                }
+            }
+            data++;
     	}
     }
 
-    penX += CHAR_WIDTH;
-    if (penX > screenData->width - CHAR_WIDTH)
-        scr_printNewline();
+    _X += CHAR_WIDTH;
+    if (_X > _screenData->width - CHAR_WIDTH)
+        printNewline();
 }
 
-uint32_t scr_print(const char* s) {
-    for (; *s != 0; s++)
-		scr_printChar(*s);
-    return penX | ((uint32_t)penY << 16);
+void print(const char* s) {
+    while (*s)
+        printChar(*s++);
 }
 
-uint32_t scr_println(const char* s) {
-    scr_print(s);
-    scr_printNewline();
-    return penX | ((uint32_t)penY << 16);
+void println(const char* s) {
+    print(s);
+    printNewline();
 }

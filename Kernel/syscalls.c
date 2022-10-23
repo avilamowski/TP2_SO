@@ -46,13 +46,13 @@ uint64_t syscall_1(uint32_t fd, const char *buff , uint64_t count){
         color = (Color){255, 0, 0};
         break;
     }
-    scr_setPenColor(color);
-    scr_print(buff);
+    setFontColor(color);
+    print(buff);
     return count;
 }
 
 void syscall_2(){
-    scr_clear();
+    videoClear();
 }
 
 uint32_t syscall_3(){

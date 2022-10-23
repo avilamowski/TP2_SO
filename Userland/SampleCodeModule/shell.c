@@ -42,7 +42,7 @@ void init() {
 void run_shell() {
     init();
     int index;
-    puts("Welcome to Cactiland OS\r\n");
+    puts("Welcome to Cactiland OS!\r\n");
     while(1){
         putchar('>');
         char command[100];
