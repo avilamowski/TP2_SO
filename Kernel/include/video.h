@@ -2,15 +2,7 @@
 #define _VIDEO_H_
 
 #include <stdint.h>
-
-#define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
-#define ERROR_COLOR {0x00, 0x00, 0xFF}
-
-typedef struct {
-	uint8_t b;
-	uint8_t g;
-	uint8_t r;
-} Color;
+#include <color.h>
 
 typedef enum {FONT_12 = 0, FONT_24} fontSize;
 
@@ -47,4 +39,6 @@ Returns the new pen position as a 32 bit number, where the 16 lowest bits are th
 void println(const char* s);
 
 int printf(char * fmt, ...);
+
+uint32_t getScreenResolution();
 #endif

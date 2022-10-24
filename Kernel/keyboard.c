@@ -14,12 +14,12 @@ static const char charHexMap[256] =
         'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',  '\'',  0,  0,  '\\', 'z',  'x', 'c', 'v',
         'b',  'n',  'm',  ',',  '.',  '/',  0,  '*', 0,  ' ',  0, 0, 0,  0, 0, 0};
 
-void keyboard_handler(){
+void keyboardHandler(){
     buffer = getKeyPressed();
 }
 
 char getScancode() {
-    int ticks = ticks_elapsed();
+    int ticks = ticksElapsed();
     if ((buffer == (buffer&0x7F) && (ticks - lastTicks > DELTA || (oldCharBuffer&0x7F) != (buffer&0x7F)))) { // La tecla esta siendo presionada
         oldCharBuffer = buffer;
         lastTicks = ticks;

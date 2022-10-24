@@ -1,6 +1,6 @@
 /* sampleCodeModule.c */
 #include <stdint.h>
-#include <unistd.h>
+#include <syscalls.h>
 #include <stdio.h>
 #include <shell.h>
 

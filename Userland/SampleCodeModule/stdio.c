@@ -1,4 +1,4 @@
-#include <unistd.h>
+#include <syscalls.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -18,7 +18,15 @@ int puts(const char * s) {
 
 int getchar() {
     char c;
-    c = read(STDIN);
+    c = read(STDIN); // TODO: Ver cuestiones de buffer
+    if(c != 0)
+        putchar(c);
+    return c;
+}
+
+char getScanCode() {
+    char c;
+    c = read(KBDIN);
     if(c != 0)
         putchar(c);
     return c;

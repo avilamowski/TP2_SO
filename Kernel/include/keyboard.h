@@ -1,6 +1,6 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
-void keyboard_handler();
+void keyboardHandler();
 char getAscii();
 char getScancode();
 #endif

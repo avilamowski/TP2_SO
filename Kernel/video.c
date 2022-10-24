@@ -225,3 +225,7 @@ int printf(char * fmt, ...) {
     va_end(v);
     return 1;
 }
+
+uint32_t getScreenResolution(){
+    return _screenData->width | _screenData->height << 16;
+}

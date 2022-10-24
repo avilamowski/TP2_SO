@@ -4,6 +4,7 @@
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
+#define KBDIN 3
 
 int putchar(int c);
 int puts(const char * s);
