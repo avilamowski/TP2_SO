@@ -25,11 +25,7 @@ int getchar() {
 }
 
 char getScanCode() {
-    char c;
-    c = read(KBDIN);
-    if(c != 0)
-        putchar(c);
-    return c;
+    return read(KBDIN);
 }
 
 int printf(char * fmt, ...) {
