@@ -80,6 +80,7 @@ int scanf(char * fmt, ...) {
     char * fmtPtr = fmt;
     char * end;
     bIdx = 0;
+    int qtyParams = 0;
     while (*fmtPtr && buffer[bIdx]) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
@@ -99,6 +100,7 @@ int scanf(char * fmt, ...) {
                     break;
             }
             bIdx += end - &buffer[bIdx];
+            qtyParams++;
         } else if (*fmtPtr == buffer[bIdx]) {
            bIdx++; 
         } else {
@@ -108,5 +110,5 @@ int scanf(char * fmt, ...) {
 
     }
     va_end(v);
-    return 1;
+    return qtyParams;
 }

@@ -38,18 +38,14 @@ void init() {
     commands[1] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &infoReg, NO_PARAMS};
     commands[2] = (Command){"time", "Despliega la hora actual", &time, NO_PARAMS};
     commands[3] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
-    commands[4] = (Command){ "???", "que es esto!", 0, NO_PARAMS};
+    commands[4] = (Command){ "opcode", "que es esto!", 0, NO_PARAMS};
     commands[5] = (Command){ "tron", "el tron", &tron, NO_PARAMS};
-    commands[6] = (Command){ "font-size", "hola", &fontSize, SINGLE_PARAM};
+    commands[6] = (Command){ "font-size", "Cambio de tamanio de la fuente. Para hacerlo escribir el comando seguido de un numero", &fontSize, SINGLE_PARAM};
     commands[7] = (Command){ "printmem", "hola", &printMem, SINGLE_PARAM};
-    commands[8] = (Command){ "clear", "hola", &clear, NO_PARAMS};
+    commands[8] = (Command){ "clear", "Limpia toda la pantalla", &clear, NO_PARAMS};
 }
 
 void run_shell() {
-    char hola[32];
-    printf("%x", hola);
-    for (int i = 0; i < 32; i++)
-        hola[i] = i;
     init();
     int index;
     puts("Welcome to Cactiland OS!\r\n");
@@ -62,6 +58,11 @@ void run_shell() {
         index = getCommandIndex(command);
         if (index == -1) {
             puts("Comando invalido!\n");
+            continue;
+        }
+        int funcParams = commands[index].ftype;
+        if(qtyParams - 1 != funcParams){
+            puts("La cantidad de parametros ingresada es invalida\n");
             continue;
         }
         switch (commands[index].ftype)
