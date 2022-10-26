@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdint.h>
 
 #define MAX_CHARS 256
-
+#define CURSOR_FREQ 10
 int putchar(int c) {
     write(STDOUT, &c, 1);
     return 1;
@@ -19,8 +20,6 @@ int puts(const char * s) {
 int getchar() {
     char c;
     c = read(STDIN); // TODO: Ver cuestiones de buffer
-    if(c != 0)
-        putchar(c);
     return c;
 }
 
@@ -31,7 +30,6 @@ char getScanCode() {
 int printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
-
     char * buffer[256] = {0};
     char * fmtPtr = fmt;
     char * end;
@@ -64,24 +62,48 @@ int printf(char * fmt, ...) {
 int scanf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
-    //TODO implementar el buffer de teclado
     char c;
+    int ticks = getTicks();
+    int cursorTicks = 0;
+    char cursorDrawn = 0;
     char buffer[MAX_CHARS];
-    int bIdx = 0;
-    while((c = getchar()) != '\n'){
-        if (c != 0) {
-            if (c != '\b')
-                buffer[bIdx++] = c;
+    uint64_t bIdx = 0;
+    while((c = getchar()) != '\n' & bIdx < MAX_CHARS){
+        cursorTicks = getTicks() - ticks;
+         if(cursorTicks > CURSOR_FREQ){
+            ticks = getTicks();
+            cursorTicks = 0;
+            if(cursorDrawn)
+                putchar('\b');
             else
+                putchar('_');
+            cursorDrawn = !cursorDrawn;
+        }
+        if (c != 0) {
+            if(cursorDrawn){
+                putchar('\b');
+                cursorDrawn = !cursorDrawn;
+            }
+            if (c != '\b'){
+                buffer[bIdx++] = c;
+                putchar(c);
+            }
+            else if(bIdx>0){
                 bIdx--;
+                putchar(c);
+            }
         }
     }
+    if(cursorDrawn)
+        putchar('\b');
+    putchar('\n');
     buffer[bIdx] = 0;
     char * fmtPtr = fmt;
     char * end;
     bIdx = 0;
+
     int qtyParams = 0;
-    while (*fmtPtr && buffer[bIdx]) {
+    while (*fmtPtr && buffer[bIdx] && bIdx < MAX_CHARS) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
             switch (*fmtPtr) {

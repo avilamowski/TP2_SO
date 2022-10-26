@@ -6,6 +6,5 @@
 #include <tron.h>
 int main() {
 	run_shell();
-	//startTron();
 	return 0xDEADBEEF;
 }
