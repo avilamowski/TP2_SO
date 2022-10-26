@@ -18,6 +18,8 @@ void syscall_fontsize(uint8_t size);
 uint32_t syscall_resolution();
 void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
 uint64_t syscall_getticks();
+void syscall_getmemory(uint64_t pos, uint8_t * vec);
+
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5) {
 	switch (nr) {
@@ -42,6 +44,9 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
             break;
         case 8:
             return syscall_getticks();
+        case 9:
+            syscall_getmemory((uint64_t) arg0, (uint8_t *) arg1);
+            break;
 	}
 	return 0;
 }
@@ -108,4 +113,9 @@ void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, u
 
 uint64_t syscall_getticks(){
     return ticksElapsed();
+}
+
+//PrintMem
+void syscall_getmemory(uint64_t pos, uint8_t * vec){
+    memcpy(vec, (uint8_t *) pos, 32);
 }

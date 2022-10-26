@@ -7,6 +7,7 @@ GLOBAL setFontSize
 GLOBAL getScreenResolution
 GLOBAL drawRect
 GLOBAL getTicks
+GLOBAL getMemory
 
 read:
     mov rax, 0
@@ -51,5 +52,10 @@ drawRect:
 
 getTicks:
     mov rax, 8
+    int 80h
+    ret
+
+getMemory:
+    mov rax, 9
     int 80h
     ret

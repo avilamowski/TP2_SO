@@ -8,6 +8,8 @@
 
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
 #define QTY_COMMANDS 9
+#define QTY_BYTES 32
+
 typedef struct Command {
     char * name;
     char * description;
@@ -25,6 +27,7 @@ static void time();
 static void infoReg();
 static void fontSize(uint8_t size);
 static void tron();
+static void printMem(uint64_t pos);
 
 static int getCommandIndex(char * command);
 
@@ -38,7 +41,7 @@ void init() {
     commands[4] = (Command){ "???", "que es esto!", 0, NO_PARAMS};
     commands[5] = (Command){ "tron", "el tron", &tron, NO_PARAMS};
     commands[6] = (Command){ "font-size", "hola", &fontSize, SINGLE_PARAM};
-    commands[7] = (Command){ "printmem", "hola", 0, SINGLE_PARAM};
+    commands[7] = (Command){ "printmem", "hola", &printMem, SINGLE_PARAM};
     commands[8] = (Command){ "clear", "hola", &clear, NO_PARAMS};
 }
 
@@ -109,4 +112,12 @@ static void fontSize(uint8_t size) {
 
 static void tron(){
     startTron();
+}
+
+static void printMem(uint64_t pos){
+    uint8_t resp[32];
+    getMemory(pos, resp);
+    for(int i = 0; i < QTY_BYTES; i++){
+        printf("Byte numero %d: %d\n", i, resp[i]);
+    }
 }
