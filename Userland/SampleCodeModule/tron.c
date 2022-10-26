@@ -37,7 +37,7 @@ static void loop();
 static int checkCollision(Player * p);
 static int update(Player * p);
 static void initializeField();
-static void setDirections(Player * p, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo);
+static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo);
 static void draw(Player * p, int * collided);
 
 Player _p1, _p2;
@@ -65,8 +65,9 @@ void startTron() {
     uint64_t nextTicks;
     while (_playing) {
         nextTicks = getTicks();
-        setDirections(&_p1, KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z);
-        setDirections(&_p2, KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_SLASH);
+        uint8_t key = getScanCode();
+        setDirections(&_p1, key, KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z);
+        setDirections(&_p2, key, KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_SLASH);
         if (nextTicks - ticks > DELTA_TICK) {
             ticks = nextTicks;
             loop(_field);
@@ -93,8 +94,7 @@ static void initializeField() {
 
 }
 
-static void setDirections(Player * p, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo) {
-    uint8_t key = getScanCode();
+static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo) {
     uint64_t ticks = getTicks();
     if (key == up && p->vy == 0) {
         p->vx = 0;     
