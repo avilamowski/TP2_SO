@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #define isNumber(n) ((n) >= '0' && (n) <= '9')
-#define isHex(n) ((n) >= 'A' && (n) <= 'F')
+#define isHex(n) ((n) >= 'a' && (n) <= 'f')
 
 static unsigned int log(int n, int base) {
     unsigned int count = 1;
@@ -35,7 +35,7 @@ char* itoa(int n, char* buffer, int base)
     while (n != 0)
     {
         int r = n % base;
-        buffer[len - i++ - 1] = (r > 9)? (r-10) + 'A' : r + '0';
+        buffer[len - i++ - 1] = (r > 9)? (r-10) + 'a' : r + '0';
         n /= base;
     }
     buffer[i] = '\0'; // Append string terminator
@@ -62,7 +62,7 @@ int strtoi(char* s, char ** end) {
 int strtoh(char* s, char ** end) {
     int num = 0;
     while (isNumber(*s) || isHex(*s)) {
-        num = num * 16 + isNumber(*s)*(*s - '0') + isHex(*s)*(*s - 'A' + 10);
+        num = num * 16 + isNumber(*s)*(*s - '0') + isHex(*s)*(*s - 'a' + 10);
         s++;
     }
     *end = s; 

@@ -15,19 +15,19 @@ typedef struct Command {
     char * description;
     union {
        int (*f)(void);
-       int (*g)(int);
-       int (*h)(int, int);
+       int (*g)(char *);
+       int (*h)(char *, char *);
     };
     functionType ftype;
 } Command;
 
 static void help();
-static int div(int num, int div);
+static int div(char * num, char * div);
 static void time();
 static void infoReg();
-static void fontSize(uint8_t size);
+static void fontSize(char * size);
 static void tron();
-static void printMem(uint64_t pos);
+static void printMem(char * pos);
 
 static int getCommandIndex(char * command);
 
@@ -46,14 +46,19 @@ void init() {
 }
 
 void run_shell() {
+    char hola[32];
+    printf("%x", hola);
+    for (int i = 0; i < 32; i++)
+        hola[i] = i;
     init();
     int index;
     puts("Welcome to Cactiland OS!\r\n");
     while(1){
         putchar('>');
         char command[100];
-        int arg1, arg2;
-        int qtyParams = scanf("%s %d %d", command, &arg1, &arg2); // TODO: Validar
+        char arg1[100];
+        char arg2[100];
+        int qtyParams = scanf("%s %s %s", command, arg1, arg2); // TODO: Validar
         index = getCommandIndex(command);
         if (index == -1) {
             puts("Comando invalido!\n");
@@ -88,8 +93,8 @@ static void help() {
         printf("%s: %s\r\n", commands[i].name, commands[i].description);
 }
 
-static int div(int num, int div) {
-    printf("%d/%d=%d\r\n", num, div, num/div);
+static int div(char * num, char * div) {
+    printf("%s/%s=%d\r\n", num, div, atoi(num)/atoi(div));
     return 1;
 }
 
@@ -106,18 +111,18 @@ static void infoReg() {
         printf("%s: %d\n", reg_names[i], regs[i]);
 }
 
-static void fontSize(uint8_t size) {
-    setFontSize(size);
+static void fontSize(char * size) {
+    setFontSize((uint8_t)atoi(size));
 }
 
 static void tron(){
     startTron();
 }
 
-static void printMem(uint64_t pos){
-    uint8_t resp[32];
-    getMemory(pos, resp);
-    for(int i = 0; i < QTY_BYTES; i++){
+static void printMem(char * pos){
+    uint8_t resp[QTY_BYTES];
+    char * end[1];
+    getMemory(strtoh(pos, &end), resp);
+    for(int i = 0; i < QTY_BYTES; i++)
         printf("Byte numero %d: %d\n", i, resp[i]);
-    }
 }
