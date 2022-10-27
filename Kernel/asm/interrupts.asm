@@ -59,23 +59,6 @@ SECTION .text
 	pop rax
 %endmacro
 
-%macro pushStateRet 0
-	push rbx
-	push rcx
-	push rdx
-	push rbp
-	push rdi
-	push rsi
-	push r8
-	push r9
-	push r10
-	push r11
-	push r12
-	push r13
-	push r14
-	push r15
-%endmacro
-
 %macro popStateRet 0
 	pop r15
 	pop r14
@@ -113,9 +96,9 @@ SECTION .text
 	pushState ; Se cargan 15 registros en stack
 
 	mov rsi, rsp
-	add rsi, 15*8 ; Dir de retorno 
+	add rsi, 15*8 ; RIP 
 	mov rdx, rsp
-	add rdx, 18*8 ; Dir de stack
+	add rdx, 18*8 ; RSP 
 
 	mov rdi, %1 ; pasaje de parametro
 	call exceptionDispatcher
@@ -181,7 +164,7 @@ _irq05Handler:
 
 ;Syscall
 _syscallHandler:
-	pushStateRet
+	pushState
 	mov rbp, rsp
 
 	push r9
@@ -192,15 +175,15 @@ _syscallHandler:
 	mov rsi, rdi
 	mov rdi, rax
 	call syscallDispatcher
-	mov rdi, rax
-	
+	mov [aux], rax
+
 	; signal pic EOI (End of Interrupt)
 	mov al, 20h
 	out 20h, al
 
-	mov rax, rdi
 	mov rsp, rbp
-	popStateRet
+	popState
+	mov rax, [aux]
 	iretq
 
 ;Zero Division Exception

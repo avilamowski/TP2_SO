@@ -9,16 +9,18 @@
 #define STDERR 2
 #define KBDIN 3
 
+#define QTY_REGS 15
+
 static uint8_t syscall_read(uint32_t fd);
 static uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count);
 static void syscall_clear();
 static uint32_t syscall_seconds();
-uint64_t * syscall_registerarray();
-void syscall_fontsize(uint8_t size);
-uint32_t syscall_resolution();
-void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
-uint64_t syscall_getticks();
-void syscall_getmemory(uint64_t pos, uint8_t * vec);
+static uint64_t * syscall_registerarray(uint64_t * regarr, uint64_t * statePtr);
+static void syscall_fontsize(uint8_t size);
+static uint32_t syscall_resolution();
+static void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
+static uint64_t syscall_getticks();
+static void syscall_getmemory(uint64_t pos, uint8_t * vec);
 
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5) {
@@ -33,7 +35,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
         case 3:
             return syscall_seconds();
         case 4:
-            return syscall_registerarray();
+            return syscall_registerarray((uint64_t *) arg0, (&arg5) + 1);
         case 5:
             syscall_fontsize((uint8_t)arg0);
             break;
@@ -58,7 +60,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
 }
 
 // Read char
-uint8_t syscall_read(uint32_t fd){
+static uint8_t syscall_read(uint32_t fd){
     switch (fd){
         case STDIN:
             return getAscii();
@@ -69,7 +71,7 @@ uint8_t syscall_read(uint32_t fd){
 }
 
 // Write
-uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count){
+static uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count){
     Color color;
     switch (fd)
     {
@@ -86,42 +88,44 @@ uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count){
 }
 
 // Clear
-void syscall_clear(){
+static void syscall_clear(){
     videoClear();
 }
 
 // GetSeconds
-uint32_t syscall_seconds(){
+static uint32_t syscall_seconds(){
     char h, m, s;
     getTime(&h, &m, &s);
     return s + m * 60 + ((h - 3) % 24) * 3600;
 }
 
 // Inforeg
-uint64_t * syscall_registerarray() {
-    return getRegisterArray();
+static uint64_t * syscall_registerarray(uint64_t * regarr, uint64_t * statePtr){
+    for(int i = 0; i < QTY_REGS; i++)
+        regarr[i] = statePtr[QTY_REGS-1-i];
+    return regarr;
 }
 
 // FontSize
-void syscall_fontsize(uint8_t size){
+static void syscall_fontsize(uint8_t size){
     if (size - 1 >= FONT_12 && size - 1 <= FONT_24)
         setFontSize(size - 1);
 }
 
-uint32_t syscall_resolution(){
+static uint32_t syscall_resolution(){
     return getScreenResolution();
 }
 
-void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color){
+static void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color){
     ColorInt myColor = { bits: color };
     drawRect(x, y, width, height, myColor.color);
 }
 
-uint64_t syscall_getticks(){
+static uint64_t syscall_getticks(){
     return ticksElapsed();
 }
 
 //PrintMem
-void syscall_getmemory(uint64_t pos, uint8_t * vec){
+static void syscall_getmemory(uint64_t pos, uint8_t * vec){
     memcpy(vec, (uint8_t *) pos, 32);
 }

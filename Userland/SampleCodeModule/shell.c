@@ -110,11 +110,12 @@ static void time(){
     printf("%d:%d:%d\r\n", h, m, s);
 }
 
-static char * reg_names[] = {"RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "RBP", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"};
+static char * reg_names[] = {"RAX", "RBX", "RCX", "RDX", "RBP", "RDI", "RSI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"};
 static void infoReg() {
-    uint64_t * regs = getInfoReg();
+    uint64_t regarr[sizeof(reg_names)/sizeof(char *)];
+    getInfoReg(regarr);
     for (int i = 0; i < sizeof(reg_names)/sizeof(char *); i++)
-        printf("%s: %d\n", reg_names[i], regs[i]);
+        printf("%s: %x\n", reg_names[i], regarr[i]);
 }
 
 static void fontSize(char * size) {

@@ -71,28 +71,6 @@ getKeyPressed:
     pop rbp
     ret
 
-
-getRegisterArray:
-    ; TODO: Ver que falta
-    mov [regarr], rax
-    mov [regarr+8], rbx
-    mov [regarr+8*2], rcx
-    mov [regarr+8*3], rdx
-    mov [regarr+8*4], rsi
-    mov [regarr+8*5], rdi
-    mov [regarr+8*6], rbp
-    mov [regarr+8*7], r8
-    mov [regarr+8*8], r9
-    mov [regarr+8*9], r10
-    mov [regarr+8*10], r11
-    mov [regarr+8*11], r12
-    mov [regarr+8*12], r13
-    mov [regarr+8*13], r14
-    mov [regarr+8*14], r15
-
-    mov rax, regarr
-    ret
-
 int_80:
     push rbp
     mov rbp, rsp
@@ -134,6 +112,3 @@ stopSound:
 	and al, 0xFC
 	out 61h, al
   	ret
-
-section .data
-regarr: resq 18
