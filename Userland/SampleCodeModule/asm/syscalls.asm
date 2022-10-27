@@ -8,6 +8,8 @@ GLOBAL getScreenResolution
 GLOBAL drawRect
 GLOBAL getTicks
 GLOBAL getMemory
+GLOBAL playSound
+GLOBAL stopSound
 
 read:
     mov rax, 0
@@ -57,5 +59,15 @@ getTicks:
 
 getMemory:
     mov rax, 9
+    int 80h
+    ret
+
+playSound:
+    mov rax, 10
+    int 80h
+    ret
+
+stopSound:
+    mov rax, 11
     int 80h
     ret

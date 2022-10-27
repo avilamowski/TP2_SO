@@ -14,5 +14,6 @@ uint32_t getScreenResolution();
 void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color color);
 uint64_t getTicks();
 void getMemory(uint64_t pos, uint8_t * vec);
-
+void playSound(uint64_t frequency);
+void stopSound();
 #endif

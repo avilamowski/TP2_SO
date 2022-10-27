@@ -80,6 +80,9 @@ int scanf(char * fmt, ...) {
             cursorDrawn = !cursorDrawn;
         }
         if (c != 0) {
+            //playSound(66);
+            //for(int i=0; i<10000000; i++);
+            //stopSound();
             if(cursorDrawn){
                 putchar('\b');
                 cursorDrawn = !cursorDrawn;
@@ -126,7 +129,7 @@ int scanf(char * fmt, ...) {
         } else if (*fmtPtr == buffer[bIdx]) {
            bIdx++; 
         } else {
-            puts("Error!!!"); // TODO: Cambiar 
+            puts("Error!!!"); 
         }
         fmtPtr++;
 

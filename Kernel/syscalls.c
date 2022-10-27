@@ -47,6 +47,12 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
         case 9:
             syscall_getmemory((uint64_t) arg0, (uint8_t *) arg1);
             break;
+        case 10:
+            playSound(arg0);
+            break;
+        case 11:
+            stopSound();
+            break;
 	}
 	return 0;
 }
