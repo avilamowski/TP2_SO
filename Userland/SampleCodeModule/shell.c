@@ -7,7 +7,7 @@
 #include <tron.h>
 
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
-#define QTY_COMMANDS 9
+#define QTY_COMMANDS 10
 #define QTY_BYTES 32
 
 typedef struct Command {
@@ -28,6 +28,7 @@ static void infoReg();
 static void fontSize(char * size);
 static void tron();
 static void printMem(char * pos);
+static void snake();
 
 static int getCommandIndex(char * command);
 
@@ -43,6 +44,7 @@ void init() {
     commands[6] = (Command){ "font-size", "Cambio de tamanio de la fuente. Para hacerlo escribir el comando seguido de un numero", &fontSize, SINGLE_PARAM};
     commands[7] = (Command){ "printmem", "hola", &printMem, SINGLE_PARAM};
     commands[8] = (Command){ "clear", "Limpia toda la pantalla", &clear, NO_PARAMS};
+    commands[9] = (Command){ "snake", "el snake", &snake, NO_PARAMS};
 }
 
 void run_shell() {
@@ -63,6 +65,7 @@ void run_shell() {
         int funcParams = commands[index].ftype;
         if(qtyParams - 1 != funcParams){
             puts("La cantidad de parametros ingresada es invalida\n");
+            puts("Uso: ... \n"); // TODO: Uso
             continue;
         }
         switch (commands[index].ftype)
@@ -117,8 +120,17 @@ static void fontSize(char * size) {
 }
 
 static void tron(){
-    startTron();
+    setFontSize(2);
+    startTron(2);
+    setFontSize(1);
 }
+
+static void snake(){
+    setFontSize(2);
+    startTron(1);
+    setFontSize(1);
+}
+
 
 static void printMem(char * pos){
     uint8_t resp[QTY_BYTES];

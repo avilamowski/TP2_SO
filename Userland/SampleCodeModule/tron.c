@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <color.h>
 
+#define ESC 0x01
 #define SPACEBAR 0x39
 #define KEY_W 0x11
 #define KEY_A 0x1E
@@ -18,9 +19,9 @@
 
 #define PLAYER_SIZE 10
 #define DELTA_TICK 1
-#define SPEED 5
-#define TURBO_TICKS 5
-#define TURBO_COOLDOWN 10
+#define SPEED 8
+#define TURBO_TICKS 2
+#define TURBO_COOLDOWN 20 
 
 #define FIELD_WIDTH (1024/PLAYER_SIZE) 
 #define FIELD_HEIGHT (768/PLAYER_SIZE)
@@ -39,59 +40,90 @@ static int update(Player * p);
 static void initializeField();
 static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo);
 static void draw(Player * p, int * collided);
+static void loopzen();
+static void debug();
 
 Player _p1, _p2;
 uint8_t _playing;
+uint8_t _qtyPlayers;
 //uint16_t _width, _height;
 uint8_t _field[FIELD_WIDTH_POSITIONS][FIELD_HEIGHT]; // Optimizacion de espacio en bits
 
-void startTron() {
+void startTron(int qtyPlayers) {
     //uint32_t res = getScreenResolution();
     //_width = res & 0x0000FFFF;
     //_height = res >> 16; 
-
-    initializeField();
-    clear();
-    puts("Bienvenido a tron\n");
-    puts("Instrucciones: bla bla bla\n");
-    puts("Presione espacio para comenzar\n");
-    while (getScanCode() != SPACEBAR)
-        ;
-    _playing = 1;
-    uint64_t initialTicks = getTicks();
-    _p1 = (Player){ FIELD_WIDTH_POSITIONS * 8 * 0.25, FIELD_HEIGHT/2, 1,  0, (Color){255,153,184}, (Color){255,0,184}, 0};
-    _p2 = (Player){ FIELD_WIDTH_POSITIONS * 8 * 0.75, FIELD_HEIGHT/2, -1, 0, (Color){100,255,100}, (Color){100,150,100}, 0};
-    uint64_t ticks = getTicks();
-    uint64_t nextTicks;
-    while (_playing) {
-        nextTicks = getTicks();
-        uint8_t key = getScanCode();
-        setDirections(&_p1, key, KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z);
-        setDirections(&_p2, key, KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_SLASH);
-        if (nextTicks - ticks > DELTA_TICK) {
-            ticks = nextTicks;
-            loop(_field);
-        }
+    if (qtyPlayers < 1 || qtyPlayers > 2) {
+        puts("Actualmente el juego solo soporta el modo individual o el de 2 jugadores, vuelva pronto!\n");
+        return;
     }
-    //clear();
-    puts("Fin del Juego hm?!!!!\n");
+
+    _qtyPlayers = qtyPlayers;
+    char userInput = 'N';
+    clear();
+    printf("Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Snake");
+    do {
+        puts("Instrucciones: bla bla bla\n");
+        puts("Presione espacio para comenzar, y ESC para salir en el juego\n");
+        initializeField();
+        while (getScanCode() != SPACEBAR)
+            ;
+        clear();
+        _playing = 1;
+        uint64_t initialTicks = getTicks();
+        _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.25, FIELD_HEIGHT / 2, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0};
+        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.75, FIELD_HEIGHT / 2, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0};
+        uint64_t ticks = getTicks();
+        uint64_t nextTicks;
+        while (_playing)
+        {
+            nextTicks = getTicks();
+            uint8_t key = getScanCode();
+            if (key == ESC)
+            {
+                puts("Fin del juego\n");
+                return;
+            }
+            setDirections(&_p1, key, KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z);
+            setDirections((qtyPlayers == 2) ? &_p2 : &_p1, key, KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_SLASH);
+            if (nextTicks - ticks > DELTA_TICK)
+            {
+                ticks = nextTicks;
+                if (qtyPlayers == 2)
+                    loop(_field);
+                else
+                    loopzen(_field);
+            }
+
+        }
+        puts("Fin del Juego hm?!!!!\n");
+        printf("Desea volver a jugar? (S para confirmar, otro para terminar)");
+        scanf("%c", &userInput);
+        clear();
+    } while (userInput == 's' || userInput == 'S');
+}
+
+static void debug() {
+    for (int i = 0; i < FIELD_WIDTH; i++)
+        for (int j = 0; j < FIELD_HEIGHT; j++)
+            if (_field[i / 8][j] & (1 << (i % 8)))
+                drawRect(i * PLAYER_SIZE, j * PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, (Color){0, 0, 255});
 }
 
 static void initializeField() {
-    for (int i = 1; i < FIELD_WIDTH_POSITIONS - 2; i++)
-        for (int j = 1; j < FIELD_HEIGHT - 2; j++)
+    for (int i = 0; i < FIELD_WIDTH_POSITIONS; i++)
+        for (int j = 0; j < FIELD_HEIGHT; j++)
             _field[i][j] = 0x00;
     
-    for(int i = 0; i < FIELD_WIDTH_POSITIONS-1; i++){
+    for(int i = 0; i < FIELD_WIDTH_POSITIONS; i++){
         _field[i][0] = 0xFF;
         _field[i][FIELD_HEIGHT-1] = 0xFF;
     }
 
-    for(int j = 0; j < FIELD_HEIGHT-1; j++){
+    for(int j = 1; j < FIELD_HEIGHT-1; j++){
         _field[0][j] = 0x01;
         _field[FIELD_WIDTH_POSITIONS-1][j] = 0x20; // Para que quede mejor en pantalla
     }
-
 }
 
 static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo) {
@@ -108,9 +140,9 @@ static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uin
     } else if (key == right && p->vx == 0) {
         p->vx = 1;
         p->vy = 0;
-    } else if (key == turbo && getTicks() - p->lastTurbo - TURBO_TICKS >= TURBO_COOLDOWN) { // Si ya paso el cooldown y se toca se activa
+    } else if (key == turbo && ticks - p->lastTurbo - TURBO_TICKS >= TURBO_COOLDOWN) { // Si ya paso el cooldown y se toca se activa
         p->lastTurbo = ticks;
-    }
+    } 
 }
 
 static void loop() {
@@ -124,7 +156,11 @@ static void loop() {
         puts("Gano el jugador 2!\n");
     else if (col2)
         puts("Gano el jugador 1!\n");
+}
 
+static void loopzen() {
+    drawRect(_p1.x*PLAYER_SIZE, _p1.y*PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, _p1.trailColor);
+    update(&_p1);
 }
 
 static int checkCollision(Player * p){
@@ -137,7 +173,7 @@ static int checkCollision(Player * p){
 }
 
 static int update(Player * p) {
-    uint8_t ticks = getTicks();
+    uint64_t ticks = getTicks();
     uint8_t realV = 1;
     int collided = 0;
     if (ticks - p->lastTurbo <= TURBO_TICKS)
@@ -152,7 +188,7 @@ static int update(Player * p) {
 }
 
 static void draw(Player * p, int * collided) {
-    collided = checkCollision(p);
+    *collided = checkCollision(p);
     _field[p->x / 8][p->y] |= (1 << (p->x % 8));
     drawRect(p->x * PLAYER_SIZE, p->y * PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, p->color);
 }
