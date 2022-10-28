@@ -10,6 +10,7 @@ GLOBAL getTicks
 GLOBAL getMemory
 GLOBAL playSound
 GLOBAL stopSound
+GLOBAL kaboom
 
 read:
     mov rax, 0
@@ -70,4 +71,7 @@ playSound:
 stopSound:
     mov rax, 11
     int 80h
+
+kaboom:
+    UD2
     ret
