@@ -32,6 +32,7 @@ getSeconds:
     int 80h
     ret
 
+; Deprecado
 getInfoReg:
     mov rax, 4
     int 80h
@@ -71,8 +72,4 @@ playSound:
 stopSound:
     mov rax, 11
     int 80h
-    ret
-
-kaboom:
-    UD2
     ret

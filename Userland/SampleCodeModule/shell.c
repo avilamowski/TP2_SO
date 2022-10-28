@@ -6,6 +6,7 @@
 #include <syscalls.h>
 #include <tron.h>
 #include <man.h>
+#include <libasm.h>
 
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
 #define QTY_BYTES 32
@@ -38,7 +39,7 @@ static Command commands[QTY_COMMANDS];
 void init() {
     commands[0] = (Command){"help", "Listado de comandos", &help, NO_PARAMS};
     commands[1] = (Command){ "man", "Manual de uso de los comandos", &man, SINGLE_PARAM};
-    commands[2] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &infoReg, NO_PARAMS};
+    commands[2] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &usrGetInfoReg, NO_PARAMS}; 
     commands[3] = (Command){"time", "Despliega la hora actual", &time, NO_PARAMS};
     commands[4] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
     commands[5] = (Command){ "kaboom", "que es esto!", &kaboom, NO_PARAMS};
@@ -108,14 +109,6 @@ static void time(){
     uint32_t secs = getSeconds();
     int h = secs / 3600, m = secs % 3600 / 60, s = secs % 3600 % 60;
     printf("%d:%d:%d\r\n", h, m, s);
-}
-
-static char * reg_names[] = {"RAX", "RBX", "RCX", "RDX", "RBP", "RDI", "RSI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"};
-static void infoReg() {
-    uint64_t regarr[sizeof(reg_names)/sizeof(char *)];
-    getInfoReg(regarr);
-    for (int i = 0; i < sizeof(reg_names)/sizeof(char *); i++)
-        printf("%s: %x\n", reg_names[i], regarr[i]);
 }
 
 static void fontSize(char * size) {

@@ -137,3 +137,9 @@ int scanf(char * fmt, ...) {
     va_end(v);
     return qtyParams;
 }
+
+static char * _regNames[] = {"RAX", "RBX", "RCX", "RDX", "RBP", "RDI", "RSI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"};
+void printRegisters(const uint64_t * rsp) {
+    for (int i = 0; i < sizeof(_regNames)/sizeof(char *); i++)
+        printf("%s: %x\n", _regNames[i], rsp[sizeof(_regNames)/sizeof(char *)-i-1]);
+}
