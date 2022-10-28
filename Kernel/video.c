@@ -148,7 +148,6 @@ void printChar(char c) {
     }
 
     _charBuffer[_bufferIdx++] = c;
-    _charBuffer[_bufferIdx] = 0;
     if (c == '\n') {
         printNewline();
         return;

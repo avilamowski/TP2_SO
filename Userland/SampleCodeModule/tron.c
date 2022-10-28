@@ -17,7 +17,7 @@
 #define KEY_RIGHT 0x4D
 #define KEY_SLASH 0x35
 
-#define PLAYER_SIZE 10
+#define PLAYER_SIZE 16
 #define DELTA_TICK 1
 #define SPEED 8
 #define TURBO_TICKS 2
@@ -44,6 +44,7 @@ static void draw(Player * p, int * collided);
 static void loopzen();
 static void debug();
 static void correctVelocity(Player * p);
+static void endMusic();
 
 Player _p1, _p2;
 uint8_t _playing;
@@ -61,7 +62,7 @@ void startTron(int qtyPlayers) {
     }
 
     _qtyPlayers = qtyPlayers;
-    char userInput = 'N';
+    char userInput;
     clear();
     printf("Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Snake");
     do {
@@ -99,11 +100,46 @@ void startTron(int qtyPlayers) {
             }
 
         }
+        endMusic();
         puts("Fin del Juego hm?!!!!\n");
-        printf("Desea volver a jugar? (S para confirmar, otro para terminar)");
-        scanf("%c", &userInput);
+        printf("Desea volver a jugar? (espacio para confirmar, esc para salir)");
+        while ((userInput = getScanCode()) != SPACEBAR && userInput != ESC)
+            ;
         clear();
-    } while (userInput == 's' || userInput == 'S');
+    } while (userInput == SPACEBAR);
+}
+
+static void endMusic() {
+    playSound(100);
+    for (int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 10; i++)
+            ;
+    stopSound();
+    playSound(100);
+    for (int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 10; i++)
+            ;
+    stopSound();
+    playSound(130);
+    for (int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 10; i++)
+            ;
+    stopSound();
+    playSound(150);
+    for (int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 20; i++)
+            ;
+    stopSound();
+    playSound(130);
+    for (int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 10; i++)
+            ;
+    stopSound();
+    playSound(150);
+    for (int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 20; i++)
+            ;
+    stopSound();
 }
 
 static void debug() {
@@ -125,7 +161,7 @@ static void initializeField() {
 
     for(int i = 1; i < FIELD_HEIGHT-1; i++){
         _field[0][i] = 0x01;
-        _field[FIELD_WIDTH_POSITIONS-1][i] = 0x20; // Para que quede mejor en pantalla
+        _field[FIELD_WIDTH_POSITIONS-2][i] = 0x80; // Para que quede mejor en pantalla
     }
 }
 
@@ -154,7 +190,7 @@ static void loop() {
     drawRect(_p2.x*PLAYER_SIZE, _p2.y*PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, _p2.trailColor);
     int col1 = update(&_p1);
     int col2 = update(&_p2);
-    if (col1 && col2)
+    if (col1 && col2 || (_p1.x == _p2.x && _p1.y == _p2.y))
         puts("Empate!\n");
     else if (col1)
         puts("Gano el jugador 2!\n");
@@ -181,7 +217,7 @@ static void correctVelocity(Player * p) {
     if (p->oldVx == -p->vx)
         p->vx = p->oldVx;
     if (p->oldVy == -p->vy)
-        p->vx = p->oldVx;
+        p->vy = p->oldVy;
     p->oldVx = p->vx;
     p->oldVy = p->vy;
 }
