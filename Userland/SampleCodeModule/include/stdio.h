@@ -6,7 +6,9 @@
 #define STDERR 2
 #define KBDIN 3
 
-int putchar(int c);
+#define MAX_CHARS 256
+
+int putchar(char c);
 int puts(const char * s);
 int getchar();
 int scanf(char * fmt, ...);

@@ -12,7 +12,7 @@
 #define QTY_REGS 15
 
 static uint8_t syscall_read(uint32_t fd);
-static uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count);
+static void syscall_write(uint32_t fd, char c);
 static void syscall_clear();
 static uint32_t syscall_seconds();
 static uint64_t * syscall_registerarray(uint64_t * regarr, uint64_t * statePtr);
@@ -28,7 +28,8 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
         case 0:
             return syscall_read((uint32_t)arg0);
 		case 1:
-			return syscall_write((uint32_t)arg0, (char *)arg1, (uint64_t)arg2);
+			syscall_write((uint32_t)arg0, (char)arg1);
+            break;
         case 2:
             syscall_clear();
             break;
@@ -71,7 +72,7 @@ static uint8_t syscall_read(uint32_t fd){
 }
 
 // Write
-static uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count){
+static void syscall_write(uint32_t fd, char c){
     Color color;
     switch (fd)
     {
@@ -83,8 +84,7 @@ static uint64_t syscall_write(uint32_t fd, const char *buff , uint64_t count){
         break;
     }
     setFontColor(color);
-    print(buff);
-    return count;
+    printChar(c);
 }
 
 // Clear

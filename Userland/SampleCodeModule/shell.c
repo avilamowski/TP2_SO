@@ -10,7 +10,7 @@
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
 #define QTY_BYTES 32
 
-typedef struct Command {
+typedef struct {
     char * name;
     char * description;
     union {
@@ -52,12 +52,12 @@ void init() {
 void run_shell() {
     init();
     int index;
-    puts("Welcome to Cactiland OS!\r\n");
+    puts("Bienvenido a Cactiland OS!\n");
     while(1){
         putchar('>');
-        char command[100];
-        char arg1[100];
-        char arg2[100];
+        char command[MAX_CHARS];
+        char arg1[MAX_CHARS];
+        char arg2[MAX_CHARS];
         int qtyParams = scanf("%s %s %s", command, arg1, arg2); // TODO: Validar
         index = getCommandIndex(command);
         if (index == -1) {

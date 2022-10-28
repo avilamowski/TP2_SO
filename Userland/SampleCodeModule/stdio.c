@@ -5,15 +5,14 @@
 #include <string.h>
 #include <stdint.h>
 
-#define MAX_CHARS 256
 #define CURSOR_FREQ 10
-int putchar(int c) {
-    write(STDOUT, &c, 1);
+int putchar(char c) {
+    write(STDOUT, c);
     return 1;
 }
 
 int puts(const char * s) {
-    while (*s) putchar(*(s++)); 
+    while (*s) putchar(*s++); 
     return 1;
 }
 
@@ -30,7 +29,7 @@ char getScanCode() {
 int printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
-    char * buffer[256] = {0};
+    char * buffer[MAX_CHARS] = {0};
     char * fmtPtr = fmt;
     char * end;
     while (*fmtPtr) {
@@ -68,7 +67,7 @@ int scanf(char * fmt, ...) {
     char cursorDrawn = 0;
     char buffer[MAX_CHARS];
     uint64_t bIdx = 0;
-    while((c = getchar()) != '\n' & bIdx < MAX_CHARS){
+    while((c = getchar()) != '\n' && bIdx < MAX_CHARS-1){
         cursorTicks = getTicks() - ticks;
          if(cursorTicks > CURSOR_FREQ){
             ticks = getTicks();
@@ -80,9 +79,6 @@ int scanf(char * fmt, ...) {
             cursorDrawn = !cursorDrawn;
         }
         if (c != 0) {
-            //playSound(66);
-            //for(int i=0; i<10000000; i++);
-            //stopSound();
             if(cursorDrawn){
                 putchar('\b');
                 cursorDrawn = !cursorDrawn;
@@ -94,6 +90,10 @@ int scanf(char * fmt, ...) {
             else if(bIdx>0){
                 bIdx--;
                 putchar(c);
+            } else {
+                playSound(66);
+                for(int i=0; i<10000000; i++); // TODO: Cambiar por un sleep o similar
+                stopSound();
             }
         }
     }
@@ -132,8 +132,8 @@ int scanf(char * fmt, ...) {
             puts("Error!!!"); 
         }
         fmtPtr++;
-
     }
+    buffer[bIdx-1] = 0;
     va_end(v);
     return qtyParams;
 }

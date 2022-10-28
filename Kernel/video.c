@@ -148,6 +148,7 @@ void printChar(char c) {
     }
 
     _charBuffer[_bufferIdx++] = c;
+    _charBuffer[_bufferIdx] = 0;
     if (c == '\n') {
         printNewline();
         return;
@@ -184,13 +185,10 @@ void print(const char* s) {
 }
 
 void printN(const char* s, uint32_t n) {
+    if (!n)
+        return;
     while (n-- && *s)
         printChar(*s++);
-}
-
-void println(const char* s) {
-    print(s);
-    printNewline();
 }
 
 int printf(char * fmt, ...) {

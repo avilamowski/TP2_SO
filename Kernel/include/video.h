@@ -34,10 +34,6 @@ void printChar(char c);
 Returns the new pen position as a 32 bit number, where the 16 lowest bits are the x and the upper 16 bits are the y. */
 void print(const char* s);
 
-/* Prints a string of characters with print(s) followed by a newline.
-Returns the new pen position as a 32 bit number, where the 16 lowest bits are the x and the upper 16 bits are the y. */
-void println(const char* s);
-
 int printf(char * fmt, ...);
 
 uint32_t getScreenResolution();

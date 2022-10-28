@@ -71,6 +71,7 @@ playSound:
 stopSound:
     mov rax, 11
     int 80h
+    ret
 
 kaboom:
     UD2

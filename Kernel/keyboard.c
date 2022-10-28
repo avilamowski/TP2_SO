@@ -23,7 +23,7 @@ void keyboardHandler(){
     if(_bufferSize < BUFFER_CAPACITY -1){
         uint8_t key = getKeyPressed();
         if(!(key & 0x80)){
-            _buffer[getBufferIndex(_bufferSize)] = getKeyPressed();
+            _buffer[getBufferIndex(_bufferSize)] = key;
             _bufferSize++;
         }
     }
