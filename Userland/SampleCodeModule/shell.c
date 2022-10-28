@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include <syscalls.h>
 #include <tron.h>
+#include <man.h>
 
 typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
-#define QTY_COMMANDS 10
 #define QTY_BYTES 32
 
 typedef struct Command {
@@ -22,29 +22,31 @@ typedef struct Command {
 } Command;
 
 static void help();
-static int div(char * num, char * div);
-static void time();
+static void man(char * command);
 static void infoReg();
-static void fontSize(char * size);
+static void time();
+static int div(char * num, char * div);
 static void tron();
+static void tronZen();
+static void fontSize(char * size);
 static void printMem(char * pos);
-static void snake();
 
 static int getCommandIndex(char * command);
 
 static Command commands[QTY_COMMANDS];
 
 void init() {
-    commands[0] = (Command){"help", "Listado de comandos", &help, NO_PARAMS};
-    commands[1] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &infoReg, NO_PARAMS};
-    commands[2] = (Command){"time", "Despliega la hora actual", &time, NO_PARAMS};
-    commands[3] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
-    commands[4] = (Command){ "opcode", "que es esto!", 0, NO_PARAMS};
-    commands[5] = (Command){ "tron", "el tron", &tron, NO_PARAMS};
-    commands[6] = (Command){ "font-size", "Cambio de tamanio de la fuente. Para hacerlo escribir el comando seguido de un numero", &fontSize, SINGLE_PARAM};
-    commands[7] = (Command){ "printmem", "hola", &printMem, SINGLE_PARAM};
-    commands[8] = (Command){ "clear", "Limpia toda la pantalla", &clear, NO_PARAMS};
-    commands[9] = (Command){ "snake", "el snake", &snake, NO_PARAMS};
+    commands[0] = (Command){ "help", "Listado de comandos", &help, NO_PARAMS};
+    commands[1] = (Command){ "man", "Manual de uso de los comandos", &man, SINGLE_PARAM};
+    commands[2] = (Command){ "inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &infoReg, NO_PARAMS};
+    commands[3] = (Command){ "time", "Despliega la hora actual", &time, NO_PARAMS};
+    commands[4] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
+    commands[5] = (Command){ "opcode", "que es esto!", 0, NO_PARAMS};
+    commands[6] = (Command){ "tron", "el tron", &tron, NO_PARAMS};
+    commands[7] = (Command){ "tron-zen", "el snake", &tronZen, NO_PARAMS};
+    commands[8] = (Command){ "font-size", "Cambio de tamanio de la fuente.", &fontSize, SINGLE_PARAM};
+    commands[9] = (Command){ "printmem", "Imprime los primeros 32 bytes de memoria a partir de una direccion de memoria", &printMem, SINGLE_PARAM};
+    commands[10] = (Command){ "clear", "Limpia toda la pantalla", &clear, NO_PARAMS};
 }
 
 void run_shell() {
@@ -65,7 +67,7 @@ void run_shell() {
         int funcParams = commands[index].ftype;
         if(qtyParams - 1 != funcParams){
             puts("La cantidad de parametros ingresada es invalida\n");
-            puts("Uso: ... \n"); // TODO: Uso
+            printf("Escriba \"man %s\" para ver como funciona el comando.\n", command);
             continue;
         }
         switch (commands[index].ftype)
@@ -125,7 +127,7 @@ static void tron(){
     setFontSize(1);
 }
 
-static void snake(){
+static void tronZen(){
     setFontSize(2);
     startTron(1);
     setFontSize(1);
@@ -138,4 +140,9 @@ static void printMem(char * pos){
     getMemory(strtoh(pos, &end), resp);
     for(int i = 0; i < QTY_BYTES; i++)
         printf("Byte numero %d: %d\n", i, resp[i]);
+}
+
+static void man(char * command){
+    int idx = getCommandIndex(command);
+    printf("%s\n", usages[idx]);
 }
