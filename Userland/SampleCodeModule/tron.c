@@ -30,6 +30,7 @@
 typedef struct {
     uint16_t x, y;              // Posiciones de la matriz que corresponden al jugador
     uint16_t vx, vy;            // Velocidad del jugador
+    uint16_t oldVx, oldVy;            // Velocidad del jugador
     Color color, trailColor;    // Color del jugador y del rastro que deja
     uint64_t lastTurbo;         // Ticks en el turbo anterior
 } Player;
@@ -42,6 +43,7 @@ static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uin
 static void draw(Player * p, int * collided);
 static void loopzen();
 static void debug();
+static void correctVelocity(Player * p);
 
 Player _p1, _p2;
 uint8_t _playing;
@@ -71,12 +73,13 @@ void startTron(int qtyPlayers) {
         clear();
         _playing = 1;
         uint64_t initialTicks = getTicks();
-        _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.25, FIELD_HEIGHT / 2, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0};
-        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.75, FIELD_HEIGHT / 2, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0};
+        _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.25, FIELD_HEIGHT / 2, 1, 0, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0};
+        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.75, FIELD_HEIGHT / 2, -1, 0, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0};
         uint64_t ticks = getTicks();
         uint64_t nextTicks;
         while (_playing)
         {
+            //debug();
             nextTicks = getTicks();
             uint8_t key = getScanCode();
             if (key == ESC)
@@ -112,7 +115,7 @@ static void debug() {
 
 static void initializeField() {
     for (int i = 0; i < FIELD_WIDTH_POSITIONS; i++)
-        for (int j = 0; j < FIELD_HEIGHT; j++)
+        for (int j = 1; j < FIELD_HEIGHT-1; j++)
             _field[i][j] = 0x00;
     
     for(int i = 0; i < FIELD_WIDTH_POSITIONS; i++){
@@ -120,24 +123,25 @@ static void initializeField() {
         _field[i][FIELD_HEIGHT-1] = 0xFF;
     }
 
-    for(int j = 1; j < FIELD_HEIGHT-1; j++){
-        _field[0][j] = 0x01;
-        _field[FIELD_WIDTH_POSITIONS-1][j] = 0x20; // Para que quede mejor en pantalla
+    for(int i = 1; i < FIELD_HEIGHT-1; i++){
+        _field[0][i] = 0x01;
+        _field[FIELD_WIDTH_POSITIONS-1][i] = 0x20; // Para que quede mejor en pantalla
     }
 }
 
+
 static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo) {
     uint64_t ticks = getTicks();
-    if (key == up && p->vy == 0) {
+    if (key == up && p->oldVy == 0) {
         p->vx = 0;     
         p->vy = -1;
-    } else if (key == left && p->vx == 0) {
+    } else if (key == left && p->oldVx == 0) {
         p->vx = -1;
         p->vy = 0;
-    } else if (key == down && p->vy == 0) {
+    } else if (key == down && p->oldVy == 0) {
         p->vx = 0;
         p->vy = 1;
-    } else if (key == right && p->vx == 0) {
+    } else if (key == right && p->oldVx == 0) {
         p->vx = 1;
         p->vy = 0;
     } else if (key == turbo && ticks - p->lastTurbo - TURBO_TICKS >= TURBO_COOLDOWN) { // Si ya paso el cooldown y se toca se activa
@@ -172,6 +176,16 @@ static int checkCollision(Player * p){
     return 0;
 }
 
+// Evita que un jugador pueda suicidarse por apretar una tecla invalida
+static void correctVelocity(Player * p) {
+    if (p->oldVx == -p->vx)
+        p->vx = p->oldVx;
+    if (p->oldVy == -p->vy)
+        p->vx = p->oldVx;
+    p->oldVx = p->vx;
+    p->oldVy = p->vy;
+}
+
 static int update(Player * p) {
     uint64_t ticks = getTicks();
     uint8_t realV = 1;
@@ -179,6 +193,7 @@ static int update(Player * p) {
     if (ticks - p->lastTurbo <= TURBO_TICKS)
         realV = SPEED;
 
+    correctVelocity(p);
     for (int i = 0; i < realV && !collided; i++) {
         p->x += p->vx;
         p->y += p->vy;
