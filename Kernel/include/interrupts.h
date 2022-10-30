@@ -12,6 +12,8 @@
 
 void _ex00Handler(void);
 void _ex06Handler(void);
+void _ex0DHandler(void);
+void _ex0EHandler(void);
 void _irq00Handler(void);
 void _irq01Handler(void);
 void _irq02Handler(void);

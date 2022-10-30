@@ -16,6 +16,8 @@ GLOBAL _syscallHandler
 
 GLOBAL _ex00Handler
 GLOBAL _ex06Handler
+GLOBAL _ex0DHandler
+GLOBAL _ex0EHandler
 
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
@@ -193,6 +195,14 @@ _ex00Handler:
 ;Invalid Op Code Exception
 _ex06Handler:
 	exceptionHandler 6
+
+; General Protection
+_ex0DHandler:
+	exceptionHandler 13
+
+; Page Fault
+_ex0EHandler:
+	exceptionHandler 14
 
 haltcpu:
 	cli

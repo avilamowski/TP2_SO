@@ -23,7 +23,7 @@ usrGetInfoReg:
     mov rdi, rsp
     call printRegisters 
 
-    mov rbp, rsp
+    mov rsp, rbp
 	pop r15
 	pop r14
 	pop r13
