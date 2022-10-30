@@ -205,10 +205,10 @@ int printf(char * fmt, ...) {
                     printChar(va_arg(v, char *));
                     break;
                 case 'd':
-                    print(itoa(va_arg(v, uint64_t *), buffer, 10));
+                    print(itoa(va_arg(v, int64_t *), buffer, 10));
                     break;
                 case 'x':
-                    print(itoa(va_arg(v, uint64_t *), buffer, 16));
+                    print(itoa(va_arg(v, int64_t *), buffer, 16));
                     break;
                 case 's':
                     print((char *) va_arg(v, char *));
