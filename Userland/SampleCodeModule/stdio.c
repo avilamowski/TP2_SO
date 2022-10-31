@@ -11,8 +11,18 @@ int putchar(char c) {
     return 1;
 }
 
+int putcharErr(char c) {
+    write(STDERR, c);
+    return 1;
+}
+
 int puts(const char * s) {
     while (*s) putchar(*s++); 
+    return 1;
+}
+
+int printErr(const char * s) {
+    while (*s) putcharErr(*s++); 
     return 1;
 }
 
@@ -129,7 +139,7 @@ int scanf(char * fmt, ...) {
         } else if (*fmtPtr == buffer[bIdx]) {
            bIdx++; 
         } else {
-            puts("Error!!!"); 
+            printErr("Error!!!"); 
         }
         fmtPtr++;
     }

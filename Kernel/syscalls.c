@@ -80,7 +80,7 @@ static void syscall_write(uint32_t fd, char c){
         color = (Color){200, 200, 200};
         break;
     case STDERR:
-        color = (Color){255, 0, 0};
+        color = (Color){0, 0, 255};
         break;
     }
     setFontColor(color);

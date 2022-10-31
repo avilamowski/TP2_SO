@@ -147,6 +147,11 @@ void printChar(char c) {
         return;
     }
 
+    if (_bufferIdx == MAX_RESOLUTION) {
+        videoClear();
+        print("Buffer de video excedido, la pantalla ha sido limpiada\n");
+    }
+
     _charBuffer[_bufferIdx++] = c;
     if (c == '\n') {
         printNewline();

@@ -63,12 +63,12 @@ void run_shell() {
         index = getCommandIndex(command);
         if (index == -1) {
             if (command[0] != 0)
-                puts("Comando invalido!\n");
+                printErr("Comando invalido!\n");
             continue;
         }
         int funcParams = commands[index].ftype;
         if(qtyParams - 1 != funcParams){
-            puts("La cantidad de parametros ingresada es invalida\n");
+            printErr("La cantidad de parametros ingresada es invalida\n");
             printf("Escriba \"man %s\" para ver como funciona el comando.\n", command);
             continue;
         }
