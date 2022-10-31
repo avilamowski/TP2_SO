@@ -56,13 +56,14 @@ void run_shell() {
     puts("Bienvenido a Cactiland OS!\n");
     while(1){
         putchar('>');
-        char command[MAX_CHARS];
+        char command[MAX_CHARS] = {0};
         char arg1[MAX_CHARS];
         char arg2[MAX_CHARS];
-        int qtyParams = scanf("%s %s %s", command, arg1, arg2); // TODO: Validar
+        int qtyParams = scanf("%s %s %s", command, arg1, arg2); 
         index = getCommandIndex(command);
         if (index == -1) {
-            puts("Comando invalido!\n");
+            if (command[0] != 0)
+                puts("Comando invalido!\n");
             continue;
         }
         int funcParams = commands[index].ftype;
@@ -138,5 +139,8 @@ static void printMem(char * pos){
 
 static void man(char * command){
     int idx = getCommandIndex(command);
-    printf("%s\n", usages[idx]);
+    if (idx != -1)
+        printf("%s\n", usages[idx]);
+    else
+        puts("Comando desconocido\n");
 }
