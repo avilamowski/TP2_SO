@@ -3,6 +3,7 @@
 #include <keyboard.h>
 #include <lib.h>
 #include <color.h>
+#include <speaker.h>
 
 #define STDIN 0
 #define STDOUT 1
@@ -52,12 +53,9 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
             syscall_getmemory((uint64_t) arg0, (uint8_t *) arg1);
             break;
         case 10:
-            playSound(arg0);
+            playSound(arg0, arg1);
             break;
         case 11:
-            stopSound();
-            break;
-        case 12:
             syscall_fontcolor((uint8_t) arg0, (uint8_t) arg1, (uint8_t) arg2);
             break;
             

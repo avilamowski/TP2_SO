@@ -10,7 +10,7 @@ char getKeyPressed();
 char *cpuVendor(char *result);
 void getTime(char * h, char * m, char * s);
 uint64_t * getRegisterArray();
-void playSound(uint64_t freq);
+void startSound(uint64_t freq);
 void stopSound();
 #endif
 

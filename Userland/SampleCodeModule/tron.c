@@ -2,6 +2,7 @@
 #include <syscalls.h>
 #include <stdio.h>
 #include <color.h>
+#include <sound.h>
 
 #define ESC 0x01
 #define SPACEBAR 0x39
@@ -18,7 +19,7 @@
 #define KEY_SLASH 0x35
 
 #define PLAYER_SIZE 16
-#define DELTA_TICK 1
+#define DELTA_TICK 2
 #define SPEED 8
 #define TURBO_TICKS 2
 #define TURBO_COOLDOWN 20 
@@ -47,7 +48,6 @@ static void draw(Player * p, int * collided);
 static void loopzen();
 static void debug();
 static void correctVelocity(Player * p);
-static void endMusic();
 
 Player _p1, _p2;
 uint8_t _playing;
@@ -104,7 +104,7 @@ void startTron(int qtyPlayers) {
             }
             setDirections(&_p1, key, KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z);
             setDirections((qtyPlayers == 2) ? &_p2 : &_p1, key, KEY_UP, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_SLASH);
-            if (nextTicks - ticks > DELTA_TICK)
+            if (nextTicks - ticks >= DELTA_TICK)
             {
                 ticks = nextTicks;
                 if (qtyPlayers == 2)
@@ -114,46 +114,14 @@ void startTron(int qtyPlayers) {
             }
 
         }
-        endMusic();
+        //playVictory1();
+        playDraw();
         puts("Fin del Juego hm?!!!!\n");
         printf("Desea volver a jugar? (espacio para confirmar, esc para salir)");
         while ((userInput = getScanCode()) != SPACEBAR && userInput != ESC)
             ;
         clear();
     } while (userInput == SPACEBAR);
-}
-
-static void endMusic() {
-    playSound(100);
-    for (int i = 0; i < 10000000; i++)
-        for (int i = 0; i < 10; i++)
-            ;
-    stopSound();
-    playSound(100);
-    for (int i = 0; i < 10000000; i++)
-        for (int i = 0; i < 10; i++)
-            ;
-    stopSound();
-    playSound(130);
-    for (int i = 0; i < 10000000; i++)
-        for (int i = 0; i < 10; i++)
-            ;
-    stopSound();
-    playSound(150);
-    for (int i = 0; i < 10000000; i++)
-        for (int i = 0; i < 20; i++)
-            ;
-    stopSound();
-    playSound(130);
-    for (int i = 0; i < 10000000; i++)
-        for (int i = 0; i < 10; i++)
-            ;
-    stopSound();
-    playSound(150);
-    for (int i = 0; i < 10000000; i++)
-        for (int i = 0; i < 20; i++)
-            ;
-    stopSound();
 }
 
 static void debug() {

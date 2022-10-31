@@ -2,7 +2,7 @@ GLOBAL cpuVendor
 GLOBAL getTime
 GLOBAL getKeyPressed
 GLOBAL getRegisterArray
-GLOBAL playSound
+GLOBAL startSound
 GLOBAL stopSound
 
 section .text
@@ -82,7 +82,7 @@ int_80:
     pop rbp
     ret
 
-playSound:
+startSound:
 	push rbp
     push rdx
 	mov rbp, rsp

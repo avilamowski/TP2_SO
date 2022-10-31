@@ -9,7 +9,6 @@ GLOBAL drawRect
 GLOBAL getTicks
 GLOBAL getMemory
 GLOBAL playSound
-GLOBAL stopSound
 GLOBAL kaboom
 GLOBAL setFontColor
 
@@ -70,12 +69,7 @@ playSound:
     int 80h
     ret
 
-stopSound:
-    mov rax, 11
-    int 80h
-    ret
-
 setFontColor:
-    mov rax, 12
+    mov rax, 11
     int 80h
     ret

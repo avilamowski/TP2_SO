@@ -17,7 +17,8 @@ int putcharErr(char c) {
 }
 
 int puts(const char * s) {
-    while (*s) putchar(*s++); 
+    while (*s)
+        putchar(*s++); 
     return 1;
 }
 
@@ -114,9 +115,7 @@ int scanf(char * fmt, ...) {
                 bIdx--;
                 putchar(c);
             } else {
-                playSound(66);
-                for(int i=0; i<10000000; i++); // TODO: Cambiar por un sleep o similar
-                stopSound();
+                playSound(66,1);
             }
         }
     }
