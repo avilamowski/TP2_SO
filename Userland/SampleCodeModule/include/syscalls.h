@@ -17,5 +17,6 @@ void getMemory(uint64_t pos, uint8_t * vec);
 void playSound(uint64_t frequency);
 void stopSound();
 void kaboom();
+void setFontColor(uint8_t r, uint8_t g, uint8_t b);
 
 #endif

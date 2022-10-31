@@ -23,6 +23,8 @@
 #define TURBO_TICKS 2
 #define TURBO_COOLDOWN 20 
 
+#define SCREEN_WIDTH 1024 
+
 #define FIELD_WIDTH (1024/PLAYER_SIZE) 
 #define FIELD_HEIGHT (768/PLAYER_SIZE)
 #define FIELD_WIDTH_POSITIONS (FIELD_WIDTH/8 + 1) 
@@ -33,6 +35,7 @@ typedef struct {
     uint16_t oldVx, oldVy;            // Velocidad del jugador
     Color color, trailColor;    // Color del jugador y del rastro que deja
     uint64_t lastTurbo;         // Ticks en el turbo anterior
+    uint8_t wins;
 } Player;
 
 static void loop();
@@ -60,22 +63,32 @@ void startTron(int qtyPlayers) {
         puts("Actualmente el juego solo soporta el modo individual o el de 2 jugadores, vuelva pronto!\n");
         return;
     }
-
     _qtyPlayers = qtyPlayers;
     char userInput;
     clear();
-    printf("Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Snake");
+    setFontColor(0, 255, 0);
+    printf("Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Tron-Zen");
+    setFontColor(255, 255, 255);
     do {
-        puts("Instrucciones: bla bla bla\n");
+        puts("El jugador 1 se mueve con W A S D y activa turbo con Z \n"
+              "El jugador 2 se mueve con las flechas y activa turbo con \\\n");
         puts("Presione espacio para comenzar, y ESC para salir en el juego\n");
         initializeField();
         while (getScanCode() != SPACEBAR)
             ;
         clear();
+        drawRect(0, 0, SCREEN_WIDTH, FIELD_HEIGHT - 15, (Color){173, 169, 170});
+        setFontColor(0, 0, 0);
+        if(qtyPlayers == 2){
+            printf("                             %d : %d\n", _p1.wins, _p2.wins);
+        }
+        else
+            printf("%d", _p1.wins);
+        setFontColor(255, 255, 255);
         _playing = 1;
         uint64_t initialTicks = getTicks();
-        _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.25, FIELD_HEIGHT / 2, 1, 0, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0};
-        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.75, FIELD_HEIGHT / 2, -1, 0, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0};
+        _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.2, FIELD_HEIGHT / 2, 1, 0, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0, _p1.wins};
+        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.7, FIELD_HEIGHT / 2, -1, 0, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0, _p2.wins};
         uint64_t ticks = getTicks();
         uint64_t nextTicks;
         while (_playing)
@@ -85,6 +98,7 @@ void startTron(int qtyPlayers) {
             uint8_t key = getScanCode();
             if (key == ESC)
             {
+                clear();
                 puts("Fin del juego\n");
                 return;
             }
@@ -149,19 +163,21 @@ static void debug() {
                 drawRect(i * PLAYER_SIZE, j * PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, (Color){0, 0, 255});
 }
 
+
 static void initializeField() {
+    
     for (int i = 0; i < FIELD_WIDTH_POSITIONS; i++)
         for (int j = 1; j < FIELD_HEIGHT-1; j++)
             _field[i][j] = 0x00;
     
     for(int i = 0; i < FIELD_WIDTH_POSITIONS; i++){
-        _field[i][0] = 0xFF;
-        _field[i][FIELD_HEIGHT-1] = 0xFF;
+        _field[i][2] |= 0xFF;
+        _field[i][FIELD_HEIGHT-1] |= 0xFF;
     }
 
-    for(int i = 1; i < FIELD_HEIGHT-1; i++){
-        _field[0][i] = 0x01;
-        _field[FIELD_WIDTH_POSITIONS-2][i] = 0x80; // Para que quede mejor en pantalla
+    for(int i = 1; i < FIELD_HEIGHT - 1; i++){
+        _field[0][i] |= 0x01;
+        _field[FIELD_WIDTH_POSITIONS-2][i] |= 0x80; // Para que quede mejor en pantalla
     }
 }
 
@@ -192,10 +208,14 @@ static void loop() {
     int col2 = update(&_p2);
     if (col1 && col2 || (_p1.x == _p2.x && _p1.y == _p2.y))
         puts("Empate!\n");
-    else if (col1)
+    else if (col1){
         puts("Gano el jugador 2!\n");
-    else if (col2)
+        _p2.wins += 1;
+    }
+    else if (col2){
         puts("Gano el jugador 1!\n");
+        _p1.wins += 1;
+    }
 }
 
 static void loopzen() {

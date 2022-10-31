@@ -11,6 +11,7 @@ GLOBAL getMemory
 GLOBAL playSound
 GLOBAL stopSound
 GLOBAL kaboom
+GLOBAL setFontColor
 
 read:
     mov rax, 0
@@ -71,5 +72,10 @@ playSound:
 
 stopSound:
     mov rax, 11
+    int 80h
+    ret
+
+setFontColor:
+    mov rax, 12
     int 80h
     ret

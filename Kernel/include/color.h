@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#define DEFAULT_COLOR {0x7F, 0x7F, 0x7F}
-#define ERROR_COLOR {0x00, 0x00, 0xFF}
+#define DEFAULT_COLOR {255, 255, 255}
+#define ERROR_COLOR {0, 0, 127}
 
 typedef struct {
 	uint8_t b;

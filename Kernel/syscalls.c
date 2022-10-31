@@ -21,6 +21,7 @@ static uint32_t syscall_resolution();
 static void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
 static uint64_t syscall_getticks();
 static void syscall_getmemory(uint64_t pos, uint8_t * vec);
+static void syscall_fontcolor(uint8_t r, uint8_t g, uint8_t b);
 
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5) {
@@ -56,6 +57,10 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
         case 11:
             stopSound();
             break;
+        case 12:
+            syscall_fontcolor((uint8_t) arg0, (uint8_t) arg1, (uint8_t) arg2);
+            break;
+            
 	}
 	return 0;
 }
@@ -74,16 +79,10 @@ static uint8_t syscall_read(uint32_t fd){
 // Write
 static void syscall_write(uint32_t fd, char c){
     Color color;
-    switch (fd)
-    {
-    case STDOUT:
-        color = (Color){200, 200, 200};
-        break;
-    case STDERR:
-        color = (Color){0, 0, 255};
-        break;
-    }
-    setFontColor(color);
+    if(fd == STDERR)
+        setFontColor((Color){255, 0, 0});
+    else if(fd != STDOUT)
+        return;
     printChar(c);
 }
 
@@ -128,4 +127,8 @@ static uint64_t syscall_getticks(){
 //PrintMem
 static void syscall_getmemory(uint64_t pos, uint8_t * vec){
     memcpy(vec, (uint8_t *) pos, 32);
+}
+
+static void syscall_fontcolor(uint8_t r, uint8_t g, uint8_t b){
+    setFontColor((Color){r, g, b});
 }
