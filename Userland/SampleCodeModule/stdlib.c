@@ -11,14 +11,14 @@ static unsigned int log(int n, int base) {
     return count;
 }
 
-char* itoa(int n, char* buffer, int base)
+int itoa(int n, char* buffer, int base)
 {
  
     if (n == 0)
     {
         buffer[0] = '0';
         buffer[1] = '\0';
-        return buffer;
+        return 1;
     }
  
     unsigned int len = 0;
@@ -35,11 +35,11 @@ char* itoa(int n, char* buffer, int base)
     while (n != 0)
     {
         int r = n % base;
-        buffer[len - i++ - 1] = (r > 9)? (r-10) + 'a' : r + '0';
+        buffer[len - i++ - 1] = (r > 9)? (r-10) + 'A' : r + '0';
         n /= base;
     }
-    buffer[i] = '\0'; // Append string terminator
-    return buffer;
+    buffer[i] = '\0'; 
+    return len;
 }
 
 int atoi(char * s)

@@ -109,7 +109,7 @@ static int div(char * num, char * div) {
 static void time(){
     uint32_t secs = getSeconds();
     int h = secs / 3600, m = secs % 3600 / 60, s = secs % 3600 % 60;
-    printf("%d:%d:%d\r\n", h, m, s);
+    printf("%2d:%2d:%2d\r\n", h, m, s);
 }
 
 static void fontSize(char * size) {
@@ -134,7 +134,7 @@ static void printMem(char * pos){
     char * end[1];
     getMemory(strtoh(pos, &end), resp);
     for(int i = 0; i < QTY_BYTES; i++)
-        printf("Byte numero %d: %d\n", i, resp[i]);
+        printf("Byte numero %d: 0x%x\n", i, resp[i]);
 }
 
 static void man(char * command){

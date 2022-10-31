@@ -45,17 +45,25 @@ int printf(char * fmt, ...) {
     while (*fmtPtr) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
+            int dx = strtoi(fmtPtr, &fmtPtr);
+            int len;
+
             switch (*fmtPtr) {
                 case 'c':
                     putchar(va_arg(v, char *));
                     break;
                 case 'd':
-                    puts(itoa(va_arg(v, int *), buffer, 10));
+                    len = itoa(va_arg(v, int *), buffer, 10);
+                    printNChars('0', dx-len);
+                    puts(buffer);
                     break;
                 case 'x':
-                    puts(itoa(va_arg(v, int *), buffer, 16));
+                    len = itoa(va_arg(v, int *), buffer, 16);
+                    printNChars('0', dx-len);
+                    puts(buffer);
                     break;
                 case 's':
+                    printNChars(' ', dx); // A diferencia %x y %d, la cantidad de espacios es igual al numero
                     puts((char *) va_arg(v, char *));
                     break;
             }
@@ -66,6 +74,11 @@ int printf(char * fmt, ...) {
     }
     va_end(v);
     return 1;
+}
+
+void printNChars(char c, int n) {
+    for (int i = 0; i < n; i++)
+        putchar(c);
 }
 
 int scanf(char * fmt, ...) {

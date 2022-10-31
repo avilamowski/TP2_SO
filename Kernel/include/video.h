@@ -36,5 +36,7 @@ void print(const char* s);
 
 int printf(char * fmt, ...);
 
+void printNChars(char c, int n);
+
 uint32_t getScreenResolution();
 #endif

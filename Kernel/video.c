@@ -198,24 +198,31 @@ void printN(const char* s, uint32_t n) {
 int printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
-
     char * buffer[256] = {0};
     char * fmtPtr = fmt;
     char * end;
     while (*fmtPtr) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
+            int dx = strtoi(fmtPtr, &fmtPtr);
+            int len;
+
             switch (*fmtPtr) {
                 case 'c':
                     printChar(va_arg(v, char *));
                     break;
                 case 'd':
-                    print(itoa(va_arg(v, int64_t *), buffer, 10));
+                    len = itoa(va_arg(v, int *), buffer, 10);
+                    printNChars('0', dx-len);
+                    print(buffer);
                     break;
                 case 'x':
-                    print(itoa(va_arg(v, int64_t *), buffer, 16));
+                    len = itoa(va_arg(v, int *), buffer, 16);
+                    printNChars('0', dx-len);
+                    print(buffer);
                     break;
                 case 's':
+                    printNChars(' ', dx); // A diferencia %x y %d, la cantidad de espacios es igual al numero
                     print((char *) va_arg(v, char *));
                     break;
             }
@@ -226,6 +233,11 @@ int printf(char * fmt, ...) {
     }
     va_end(v);
     return 1;
+}
+
+void printNChars(char c, int n) {
+    for (int i = 0; i < n; i++)
+        printChar(c);
 }
 
 uint32_t getScreenResolution(){
