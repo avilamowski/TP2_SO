@@ -109,6 +109,10 @@ void setFontColor(Color color) {
     _fontColor = color;
 }
 
+Color getFontColor(){
+    return _fontColor;
+}
+
 void setFontSize(fontSize f){
     if(f >= FONT_12 && f <= FONT_36){
         _font = fonts[f];

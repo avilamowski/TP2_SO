@@ -66,9 +66,7 @@ void startTron(int qtyPlayers) {
     _qtyPlayers = qtyPlayers;
     char userInput;
     clear();
-    setFontColor(0, 255, 0);
-    printf("Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Tron-Zen");
-    setFontColor(255, 255, 255);
+    printfc(0, 255, 0, "Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Tron-Zen");
     _p1.wins = 0;
     _p2.wins = 0;
     do {
@@ -80,11 +78,10 @@ void startTron(int qtyPlayers) {
             ;
         clear();
         drawRect(0, 0, SCREEN_WIDTH, FIELD_HEIGHT - 15, (Color){173, 169, 170});
-        setFontColor(0, 0, 0);
-        if(qtyPlayers == 2){
-            printf("                             %d : %d\n", _p1.wins, _p2.wins);
-        }
-        setFontColor(255, 255, 255);
+        if(qtyPlayers == 2)
+            printfc(0, 0, 0, "%30s%d : %d\n", " ", _p1.wins, _p2.wins);
+        else
+            printfc(0, 0, 0, "Muertes: %d", _p1.wins);
         _playing = 1;
         uint64_t initialTicks = getTicks();
         _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.2, FIELD_HEIGHT / 2, 1, 0, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0, _p1.wins};
@@ -113,8 +110,8 @@ void startTron(int qtyPlayers) {
                     loopzen(_field);
             }
         }
-        puts("Fin del Juego!!!\n");
-        printf("Desea volver a jugar? (espacio para confirmar, esc para salir)");
+        puts("Fin del Juego hm?!!!!\n");
+        puts("Desea volver a jugar? (espacio para confirmar, esc para salir)");
         while ((userInput = getScanCode()) != SPACEBAR && userInput != ESC)
             ;
         clear();
@@ -191,6 +188,7 @@ static void loopzen() {
     drawRect(_p1.x*PLAYER_SIZE, _p1.y*PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, _p1.trailColor);
     int col1 = update(&_p1);
     if (col1){
+        _p1.wins++;
         playSoundDraw();   
     }
 }
