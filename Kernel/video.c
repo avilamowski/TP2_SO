@@ -110,10 +110,12 @@ void setFontColor(Color color) {
 }
 
 void setFontSize(fontSize f){
-    _font = fonts[f];
-    _charWidth = charWidths[f];
-    _charHeight = charHeights[f];
-    renderFonts();
+    if(f >= FONT_12 && f <= FONT_36){
+        _font = fonts[f];
+        _charWidth = charWidths[f];
+        _charHeight = charHeights[f];
+        renderFonts();
+    }
 }
 
 static void renderFonts() {

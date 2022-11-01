@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <color.h>
 
-typedef enum {FONT_12 = 0, FONT_24} fontSize;
+typedef enum {FONT_12 = 0, FONT_24, FONT_36} fontSize;
 
 /* Clears the whole screen to black. */
 void videoClear();

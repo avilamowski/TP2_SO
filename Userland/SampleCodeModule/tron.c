@@ -69,6 +69,8 @@ void startTron(int qtyPlayers) {
     setFontColor(0, 255, 0);
     printf("Bienvenido a %s\n", qtyPlayers == 2? "Tron" : "Tron-Zen");
     setFontColor(255, 255, 255);
+    _p1.wins = 0;
+    _p2.wins = 0;
     do {
         puts("El jugador 1 se mueve con W A S D y activa turbo con Z \n"
               "El jugador 2 se mueve con las flechas y activa turbo con \\\n");
@@ -82,13 +84,11 @@ void startTron(int qtyPlayers) {
         if(qtyPlayers == 2){
             printf("                             %d : %d\n", _p1.wins, _p2.wins);
         }
-        else
-            printf("%d", _p1.wins);
         setFontColor(255, 255, 255);
         _playing = 1;
         uint64_t initialTicks = getTicks();
         _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.2, FIELD_HEIGHT / 2, 1, 0, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0, _p1.wins};
-        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.7, FIELD_HEIGHT / 2, -1, 0, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0, _p2.wins};
+        _p2 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.69, FIELD_HEIGHT / 2, -1, 0, -1, 0, (Color){255, 153, 184}, (Color){255, 0, 184}, 0, _p2.wins};
         uint64_t ticks = getTicks();
         uint64_t nextTicks;
         while (_playing)
@@ -112,11 +112,8 @@ void startTron(int qtyPlayers) {
                 else
                     loopzen(_field);
             }
-
         }
-        //playVictory1();
-        playDraw();
-        puts("Fin del Juego hm?!!!!\n");
+        puts("Fin del Juego!!!\n");
         printf("Desea volver a jugar? (espacio para confirmar, esc para salir)");
         while ((userInput = getScanCode()) != SPACEBAR && userInput != ESC)
             ;
@@ -174,21 +171,28 @@ static void loop() {
     drawRect(_p2.x*PLAYER_SIZE, _p2.y*PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, _p2.trailColor);
     int col1 = update(&_p1);
     int col2 = update(&_p2);
-    if (col1 && col2 || (_p1.x == _p2.x && _p1.y == _p2.y))
+    if (col1 && col2 || (_p1.x == _p2.x && _p1.y == _p2.y)){
         puts("Empate!\n");
+        playSoundDraw();
+    }
     else if (col1){
         puts("Gano el jugador 2!\n");
+        playSoundVictory2();
         _p2.wins += 1;
     }
     else if (col2){
         puts("Gano el jugador 1!\n");
+        playSoundVictory1();
         _p1.wins += 1;
     }
 }
 
 static void loopzen() {
     drawRect(_p1.x*PLAYER_SIZE, _p1.y*PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, _p1.trailColor);
-    update(&_p1);
+    int col1 = update(&_p1);
+    if (col1){
+        playSoundDraw();   
+    }
 }
 
 static int checkCollision(Player * p){

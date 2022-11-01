@@ -1,5 +1,6 @@
 #ifndef SOUND_H
 #define SOUND_H
-void playVictory1();
-void playDraw();
+void playSoundVictory1();
+void playSoundVictory2();
+void playSoundDraw();
 #endif

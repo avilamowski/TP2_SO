@@ -1,5 +1,5 @@
 #include <sound.h>
-void playVictory1(){
+void playSoundVictory1(){
     playSound(390,3);
     playSound(520,3);
     playSound(660,3);
@@ -7,7 +7,17 @@ void playVictory1(){
     playSound(660,3);
     playSound(780,6);
 }
-void playDraw(){
+
+void playSoundVictory2(){
+    playSound(880,3);
+    playSound(780,3);
+    playSound(660,3);
+    playSound(585,6);
+    playSound(780,3);
+    playSound(520,6);
+}
+
+void playSoundDraw(){
     for(int i=0; i<18; i++)
         playSound(500-20*i,1);
 }

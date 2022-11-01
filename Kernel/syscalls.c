@@ -105,8 +105,7 @@ static uint64_t * syscall_registerarray(uint64_t * regarr, uint64_t * statePtr){
 
 // FontSize
 static void syscall_fontsize(uint8_t size){
-    if (size - 1 >= FONT_12 && size - 1 <= FONT_24)
-        setFontSize(size - 1);
+    setFontSize(size - 1);
 }
 
 static uint32_t syscall_resolution(){
