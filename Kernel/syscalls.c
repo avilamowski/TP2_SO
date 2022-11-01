@@ -90,9 +90,9 @@ static void syscall_clear(){
 
 // GetSeconds
 static uint32_t syscall_seconds(){
-    char h, m, s;
+    uint8_t h, m, s;
     getTime(&h, &m, &s);
-    return s + m * 60 + ((h - 3) % 24) * 3600;
+    return s + m * 60 + ((h + 24 - 3) % 24) * 3600;
 }
 
 // Inforeg

@@ -107,7 +107,7 @@ static int div(char * num, char * div) {
 
 static void time(){
     uint32_t secs = getSeconds();
-    int h = secs / 3600, m = secs % 3600 / 60, s = secs % 3600 % 60;
+    uint32_t h = secs / 3600, m = secs % 3600 / 60, s = secs % 3600 % 60;
     printf("%2d:%2d:%2d\r\n", h, m, s);
 }
 
@@ -142,7 +142,7 @@ static void printInfoReg() {
     char * regSnapshot[len];
     getInfoReg(regSnapshot);
     for (int i = 0; i < len; i++)
-        printf("%s: %x\n", _regNames[i], regSnapshot[i]);
+        printf("%s: 0x%x\n", _regNames[i], regSnapshot[i]);
     
 }
 

@@ -32,7 +32,6 @@ getSeconds:
     int 80h
     ret
 
-; Deprecado
 getInfoReg:
     mov rax, 4
     int 80h
