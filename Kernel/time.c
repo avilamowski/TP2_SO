@@ -1,10 +1,12 @@
 #include <time.h>
-static unsigned long ticks = 0;
+#include <stdint.h>
+static uint64_t ticks = 0;
+
 void timerHandler() {
 	ticks++;
 }
 
-int ticksElapsed() {
+uint64_t ticksElapsed() {
 	return ticks;
 }
 

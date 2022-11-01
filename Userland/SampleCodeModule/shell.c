@@ -130,16 +130,19 @@ static void tronZen(){
 
 static void printMem(char * pos){
     uint8_t resp[QTY_BYTES];
-    char * end[1];
+    char * end;
     getMemory(strtoh(pos, &end), resp);
-    for(int i = 0; i < QTY_BYTES; i++)
-        printf("Byte numero %d: 0x%x\n", i, resp[i]);
+    for(int i = 0; i < QTY_BYTES; i++) {
+        printf("0x%2x ", resp[i]);
+        if (i % 4 == 3)
+            putchar('\n');
+    }
 }
 
 static char * _regNames[] = {"RIP", "RSP", "RAX", "RBX", "RCX", "RDX", "RBP", "RDI", "RSI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"};
 static void printInfoReg() {
     int len = sizeof(_regNames)/sizeof(char *);
-    char * regSnapshot[len];
+    uint64_t regSnapshot[len];
     getInfoReg(regSnapshot);
     for (int i = 0; i < len; i++)
         printf("%s: 0x%x\n", _regNames[i], regSnapshot[i]);

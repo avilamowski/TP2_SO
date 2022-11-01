@@ -204,9 +204,8 @@ void printN(const char* s, uint32_t n) {
 int printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
-    char * buffer[256] = {0};
+    char buffer[256] = {0};
     char * fmtPtr = fmt;
-    char * end;
     while (*fmtPtr) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
@@ -215,15 +214,15 @@ int printf(char * fmt, ...) {
 
             switch (*fmtPtr) {
                 case 'c':
-                    printChar(va_arg(v, char *));
+                    printChar(va_arg(v, int));
                     break;
                 case 'd':
-                    len = itoa(va_arg(v, int *), buffer, 10);
+                    len = itoa(va_arg(v, int), buffer, 10);
                     printNChars('0', dx-len);
                     print(buffer);
                     break;
                 case 'x':
-                    len = itoa(va_arg(v, int *), buffer, 16);
+                    len = itoa(va_arg(v, int), buffer, 16);
                     printNChars('0', dx-len);
                     print(buffer);
                     break;

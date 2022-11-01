@@ -6,25 +6,22 @@
 #include <stdint.h>
 
 #define CURSOR_FREQ 10
-int putchar(char c) {
+
+void putchar(char c) {
     write(STDOUT, c);
-    return 1;
 }
 
-int putcharErr(char c) {
+void putcharErr(char c) {
     write(STDERR, c);
-    return 1;
 }
 
-int puts(const char * s) {
+void puts(const char * s) {
     while (*s)
         putchar(*s++); 
-    return 1;
 }
 
-int printErr(const char * s) {
+void printErr(const char * s) {
     while (*s) putcharErr(*s++); 
-    return 1;
 }
 
 int getchar() {
@@ -37,54 +34,16 @@ char getScanCode() {
     return read(KBDIN);
 }
 
-int printf(char * fmt, ...) {
+void printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
     vprintf(fmt, v);
     va_end(v);
-    /*va_list v;
-    va_start(v, fmt);
-    char * buffer[MAX_CHARS] = {0};
-    char * fmtPtr = fmt;
-    char * end;
-    while (*fmtPtr) {
- 	    if (*fmtPtr == '%') {
-            fmtPtr++;
-            int dx = strtoi(fmtPtr, &fmtPtr);
-            int len;
-
-            switch (*fmtPtr) {
-                case 'c':
-                    putchar(va_arg(v, char *));
-                    break;
-                case 'd':
-                    len = itoa(va_arg(v, int *), buffer, 10);
-                    printNChars('0', dx-len);
-                    puts(buffer);
-                    break;
-                case 'x':
-                    len = itoa(va_arg(v, int *), buffer, 16);
-                    printNChars('0', dx-len);
-                    puts(buffer);
-                    break;
-                case 's':
-                    printNChars(' ', dx); // A diferencia %x y %d, la cantidad de espacios es igual al numero
-                    puts((char *) va_arg(v, char *));
-                    break;
-            }
-        } else {
-            putchar(*fmtPtr);
-        }
-        fmtPtr++;
-    }
-    va_end(v);
-    return 1;*/
 }
 
-int vprintf(char * fmt, va_list args) {
-    char * buffer[MAX_CHARS] = {0};
+void vprintf(char * fmt, va_list args) {
+    char buffer[MAX_CHARS] = {0};
     char * fmtPtr = fmt;
-    char * end;
     while (*fmtPtr) {
  	    if (*fmtPtr == '%') {
             fmtPtr++;
@@ -93,15 +52,15 @@ int vprintf(char * fmt, va_list args) {
 
             switch (*fmtPtr) {
                 case 'c':
-                    putchar(va_arg(args, char *));
+                    putchar(va_arg(args, int));
                     break;
                 case 'd':
-                    len = itoa(va_arg(args, int *), buffer, 10);
+                    len = itoa(va_arg(args, int), buffer, 10);
                     printNChars('0', dx-len);
                     puts(buffer);
                     break;
                 case 'x':
-                    len = itoa(va_arg(args, int *), buffer, 16);
+                    len = itoa(va_arg(args, int), buffer, 16);
                     printNChars('0', dx-len);
                     puts(buffer);
                     break;
@@ -115,10 +74,9 @@ int vprintf(char * fmt, va_list args) {
         }
         fmtPtr++;
     }
-    return 1;
 }
 
-int printfc(uint8_t r, uint8_t g, uint8_t b, char * fmt, ...){
+void printfc(uint8_t r, uint8_t g, uint8_t b, char * fmt, ...){
     Color prevColor = getFontColor();
     setFontColor(r, g, b);
     va_list args;
@@ -126,7 +84,6 @@ int printfc(uint8_t r, uint8_t g, uint8_t b, char * fmt, ...){
     vprintf(fmt, args);
     va_end(args);
     setFontColor(prevColor.r, prevColor.g, prevColor.b);
-    return 1;
 }
 
 

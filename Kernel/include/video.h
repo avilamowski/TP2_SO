@@ -36,6 +36,8 @@ void print(const char* s);
 
 int printf(char * fmt, ...);
 
+void printN(const char * s, uint32_t n);
+
 void printNChars(char c, int n);
 
 uint32_t getScreenResolution();
@@ -43,4 +45,5 @@ uint32_t getScreenResolution();
 void setFontColor(Color color);
 
 Color getFontColor();
+
 #endif

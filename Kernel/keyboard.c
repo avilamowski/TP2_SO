@@ -45,5 +45,5 @@ char getScancode() {
 }
 
 char getAscii(){
-    return charHexMap[getScancode()];
+    return charHexMap[(int) getScancode()];
 }

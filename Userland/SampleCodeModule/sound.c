@@ -1,4 +1,6 @@
+#include <syscalls.h>
 #include <sound.h>
+
 void playSoundVictory1(){
     playSound(390,3);
     playSound(520,3);

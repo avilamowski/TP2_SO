@@ -4,6 +4,7 @@
 #include <lib.h>
 #include <color.h>
 #include <speaker.h>
+#include <time.h>
 #include <memory.h>
 
 #define STDIN 0
@@ -38,7 +39,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
         case 3:
             return syscall_seconds();
         case 4:
-            return syscall_registerarray((uint64_t *) arg0);
+            return (uint64_t) syscall_registerarray((uint64_t *) arg0);
         case 5:
             syscall_fontsize((uint8_t)arg0);
             break;
@@ -78,7 +79,6 @@ static uint8_t syscall_read(uint32_t fd){
 
 // Write
 static void syscall_write(uint32_t fd, char c){
-    Color color;
     Color prevColor = getFontColor();
     if(fd == STDERR)
         setFontColor((Color){0, 0, 255});

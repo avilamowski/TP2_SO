@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <color.h>
 
-uint64_t write(int fd, const void * buf);
+uint64_t write(int fd, char c);
 uint64_t read(int fd);
 uint32_t getSeconds();
 int clear(void);
