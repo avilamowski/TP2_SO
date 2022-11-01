@@ -19,8 +19,8 @@ typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
 #define INVALID_COMMAND "Comando invalido!\n"
 #define WRONG_PARAMS "La cantidad de parametros ingresada es invalida\n"
 #define INVALID_FONT_SIZE "Dimension invalida de fuente\n"
-#define CHECK_MAN "Escriba \"man %s\" para ver como funciona el comando.\n"
-#define CHECK_MAN_FONT "Escriba \"man font-size \" para ver las dimensiones validas.\n"
+#define CHECK_MAN "Escriba \"man %s\" para ver como funciona el comando\n"
+#define CHECK_MAN_FONT "Escriba \"man font-size\" para ver las dimensiones validas\n"
 
 typedef struct {
     char * name;                    // Nombre del comando
@@ -51,7 +51,7 @@ void init() {
     commands[1] = (Command){ "man", "Manual de uso de los comandos", &man, SINGLE_PARAM};
     commands[2] = (Command){"inforeg", "Informacion de los registos que fueron capturados en un momento arbitrario de ejecucion del sistema", &printInfoReg, NO_PARAMS}; 
     commands[3] = (Command){"time", "Despliega la hora actual UTC - 3", &time, NO_PARAMS};
-    commands[4] = (Command){ "div", "Divide dos numeros enviados por parametro", &div, DUAL_PARAM};
+    commands[4] = (Command){ "div", "Hace la division entera de dos numeros naturales enviados por parametro", &div, DUAL_PARAM};
     commands[5] = (Command){ "kaboom", "Ejecuta una excepcion de Invalid Opcode", &kaboom, NO_PARAMS};
     commands[6] = (Command){ "tron", "Juego Tron Light Cycles", &tron, NO_PARAMS};
     commands[7] = (Command){ "tron-zen", "Juego Tron Light Cycles con un unico jugador", &tronZen, NO_PARAMS};

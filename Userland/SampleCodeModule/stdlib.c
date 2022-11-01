@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define toLower(n) ((n) >= 'A' && (n) <= 'Z' ? (n) - ('A' - 'a') : (n))
 #define isNumber(n) ((n) >= '0' && (n) <= '9')
 #define isHex(n) ((n) >= 'a' && (n) <= 'f')
 
@@ -59,11 +60,12 @@ int strtoi(char* s, char ** end) {
     return num;
 }
 
-// Solo soporta mayusculas por ahora
 int strtoh(char* s, char ** end) {
     int num = 0;
+    int aux;
     while (isNumber(*s) || isHex(*s)) {
-        num = num * 16 + isNumber(*s)*(*s - '0') + isHex(*s)*(*s - 'a' + 10);
+        aux = toLower(*s);
+        num = num * 16 + isNumber(aux)*(aux - '0') + isHex(aux)*(aux - 'a' + 10);
         s++;
     }
     *end = s; 
