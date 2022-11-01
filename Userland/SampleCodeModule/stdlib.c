@@ -1,17 +1,18 @@
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #define isNumber(n) ((n) >= '0' && (n) <= '9')
 #define isHex(n) ((n) >= 'a' && (n) <= 'f')
 
-static unsigned int log(int n, int base) {
+static unsigned int log(uint64_t n, int base) {
     unsigned int count = 1;
     while (n /= base)
         count++;
     return count;
 }
 
-int itoa(int n, char* buffer, int base)
+int itoa(uint64_t n, char* buffer, int base)
 {
  
     if (n == 0)

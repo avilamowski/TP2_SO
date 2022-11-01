@@ -55,12 +55,12 @@ void vprintf(char * fmt, va_list args) {
                     putchar(va_arg(args, int));
                     break;
                 case 'd':
-                    len = itoa(va_arg(args, int), buffer, 10);
+                    len = itoa(va_arg(args, uint64_t), buffer, 10);
                     printNChars('0', dx-len);
                     puts(buffer);
                     break;
                 case 'x':
-                    len = itoa(va_arg(args, int), buffer, 16);
+                    len = itoa(va_arg(args, uint64_t), buffer, 16);
                     printNChars('0', dx-len);
                     puts(buffer);
                     break;

@@ -217,12 +217,12 @@ void printf(char * fmt, ...) {
                     printChar(va_arg(v, int));
                     break;
                 case 'd':
-                    len = itoa(va_arg(v, int), buffer, 10);
+                    len = itoa(va_arg(v, uint64_t), buffer, 10);
                     printNChars('0', dx-len);
                     print(buffer);
                     break;
                 case 'x':
-                    len = itoa(va_arg(v, int), buffer, 16);
+                    len = itoa(va_arg(v, uint64_t), buffer, 16);
                     printNChars('0', dx-len);
                     print(buffer);
                     break;
