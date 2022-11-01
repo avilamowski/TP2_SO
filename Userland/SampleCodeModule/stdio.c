@@ -40,6 +40,10 @@ char getScanCode() {
 int printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
+    vprintf(fmt, v);
+    va_end(v);
+    /*va_list v;
+    va_start(v, fmt);
     char * buffer[MAX_CHARS] = {0};
     char * fmtPtr = fmt;
     char * end;
@@ -74,8 +78,57 @@ int printf(char * fmt, ...) {
         fmtPtr++;
     }
     va_end(v);
+    return 1;*/
+}
+
+int vprintf(char * fmt, va_list args) {
+    char * buffer[MAX_CHARS] = {0};
+    char * fmtPtr = fmt;
+    char * end;
+    while (*fmtPtr) {
+ 	    if (*fmtPtr == '%') {
+            fmtPtr++;
+            int dx = strtoi(fmtPtr, &fmtPtr);
+            int len;
+
+            switch (*fmtPtr) {
+                case 'c':
+                    putchar(va_arg(args, char *));
+                    break;
+                case 'd':
+                    len = itoa(va_arg(args, int *), buffer, 10);
+                    printNChars('0', dx-len);
+                    puts(buffer);
+                    break;
+                case 'x':
+                    len = itoa(va_arg(args, int *), buffer, 16);
+                    printNChars('0', dx-len);
+                    puts(buffer);
+                    break;
+                case 's':
+                    printNChars(' ', dx); // A diferencia %x y %d, la cantidad de espacios es igual al numero
+                    puts((char *) va_arg(args, char *));
+                    break;
+            }
+        } else {
+            putchar(*fmtPtr);
+        }
+        fmtPtr++;
+    }
     return 1;
 }
+
+int printfc(uint8_t r, uint8_t g, uint8_t b, char * fmt, ...){
+    Color prevColor = getFontColor();
+    setFontColor(r, g, b);
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    setFontColor(prevColor.r, prevColor.g, prevColor.b);
+    return 1;
+}
+
 
 void printNChars(char c, int n) {
     for (int i = 0; i < n; i++)
