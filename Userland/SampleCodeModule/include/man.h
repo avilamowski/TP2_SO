@@ -14,7 +14,7 @@ char * usages [QTY_COMMANDS] = { "Uso: help - muestra todos los comandos que exi
                               "Uso: time - despliega la hora actual. No recibe parametros.",
 
                               "Uso: div [OP1] [OP2] - divide dos numeros que recibe por parametro\n"
-                              "Ejemplo: div 10 5.\n",
+                              "Ejemplo: div 10 5.",
 
                               "Uso: kaboom - arroja una excepcion de invalid opcode. No recibe parametros",
                               

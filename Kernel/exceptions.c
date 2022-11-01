@@ -36,7 +36,7 @@ void exceptionDispatcher(int ex, uint64_t * rip, uint64_t * rsp) {
 }
 
 static void printError(char * msg, uint64_t rip, uint64_t * rsp){
-	setFontColor((Color) ERROR_COLOR);
+	setFontColor(ERROR_COLOR);
     printf("Error: %s\n\n", msg);
 	dump(rip, *rsp, rsp - 4);
     setFontColor((Color) DEFAULT_COLOR);

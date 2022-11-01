@@ -13,14 +13,6 @@ typedef enum {FONT_12 = 0, FONT_24, FONT_36} fontSize;
 void videoClear();
 
 /**
- * @brief  Pinta un pixel
- * @param  x: Posicion x del pixel
- * @param  y: Posicion y del pixel 
- * @param  color: Color del que se lo quiere pintar
- */
-void setPixel(uint16_t x, uint16_t y, Color color);
-
-/**
  * @brief  Dibuja un rectangulo
  * @param  x: Origen en x 
  * @param  y: Origen en y 

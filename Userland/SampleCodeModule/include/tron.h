@@ -3,7 +3,7 @@
 
 /**
  * @brief Comienza una partida de tron o tron-zen
- * @param qtyPlayers Cantidad de jugadores
+ * @param qtyPlayers: Cantidad de jugadores
  */
 void startTron(int qtyPlayers);
 

@@ -6,14 +6,14 @@
 
 /**
  * @brief Escribe a partir del descriptor recibido un caracter
- * @param fd FileDescriptor (STDOUT | STDERR)
- * @param c Caracter a escribir
+ * @param fd: FileDescriptor (STDOUT | STDERR)
+ * @param c: Caracter a escribir
  */
 void write(int fd, char c);
 
 /**
  * @brief Lee un byte a partir del descriptor recibido
- * @param fd FileDescriptor (STDIN | KBDIN)
+ * @param fd: FileDescriptor (STDIN | KBDIN)
  * @return Byte leido
  */
 uint8_t read(int fd);
@@ -31,14 +31,14 @@ void clear(void);
 
 /**
  * @brief 
- * @param regarr Vector donde se llena la informacion de los registros
+ * @param regarr: Vector donde se llena la informacion de los registros
  * @return Puntero a la informacion de los registros
  */
 uint64_t * getInfoReg(uint64_t * regarr);
 
 /**
  * @brief Cambia el tamaño de la fuente
- * @param size (1|2|3)
+ * @param size: (1|2|3)
  */
 void setFontSize(uint8_t size);
 
@@ -49,12 +49,12 @@ void setFontSize(uint8_t size);
 uint32_t getScreenResolution();
 
 /**
- * @brief Dibuja un rectangulo
- * @param x Posicion en X
- * @param y Posicion en Y
- * @param width Ancho
- * @param height Alto
- * @param color Color
+ * @brief  Dibuja un rectangulo
+ * @param  x: Origen en x 
+ * @param  y: Origen en y 
+ * @param  width: Ancho
+ * @param  height: Alto
+ * @param  color: Color de relleno
  */
 void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color color);
 
@@ -66,15 +66,15 @@ uint64_t getTicks();
 
 /**
  * @brief Llena un vector con 32 bytes de informacion a partir de una direccion de memoria en hexa
- * @param pos Direccion de memoria a partir de la cual se llena el vector 
- * @param vec Vector en el cual se llena la informacion
+ * @param pos: Direccion de memoria a partir de la cual se llena el vector 
+ * @param vec: Vector en el cual se llena la informacion
  */
 void getMemory(uint64_t pos, uint8_t * vec);
 
 /**
  * @brief Reproduce un sonido
- * @param frequency Frecuencia del sonido
- * @param ticks Cantidad de ticks que se desea que dure el sonido
+ * @param frequency: Frecuencia del sonido
+ * @param ticks: Cantidad de ticks que se desea que dure el sonido
  */
 void playSound(uint64_t frequency, uint64_t ticks);
 
@@ -85,9 +85,9 @@ void kaboom();
 
 /**
  * @brief Establece un color de fuente
- * @param r Color rojo
- * @param g Color verde
- * @param b Color azul
+ * @param r: Color rojo
+ * @param g: Color verde
+ * @param b: Color azul
  */
 void setFontColor(uint8_t r, uint8_t g, uint8_t b);
 

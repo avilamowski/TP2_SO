@@ -4,8 +4,18 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
+#include <sound.h>
 
-#define CURSOR_FREQ 10
+#define CURSOR_FREQ 10  /* Frecuencia en Ticks del dibujo del cursor*/
+
+
+/**
+ * @brief Funcion auxiliar para printf y printfc
+ * @note La cantidad de parametros no es fija
+ * @param fmt Formato de lo que se desea escribir de STDOUT
+ * @param args lista de argumentos
+ */
+static void vprintf(char * fmt, va_list args);
 
 void putchar(char c) {
     write(STDOUT, c);
@@ -76,9 +86,9 @@ void vprintf(char * fmt, va_list args) {
     }
 }
 
-void printfc(uint8_t r, uint8_t g, uint8_t b, char * fmt, ...){
+void printfc(Color color, char * fmt, ...){    
     Color prevColor = getFontColor();
-    setFontColor(r, g, b);
+    setFontColor(color.r, color.g, color.b);
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);

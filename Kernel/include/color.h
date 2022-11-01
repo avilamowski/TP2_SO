@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-#define DEFAULT_COLOR {255, 255, 255} 	// Color por defecto de la letra del monitor
-#define ERROR_COLOR {0, 0, 255}			// Color por defecto para errores
+#define DEFAULT_COLOR {255, 255, 255} 			// Color por defecto de la letra del monitor
+#define ERROR_COLOR ((Color){0, 0, 255})		// Color por defecto para errores
+#define BLACK ((Color){0, 0, 0})				// Negro
 
 /* Estructura que guarda el valor RGB de un pixel */
 typedef struct {

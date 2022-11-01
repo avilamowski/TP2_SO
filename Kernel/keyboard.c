@@ -3,19 +3,23 @@
 #include <lib.h>
 #include <video.h>
 #include <time.h>
-#define INITIAL_DELAY 5
-#define LOOP_DELAY 1
-#define BUFFER_CAPACITY 10
-#define HOTKEY 29
-static uint8_t _bufferStart = 0;
-static char _bufferSize = 0;
-static uint8_t _buffer[BUFFER_CAPACITY] = {0};
-static const char charHexMap[256] = 
+#define BUFFER_CAPACITY 10                      /* Longitud maxima del vector _buffer */
+#define HOTKEY 29                               /* Scancode para el snapshot de registros */
+static uint8_t _bufferStart = 0;                /* Indice del comienzo de la cola */
+static char _bufferSize = 0;                    /* Longitud de la cola */
+static uint8_t _buffer[BUFFER_CAPACITY] = {0};  /* Vector ciclico que guarda las teclas 
+                                                 * que se van leyendo del teclado */
+static const char charHexMap[256] =             /* Mapa de scancode a ASCII */
     {   0,  0,  '1',  '2',  '3',  '4',  '5',  '6', '7',  '8',  '9', '0', '-',  '=',  '\b',  ' ',
         'q',  'w',  'e',  'r',  't',  'y',  'u',  'i', 'o',  'p',  '[', ']',  '\n',  0, 'a', 's',
         'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',  '\'',  0,  0,  '\\', 'z',  'x', 'c', 'v',
         'b',  'n',  'm',  ',',  '.',  '/',  0,  '*', 0,  ' ',  0, 0, 0,  0, 0, 0};
 
+/**
+ * @brief  Obtiene el indice del elemento en la cola dado un corrimiento 
+ * @param  offset: corrimiento
+ * @return Indice del elemento en la cola
+ */
 static int getBufferIndex(int offset){
     return (_bufferStart+offset)%(BUFFER_CAPACITY);
 }

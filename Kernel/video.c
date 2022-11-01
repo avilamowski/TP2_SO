@@ -6,7 +6,8 @@
 #include <stdarg.h>
 
 #define RGB_SIZE 3
-#define MAX_RESOLUTION (64 * 128)
+#define MAX_RESOLUTION (64 * 128)   /* Longitud del buffer de caracteres */
+#define MSG_BUFFER_EXCEEDED "Buffer de video excedido, la pantalla ha sido limpiada\n"
 
 struct vbe_mode_info_structure {
     uint16_t attributes;        // deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -47,15 +48,26 @@ struct vbe_mode_info_structure {
 } __attribute__ ((packed));
 
 struct vbe_mode_info_structure* _screenData = (void*)0x5C00;
-uint16_t _X = 0, _Y = 0;
-Color _fontColor = DEFAULT_COLOR;
-uint8_t _charWidth = CHAR_WIDTH_12;
-uint8_t _charHeight = CHAR_HEIGHT_12;
-char * _font = font_12;
-char _charBuffer[MAX_RESOLUTION];
-uint16_t _bufferIdx = 0;
+uint16_t _X = 0, _Y = 0;                /* Coordenadas de escritura de caracteres */
+Color _fontColor = DEFAULT_COLOR;       /* Color de fuente */
+uint8_t _charWidth = CHAR_WIDTH_12;     /* Ancho en pixeles de un caracter */
+uint8_t _charHeight = CHAR_HEIGHT_12;   /* Altura en pixeles de un caracter */
+char * _font = font_12;                 /* Mapa de bits de dibujo para los caracteres */
+char _charBuffer[MAX_RESOLUTION];       /* Buffer de caracteres */
+uint16_t _bufferIdx = 0;                /* Posicion de indice del buffer */
 
+/**
+ * @brief Reescribe los caracteres de _charBuffer
+ * @note  Se llama cuando se reajusta el tamaño de fuente
+ */
 static void renderFonts();
+
+/**
+ * @brief  Obtiene la direccion de memoria del pixel (x,y) de la pantalla
+ * @param  x: Coordenada x
+ * @param  y: Coordenada y
+ * @return Puntero al pixel (x,y)
+ */
 static void* getPtrToPixel(uint16_t x, uint16_t y);
 
 static void* getPtrToPixel(uint16_t x, uint16_t y) {
@@ -71,11 +83,6 @@ void videoClear() {
 
 uint8_t coordinatesValid(uint16_t x, uint16_t y) {
     return x < _screenData->width && y < _screenData->height;
-}
-
-void setPixel(uint16_t x, uint16_t y, Color color) {
-    if (coordinatesValid(x,y))
-        *((Color*) getPtrToPixel(x,y)) = color;
 }
 
 void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color color) {
@@ -141,21 +148,21 @@ void printNewline(void) {
 }
 
 void printChar(char c) {
-    if (c == '\b') { // Pensado solo para shell
+    if (c == '\b') { // Borrar el caracter anterior 
         if (_X < _charWidth && _Y > 0) { 
             _Y -= _charHeight;
             _X = (_screenData->width / _charWidth) * _charWidth - _charWidth;
         } else {
             _X -= _charWidth;
         }
-        drawRect(_X, _Y, _charWidth, _charHeight, (Color){0, 0, 0});
+        drawRect(_X, _Y, _charWidth, _charHeight, BLACK);
         _bufferIdx--;
         return;
     }
 
     if (_bufferIdx == MAX_RESOLUTION) {
         videoClear();
-        print("Buffer de video excedido, la pantalla ha sido limpiada\n");
+        print(MSG_BUFFER_EXCEEDED);
     }
 
     _charBuffer[_bufferIdx++] = c;
@@ -165,21 +172,21 @@ void printChar(char c) {
     }
     
     if (c >= FIRST_CHAR && c <= LAST_CHAR) {
-	    const char* data = _font + _charHeight * _charWidth * (c-FIRST_CHAR) / 8;
-	    for (int h=0; h<_charHeight; h++) {
+        /* Puntero al Bitmap de dibujo del caracter recibido */
+	    const char* data = _font + _charHeight * _charWidth * (c-FIRST_CHAR) / 8;   
+	    for (int h=0; h<_charHeight; h++) { // Iteracion por filas
     		Color* ptr = (Color*)getPtrToPixel(_X, _Y + h);
             uint8_t mask = 1;
-            for (uint8_t i = 0; i < _charWidth; i++) // TODO: Ver si se puede optimizar
-            {
+            for (uint8_t i = 0; i < _charWidth; i++) { // Iteracion por columnas
                 if (*data & mask) {
                     ptr[i] = _fontColor;
                 }
                 
                 if (mask & 0b10000000) {
                     mask = 0b00000001;
-                    data++;
+                    data++; // Pasa al siguiente byte dentro de una fila o de la siguiente 
                 } else {
-                    mask <<= 1;
+                    mask <<= 1; // Pasa al siguiente bit
                 }
             }
     	}

@@ -8,18 +8,29 @@
 #include <man.h>
 #include <libasm.h>
 
-typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;
-#define QTY_BYTES 32
+/* Enum para la cantidad de argumentos recibidos */
+typedef enum {NO_PARAMS = 0, SINGLE_PARAM, DUAL_PARAM} functionType;    
+#define QTY_BYTES 32 /* Cantidad de bytes de respuesta del printmem */
+#define DEFAULT_FONT_SIZE 1
+#define MIN_FONT_SIZE 1
+#define MAX_FONT_SIZE 3
+
+#define WELCOME "Bienvenido a Cactiland OS!\n"
+#define INVALID_COMMAND "Comando invalido!\n"
+#define WRONG_PARAMS "La cantidad de parametros ingresada es invalida\n"
+#define INVALID_FONT_SIZE "Dimension invalida de fuente\n"
+#define CHECK_MAN "Escriba \"man %s\" para ver como funciona el comando.\n"
+#define CHECK_MAN_FONT "Escriba \"man font-size \" para ver las dimensiones validas.\n"
 
 typedef struct {
-    char * name;
-    char * description;
-    union {
+    char * name;                    // Nombre del comando
+    char * description;             // Descripcion del comando (para help)
+    union {                         // Puntero a la funcion
        int (*f)(void);
        int (*g)(char *);
        int (*h)(char *, char *);
     };
-    functionType ftype;
+    functionType ftype;             // Cantidad de argumentos del comando
 } Command;
 
 static void help();
@@ -44,7 +55,7 @@ void init() {
     commands[5] = (Command){ "kaboom", "Ejecuta una excepcion de Invalid Opcode", &kaboom, NO_PARAMS};
     commands[6] = (Command){ "tron", "Juego Tron Light Cycles", &tron, NO_PARAMS};
     commands[7] = (Command){ "tron-zen", "Juego Tron Light Cycles con un unico jugador", &tronZen, NO_PARAMS};
-    commands[8] = (Command){ "font-size", "Cambio de tamanio de la fuente. Para hacerlo escribir el comando seguido de un numero", &fontSize, SINGLE_PARAM};
+    commands[8] = (Command){ "font-size", "Cambio de dimensiones de la fuente. Para hacerlo escribir el comando seguido de un numero", &fontSize, SINGLE_PARAM};
     commands[9] = (Command){ "printmem", "Realiza un vuelco de memoria de los 32 bytes posteriores a una direccion de memoria en formato hexadecimal enviada por parametro", &printMem, SINGLE_PARAM};
     commands[10] = (Command){ "clear", "Limpia toda la pantalla", &clear, NO_PARAMS};
 }
@@ -52,7 +63,7 @@ void init() {
 void run_shell() {
     init();
     int index;
-    puts("Bienvenido a Cactiland OS!\n");
+    puts(WELCOME);
     while(1){
         putchar('>');
         char command[MAX_CHARS] = {0};
@@ -62,13 +73,13 @@ void run_shell() {
         index = getCommandIndex(command);
         if (index == -1) {
             if (command[0] != 0)
-                printErr("Comando invalido!\n");
+                printErr(INVALID_COMMAND);
             continue;
         }
         int funcParams = commands[index].ftype;
         if(qtyParams - 1 != funcParams){
-            printErr("La cantidad de parametros ingresada es invalida\n");
-            printf("Escriba \"man %s\" para ver como funciona el comando.\n", command);
+            printErr(WRONG_PARAMS);
+            printf(CHECK_MAN, command);
             continue;
         }
         switch (commands[index].ftype)
@@ -86,6 +97,11 @@ void run_shell() {
     }
 }
 
+/**
+ * @brief  Devuelve el indice del vector de comandos dado su nombre
+ * @param  command: Nombre del comando a buscar
+ * @return  Indice del comando 
+ */
 static int getCommandIndex(char * command) {
     int idx = 0;
     for(; idx < QTY_COMMANDS; idx++){
@@ -112,7 +128,13 @@ static void time(){
 }
 
 static void fontSize(char * size) {
-    setFontSize((uint8_t)atoi(size));
+    int s = atoi(size);
+    if(s >= MIN_FONT_SIZE && s <= MAX_FONT_SIZE)
+        setFontSize((uint8_t)atoi(size));
+    else{
+        printErr(INVALID_FONT_SIZE);
+        puts(CHECK_MAN_FONT);
+    }
 }
 
 static void tron(){
@@ -154,5 +176,5 @@ static void man(char * command){
     if (idx != -1)
         printf("%s\n", usages[idx]);
     else
-        puts("Comando desconocido\n");
+        printErr(INVALID_COMMAND);
 }
