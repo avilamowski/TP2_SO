@@ -144,7 +144,7 @@ void printChar(char c) {
     if (c == '\b') { // Pensado solo para shell
         if (_X < _charWidth && _Y > 0) { 
             _Y -= _charHeight;
-            _X = _screenData->width - _charWidth;
+            _X = (_screenData->width / _charWidth) * _charWidth - _charWidth;
         } else {
             _X -= _charWidth;
         }
@@ -185,7 +185,7 @@ void printChar(char c) {
     	}
     }
     _X += _charWidth;
-    if (_X > _screenData->width - _charWidth)
+    if (_X > (_screenData->width / _charWidth) * _charWidth - _charWidth)
         printNewline();
 }
 

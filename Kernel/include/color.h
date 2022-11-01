@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define DEFAULT_COLOR {255, 255, 255}
-#define ERROR_COLOR {0, 0, 127}
+#define ERROR_COLOR {0, 0, 255}
 
 typedef struct {
 	uint8_t b;

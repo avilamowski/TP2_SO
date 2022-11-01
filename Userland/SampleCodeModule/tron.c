@@ -81,7 +81,7 @@ void startTron(int qtyPlayers) {
         if(qtyPlayers == 2)
             printfc(0, 0, 0, "%30s%d : %d\n", " ", _p1.wins, _p2.wins);
         else
-            printfc(0, 0, 0, "Muertes: %d", _p1.wins);
+            printfc(0, 0, 0, "Muertes: %d\n", _p1.wins);
         _playing = 1;
         uint64_t initialTicks = getTicks();
         _p1 = (Player){FIELD_WIDTH_POSITIONS * 8 * 0.2, FIELD_HEIGHT / 2, 1, 0, 1, 0, (Color){100, 255, 100}, (Color){100, 150, 100}, 0, _p1.wins};

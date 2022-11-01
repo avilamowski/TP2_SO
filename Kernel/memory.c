@@ -14,12 +14,12 @@ void copyRegisters(uint64_t * rsp) {
     uint64_t * rspEnd = rsp+7; 
     int i = 0;
 
-    printf("RIP: 0x%x\nRSP: 0x%x\n", *p, (uint64_t) p + 0x30);
+    //printf("RIP: 0x%x\nRSP: 0x%x\n", *p, (uint64_t) p + 0x30);
     _regSnapshot[0] = *p;
     _regSnapshot[1] = (uint64_t) p + 0x30;
     p--;
     while (p != rspEnd) {
-        printf("%s: 0x%x\n", _regNames[i], *p);
+        //printf("%s: 0x%x\n", _regNames[i], *p);
         _regSnapshot[i+2] = *p;
         p--;
         i++;
