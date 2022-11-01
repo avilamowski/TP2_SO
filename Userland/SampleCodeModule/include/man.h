@@ -1,7 +1,10 @@
 #ifndef _MAN_H
 #define _MAN_H
 #include <shell.h>
-
+/**
+ * @brief Matriz con una breve explicacion de uso de cada uno de los comandos
+ * 
+ */
 char * usages [QTY_COMMANDS] = { "Uso: help - muestra todos los comandos que existen en la terminal. No recibe parametros.",
                               
                               "Uso: man [COMANDO] - explica el funcionamiento de un comando enviado como parametro.",

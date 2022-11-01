@@ -2,7 +2,6 @@ EXTERN copyRegisters
 GLOBAL cpuVendor
 GLOBAL getTime
 GLOBAL getKeyPressed
-GLOBAL getRegisterArray
 GLOBAL startSound
 GLOBAL stopSound
 GLOBAL saveRegisters

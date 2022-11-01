@@ -9,6 +9,10 @@ uint64_t * getLastRegSnapshot() {
     return _regSnapshot;
 }
 
+/**
+ * @brief Carga en regSnapshot los valores de los registros
+ * @note  Se asume que todos los registros llegan por stack 
+ */
 void copyRegisters(uint64_t * rsp) {
     uint64_t * p = rsp + 23; 
     uint64_t * rspEnd = rsp+7; 

@@ -4,46 +4,100 @@
 #include <stdint.h>
 #include <color.h>
 
+/* Tamaños de fuente disponibles */
 typedef enum {FONT_12 = 0, FONT_24, FONT_36} fontSize;
 
-/* Clears the whole screen to black. */
+/**
+ * @brief  Pone todos los pixeles de la pantalla en negro y limpia el buffer de video
+ */
 void videoClear();
 
-/* Sets the color of a specific pixel on the screen. */
+/**
+ * @brief  Pinta un pixel
+ * @param  x: Posicion x del pixel
+ * @param  y: Posicion y del pixel 
+ * @param  color: Color del que se lo quiere pintar
+ */
 void setPixel(uint16_t x, uint16_t y, Color color);
 
-/* Sets a specified rectangle of pixels on the screen to the specified color. */
+/**
+ * @brief  Dibuja un rectangulo
+ * @param  x: Origen en x 
+ * @param  y: Origen en y 
+ * @param  width: Ancho
+ * @param  height: Alto
+ * @param  color: Color de relleno
+ */
 void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, Color color);
 
-/* Sets the pen position for drawing characters on the screen as a console. */
-void setPenPosition(uint16_t x, uint16_t y);
-
-/* Sets the pen color for drawing characters on the screen as a console. */
+/**
+ * @brief  Cambiar el color de la letra para STDIN
+ * @param  color: Nuevo color
+ */
 void setFontColor(Color color);
 
-/* Sets the font size for drawing characters on the screen as a console. */
+/**
+ * @brief  Cambia el tamaño de la fuente
+ * @param  f: (1|2|3)
+ */
 void setFontSize(fontSize f);
 
-/* Advances the pen to the beginning of the next line. */
-void printNewline(void);
+/**
+ * @brief  Hace un salto de linea y pasa al principio de la siguiente
+ */
+void printNewline();
 
-/* Prints a single character with the pen, wrapping around the end of the screen and pushing old lines up if necessary. */
+/**
+ * @brief  Imprime un caracter en pantalla
+ * @param  c: Caracter a imprimir 
+ */
 void printChar(char c);
 
-/* Prints a string of characters with the pen, wrapping around the end of the screen and pushing old lines up if necessary.
-Returns the new pen position as a 32 bit number, where the 16 lowest bits are the x and the upper 16 bits are the y. */
+/**
+ * @brief  Imprime una cadena de caracteres en pantalla
+ * @param  s: Cadena de caracteres a imprimir
+ */
 void print(const char* s);
 
-int printf(char * fmt, ...);
+/**
+ * @brief  Imprime una cadena de caracteres con formato en pantalla
+ * @note   Hay una funcion printf 
+ * @param  fmt: Formato
+ */
+void printf(char * fmt, ...);
 
+
+/**
+ * @brief  Imprime n caracteres de un string
+ * @param  s: String origen
+ * @param  n: Cantidad de caracteres a imprimir
+ */
 void printN(const char * s, uint32_t n);
 
+/**
+ * @brief  Imprime n veces un caracter
+ * @param  c: Caracter a imprimir
+ * @param  n: Cantidad de veces que se lo quiere imprimir
+ */
 void printNChars(char c, int n);
 
+/**
+ * @brief  Devuelve las dimensiones de la pantalla
+ * @note   
+ * @return 32 bits menos significativos el ancho, 32 el alto 
+ */
 uint32_t getScreenResolution();
 
+/**
+ * @brief  Cambia el color de la letra
+ * @param  color: Nuevo color
+ */
 void setFontColor(Color color);
 
+/**
+ * @brief  Devuelve el color de la letra
+ * @return Color de la letra
+ */
 Color getFontColor();
 
 #endif

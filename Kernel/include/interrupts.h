@@ -5,8 +5,8 @@
  *      Author: anizzomc
  */
 
-#ifndef INTERRUPTS_H_
-#define INTERRUPTS_H_
+#ifndef _INTERRUPTS_H_
+#define _INTERRUPTS_H_
 
 #include <idtLoader.h>
 

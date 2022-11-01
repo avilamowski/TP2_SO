@@ -201,7 +201,7 @@ void printN(const char* s, uint32_t n) {
         printChar(*s++);
 }
 
-int printf(char * fmt, ...) {
+void printf(char * fmt, ...) {
     va_list v;
     va_start(v, fmt);
     char buffer[256] = {0};
@@ -237,7 +237,6 @@ int printf(char * fmt, ...) {
         fmtPtr++;
     }
     va_end(v);
-    return 1;
 }
 
 void printNChars(char c, int n) {

@@ -2,8 +2,8 @@
   Defs.h
 ****************************************************/
 
-#ifndef _defs_
-#define _defs_
+#ifndef _DEFS_H_
+#define _DEFS_H_
 
 
 /* Flags para derechos de acceso de los segmentos */

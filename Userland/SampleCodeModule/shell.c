@@ -38,14 +38,14 @@ static Command commands[QTY_COMMANDS];
 void init() {
     commands[0] = (Command){"help", "Listado de comandos", &help, NO_PARAMS};
     commands[1] = (Command){ "man", "Manual de uso de los comandos", &man, SINGLE_PARAM};
-    commands[2] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &printInfoReg, NO_PARAMS}; 
-    commands[3] = (Command){"time", "Despliega la hora actual", &time, NO_PARAMS};
-    commands[4] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
-    commands[5] = (Command){ "kaboom", "que es esto!", &kaboom, NO_PARAMS};
-    commands[6] = (Command){ "tron", "el tron", &tron, NO_PARAMS};
-    commands[7] = (Command){ "tron-zen", "el snake", &tronZen, NO_PARAMS};
+    commands[2] = (Command){"inforeg", "Informacion de los registos que fueron capturados en un momento arbitrario de ejecucion del sistema", &printInfoReg, NO_PARAMS}; 
+    commands[3] = (Command){"time", "Despliega la hora actual UTC - 3", &time, NO_PARAMS};
+    commands[4] = (Command){ "div", "Divide dos numeros enviados por parametro", &div, DUAL_PARAM};
+    commands[5] = (Command){ "kaboom", "Ejecuta una excepcion de Invalid Opcode", &kaboom, NO_PARAMS};
+    commands[6] = (Command){ "tron", "Juego Tron Light Cycles", &tron, NO_PARAMS};
+    commands[7] = (Command){ "tron-zen", "Juego Tron Light Cycles con un unico jugador", &tronZen, NO_PARAMS};
     commands[8] = (Command){ "font-size", "Cambio de tamanio de la fuente. Para hacerlo escribir el comando seguido de un numero", &fontSize, SINGLE_PARAM};
-    commands[9] = (Command){ "printmem", "hola", &printMem, SINGLE_PARAM};
+    commands[9] = (Command){ "printmem", "Realiza un vuelco de memoria de los 32 bytes posteriores a una direccion de memoria en formato hexadecimal enviada por parametro", &printMem, SINGLE_PARAM};
     commands[10] = (Command){ "clear", "Limpia toda la pantalla", &clear, NO_PARAMS};
 }
 

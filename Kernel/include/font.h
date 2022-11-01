@@ -4,10 +4,12 @@
 #define FIRST_CHAR 33
 #define LAST_CHAR 126
 
-/* The width of a character in pixels. */
+/* Ancho de la fuente 12 en pixeles */
 #define CHAR_WIDTH_12 8
-/* The height of a character in pixels. */
+/* Alto de la fuente 12 en pixeles */
 #define CHAR_HEIGHT_12 16
+
+/* Vector de pixeles de los caracteres de fuente 12 */
 char font_12[] = {
     // input12_excl
     0x00, 0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x08, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00, 0x00,
@@ -199,11 +201,12 @@ char font_12[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E, 0x4A, 0x52, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-/* The width of a character in pixels. */
+/* Ancho de la fuente 24 en pixeles */
 #define CHAR_WIDTH_24 16 
-/* The height of a character in pixels. */
+/* Alto de la fuente 24 en pixeles */
 #define CHAR_HEIGHT_24 32
 
+/* Vector de pixeles de los caracteres de fuente 24 */
 char font_24[] = {
     // input24_excl
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x01, 0xC0, 0x01, 0xC0, 0x01, 0xC0, 0x01,
@@ -677,11 +680,12 @@ char font_24[] = {
     0x00, 0x00, 0x00, 0x00,
 };
 
-/* The width of a character in pixels. */
+/* Ancho de la fuente 36 en pixeles */
 #define CHAR_WIDTH_36 24 
-/* The height of a character in pixels. */
+/* Alto de la fuente 36 en pixeles */
 #define CHAR_HEIGHT_36 48
 
+/* Vector de pixeles de los caracteres de fuente 36 */
 char font_36[] = {
         // input36_excl
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

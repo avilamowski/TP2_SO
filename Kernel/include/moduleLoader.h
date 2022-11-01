@@ -1,5 +1,5 @@
-#ifndef MODULELOADER_H
-#define MODULELOADER_H
+#ifndef _MODULELOADER_H
+#define _MODULELOADER_H
 
 void loadModules(void * payloadStart, void ** moduleTargetAddress);
 

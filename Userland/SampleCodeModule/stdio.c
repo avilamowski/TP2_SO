@@ -26,7 +26,7 @@ void printErr(const char * s) {
 
 int getchar() {
     char c;
-    c = read(STDIN); // TODO: Ver cuestiones de buffer
+    c = read(STDIN);
     return c;
 }
 
