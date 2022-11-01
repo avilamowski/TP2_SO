@@ -23,3 +23,7 @@ void playSoundDraw(){
     for(int i=0; i<18; i++)
         playSound(500-20*i,1);
 }
+
+void playSoundLimitReached(){
+    playSound(66,1);
+}

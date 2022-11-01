@@ -125,7 +125,7 @@ int scanf(char * fmt, ...) {
                 bIdx--;
                 putchar(c);
             } else {
-                playSound(66,1);
+                playSoundLimitReached();
             }
         }
     }

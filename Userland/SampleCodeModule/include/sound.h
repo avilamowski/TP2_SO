@@ -3,4 +3,5 @@
 void playSoundVictory1();
 void playSoundVictory2();
 void playSoundDraw();
+void playSoundLimitReached();
 #endif
