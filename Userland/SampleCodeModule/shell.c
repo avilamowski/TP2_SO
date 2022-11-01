@@ -24,14 +24,13 @@ typedef struct {
 
 static void help();
 static void man(char * command);
-static void infoReg();
+static void printInfoReg();
 static void time();
 static int div(char * num, char * div);
 static void tron();
 static void tronZen();
 static void fontSize(char * size);
 static void printMem(char * pos);
-
 static int getCommandIndex(char * command);
 
 static Command commands[QTY_COMMANDS];
@@ -39,7 +38,7 @@ static Command commands[QTY_COMMANDS];
 void init() {
     commands[0] = (Command){"help", "Listado de comandos", &help, NO_PARAMS};
     commands[1] = (Command){ "man", "Manual de uso de los comandos", &man, SINGLE_PARAM};
-    commands[2] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &usrGetInfoReg, NO_PARAMS}; 
+    commands[2] = (Command){"inforeg", "Informacion de los registos en un momento arbitrario de ejecucion del sistema", &printInfoReg, NO_PARAMS}; 
     commands[3] = (Command){"time", "Despliega la hora actual", &time, NO_PARAMS};
     commands[4] = (Command){ "div", "Divide dos numeros", &div, DUAL_PARAM};
     commands[5] = (Command){ "kaboom", "que es esto!", &kaboom, NO_PARAMS};
@@ -135,6 +134,16 @@ static void printMem(char * pos){
     getMemory(strtoh(pos, &end), resp);
     for(int i = 0; i < QTY_BYTES; i++)
         printf("Byte numero %d: 0x%x\n", i, resp[i]);
+}
+
+static char * _regNames[] = {"RIP", "RSP", "RAX", "RBX", "RCX", "RDX", "RBP", "RDI", "RSI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"};
+static void printInfoReg() {
+    int len = sizeof(_regNames)/sizeof(char *);
+    char * regSnapshot[len];
+    getInfoReg(regSnapshot);
+    for (int i = 0; i < len; i++)
+        printf("%s: %x\n", _regNames[i], regSnapshot[i]);
+    
 }
 
 static void man(char * command){

@@ -1,9 +1,11 @@
+EXTERN copyRegisters
 GLOBAL cpuVendor
 GLOBAL getTime
 GLOBAL getKeyPressed
 GLOBAL getRegisterArray
 GLOBAL startSound
 GLOBAL stopSound
+GLOBAL saveRegisters
 
 section .text
     
@@ -112,3 +114,8 @@ stopSound:
 	and al, 0xFC
 	out 61h, al
   	ret
+
+saveRegisters:
+    mov rdi, rbp 
+    call copyRegisters
+    ret

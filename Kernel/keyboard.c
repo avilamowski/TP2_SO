@@ -6,6 +6,7 @@
 #define INITIAL_DELAY 5
 #define LOOP_DELAY 1
 #define BUFFER_CAPACITY 10
+#define HOTKEY 29
 static uint8_t _bufferStart = 0;
 static char _bufferSize = 0;
 static uint8_t _buffer[BUFFER_CAPACITY] = {0};
@@ -23,6 +24,10 @@ void keyboardHandler(){
     uint8_t key = getKeyPressed();
     if(_bufferSize < BUFFER_CAPACITY -1){
         if(!(key & 0x80)){
+            if (key == HOTKEY) {
+                saveRegisters();
+                return;
+            }
             _buffer[getBufferIndex(_bufferSize)] = key;
             _bufferSize++;
         }

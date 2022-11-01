@@ -4,19 +4,18 @@
 #include <lib.h>
 #include <color.h>
 #include <speaker.h>
+#include <memory.h>
 
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
 #define KBDIN 3
 
-#define QTY_REGS 15
-
 static uint8_t syscall_read(uint32_t fd);
 static void syscall_write(uint32_t fd, char c);
 static void syscall_clear();
 static uint32_t syscall_seconds();
-static uint64_t * syscall_registerarray(uint64_t * regarr, uint64_t * statePtr);
+static uint64_t * syscall_registerarray(uint64_t * regarr);
 static void syscall_fontsize(uint8_t size);
 static uint32_t syscall_resolution();
 static void syscall_drawrect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
@@ -38,7 +37,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1, uint64_t a
         case 3:
             return syscall_seconds();
         case 4:
-            return syscall_registerarray((uint64_t *) arg0, (&arg5) + 1);
+            return syscall_registerarray((uint64_t *) arg0);
         case 5:
             syscall_fontsize((uint8_t)arg0);
             break;
@@ -97,9 +96,10 @@ static uint32_t syscall_seconds(){
 }
 
 // Inforeg
-static uint64_t * syscall_registerarray(uint64_t * regarr, uint64_t * statePtr){
+static uint64_t * syscall_registerarray(uint64_t * regarr){
+    uint64_t * snapshot = getLastRegSnapshot();
     for(int i = 0; i < QTY_REGS; i++)
-        regarr[i] = statePtr[QTY_REGS-1-i];
+        regarr[i] = snapshot[i];
     return regarr;
 }
 
