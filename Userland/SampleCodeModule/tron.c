@@ -4,6 +4,8 @@
 #include <color.h>
 #include <sound.h>
 
+#define DEBUG 0 /* Modo de debug */
+
 /* Scancodes de las teclas */
 #define ESC 0x01
 #define SPACEBAR 0x39
@@ -97,13 +99,15 @@ static int update(Player * p);
 static void setDirections(Player * p, uint8_t key, uint8_t up, uint8_t left, uint8_t down, uint8_t right, uint8_t turbo);
 /* Bucle del juego para un jugador */
 static void loopzen();
-/* Pinta los espacios ocupados dentro del tablero, solo se usa para debuggear */
-static void debug();
 /**
  * @brief  Evita que un jugador pueda suicidarse por apretar una tecla invalida
  * @param  p: Puntero al jugador
  */
 static void correctVelocity(Player * p);
+#if DEBUG == 1
+/* Pinta los espacios ocupados dentro del tablero, solo se usa para debuggear */
+static void debug();
+#endif
 
 Player _p1, _p2;                                        /* Jugadores */
 uint8_t _playing;                                       /* Boolean para saber si la partida continua */
@@ -149,6 +153,9 @@ static void tron(){
                 else
                     loopzen(_field);
             }
+            #if DEBUG == 1
+            debug();
+            #endif
         }
         puts(GAME_OVER);
         puts(PLAY_AGAIN);
@@ -158,12 +165,14 @@ static void tron(){
     } while (userInput == SPACEBAR);
 } 
 
+#if DEBUG == 1
 static void debug() {
     for (int i = 0; i < FIELD_WIDTH; i++)
         for (int j = 0; j < FIELD_HEIGHT; j++)
             if (_field[i / 8][j] & (1 << (i % 8)))
                 drawRect(i * PLAYER_SIZE, j * PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE, RED);
 }
+#endif
 
 static void initializeField() {
     

@@ -53,7 +53,7 @@ void print(const char* s);
 
 /**
  * @brief  Imprime una cadena de caracteres con formato en pantalla
- * @note   Hay una funcion printf 
+ * @note   No confundir con la funcion printf definida en userland 
  * @param  fmt: Formato
  */
 void printf(char * fmt, ...);
