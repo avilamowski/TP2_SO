@@ -22,6 +22,7 @@ GLOBAL _ex0EHandler
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
 EXTERN exceptionDispatcher
+EXTERN load_main
 
 SECTION .text
 
@@ -89,6 +90,9 @@ SECTION .text
 	call exceptionDispatcher
 
 	popState
+	; El iretq necesita que le manden los valores de RIP|CS|RFLAGS|SP|SS de userland por stack
+	add rsp, 8
+	push load_main
 	iretq
 %endmacro
 
