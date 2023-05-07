@@ -1,4 +1,4 @@
- /*
+/*
  *   interrupts.h
  *
  *  Created on: Apr 18, 2010
@@ -9,6 +9,7 @@
 #define _INTERRUPTS_H_
 
 #include <idtLoader.h>
+#include <stdint.h>
 
 void _ex00Handler(void);
 void _ex06Handler(void);
@@ -33,7 +34,7 @@ void picMasterMask(uint8_t mask);
 
 void picSlaveMask(uint8_t mask);
 
-//Termina la ejecución de la cpu.
+// Termina la ejecución de la cpu.
 void haltcpu(void);
 
 #endif /* INTERRUPS_H_ */

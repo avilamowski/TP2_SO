@@ -6,17 +6,17 @@
  * @brief Estructura para definir un color con atributos rojo, verde y azul
  */
 typedef struct {
-	uint8_t b;
-	uint8_t g;
-	uint8_t r;
+  uint8_t b;
+  uint8_t g;
+  uint8_t r;
 } Color;
 
 /**
  * @brief Estructura auxiliar de un color y su respectiva expresion en bits
  */
 typedef union {
-	Color color;
-	uint32_t bits;
+  Color color;
+  uint32_t bits;
 } ColorInt;
 
 #define LIGHT_GREEN ((Color){100, 255, 100})

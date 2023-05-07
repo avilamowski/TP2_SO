@@ -9,9 +9,9 @@
 /* Cantidad maxima de caracteres para los buffers */
 #define MAX_CHARS 256
 
-#include <stdint.h>
-#include <stdarg.h>
 #include <color.h>
+#include <stdarg.h>
+#include <stdint.h>
 /**
  * @brief Imprime un caracter en STDOUT
  * @param c: Caracter a imprimir
@@ -28,18 +28,18 @@ void putcharErr(char c);
  * @brief Imprime una cadena en STDOUT
  * @param s: Cadena a a imprimir
  */
-void puts(const char * s);
+void puts(const char *s);
 
 /**
  * @brief Imprime una cadena en STDERR
- * 
+ *
  * @param s: Cadena a a imprimir
  */
-void printErr(const char * s);
+void printErr(const char *s);
 
 /**
  * @brief Imprime una n cantidad de caracteres el caracter c
- * 
+ *
  * @param c: Caracter a imprimir
  * @param n: Cantidad de veces que se imprimira el caracter
  */
@@ -53,36 +53,39 @@ int getchar();
 
 /**
  * @brief Devuelve un scancode escrito en KBDIN
- * @return Scancode 
+ * @return Scancode
  */
 char getScanCode();
 
 /**
- * @brief Permite leer varios tipos de datos de una sola vez (%d, %s, &c, %x, ...)
+ * @brief Permite leer varios tipos de datos de una sola vez (%d, %s, &c, %x,
+ * ...)
  * @param fmt: Formato de lo que se desea leer de STDIN
- * @param ... 
+ * @param ...
  * @return Cantidad de parametros que se leyeron
  */
-int scanf(char * fmt, ...);
+int scanf(char *fmt, ...);
 
 /**
- * @brief Imprime en STDOUT una "cadena de formato" que permite mezclar distintos tipos de datos para luego mostrarlos en la cadena final
+ * @brief Imprime en STDOUT una "cadena de formato" que permite mezclar
+ * distintos tipos de datos para luego mostrarlos en la cadena final
  * @note La cantidad de parametros no es fija
  * @param fmt: Formato de lo que se desea escribir de STDOUT
- * @param ... 
+ * @param ...
  */
-void printf(char * fmt, ...);
+void printf(char *fmt, ...);
 
 /* Deprecado */
-void printRegisters(const uint64_t * rsp);
+void printRegisters(const uint64_t *rsp);
 
 /**
- * @brief Analogo a printf pero permite asignar un color a la cadena de caracteres
+ * @brief Analogo a printf pero permite asignar un color a la cadena de
+ * caracteres
  * @note La cantidad de parametros no es fija
  * @param color: color
  * @param fmt: Formato de lo que se desea escribir de STDOUT
- * @param ... 
+ * @param ...
  */
-void printfc(Color color, char * fmt, ...);    
+void printfc(Color color, char *fmt, ...);
 
 #endif

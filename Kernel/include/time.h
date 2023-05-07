@@ -7,7 +7,7 @@
  */
 void timerHandler();
 /**
- * @return Devuelve los ticks 
+ * @return Devuelve los ticks
  */
 uint64_t ticksElapsed();
 
