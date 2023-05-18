@@ -1,5 +1,7 @@
+#include <defs.h>
 #include <interrupts.h>
 #include <lib.h>
+#include <memoryManager.h>
 #include <moduleLoader.h>
 #include <stdint.h>
 #include <video.h>
@@ -15,6 +17,7 @@ static const uint64_t PageSize = 0x1000;
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
+static void *const memAmount = (void *)(SYSTEM_VARIABLES + 132);
 
 typedef int (*EntryPoint)();
 
@@ -31,8 +34,12 @@ void *getStackBase() {
 
 void initializeKernelBinary() {
   void *moduleAddresses[] = {sampleCodeModuleAddress, sampleDataModuleAddress};
-  loadModules(&endOfKernelBinary, moduleAddresses);
+  uint64_t userlandSize = loadModules(&endOfKernelBinary, moduleAddresses);
   clearBSS(&bss, &endOfKernel - &bss);
+
+  uint64_t memAmountBytes = *((uint32_t *)memAmount) * (1 << 20);
+  createMemoryManager((void *)MEMORY_MANAGER_ADDRESS,
+                      sampleDataModuleAddress + userlandSize, memAmountBytes);
 }
 
 int main() {

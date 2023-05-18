@@ -99,4 +99,9 @@ void setFontColor(uint8_t r, uint8_t g, uint8_t b);
  * @return Color
  */
 Color getFontColor();
+
+void *malloc(uint64_t size);
+
+void free(void *ptr);
+
 #endif

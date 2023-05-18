@@ -19,4 +19,8 @@
 #define ACS_DATA (ACS_PRESENT | ACS_DSEG | ACS_WRITE)
 #define ACS_STACK (ACS_PRESENT | ACS_DSEG | ACS_WRITE)
 
+/* Direccion del MemoryManager */
+#define SYSTEM_VARIABLES 0x5A00
+#define MEMORY_MANAGER_ADDRESS 0x50000
+
 #endif

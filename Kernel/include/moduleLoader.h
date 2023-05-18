@@ -1,6 +1,6 @@
 #ifndef _MODULELOADER_H
 #define _MODULELOADER_H
 
-void loadModules(void *payloadStart, void **moduleTargetAddress);
+uint64_t loadModules(void *payloadStart, void **moduleTargetAddress);
 
 #endif
