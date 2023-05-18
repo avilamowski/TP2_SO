@@ -1,6 +1,5 @@
+#include <lib.h>
 #include <stdint.h>
-
-static unsigned int log(uint64_t n, int base);
 
 void *memset(void *destination, int32_t c, uint64_t length) {
   uint8_t chr = (uint8_t)c;
@@ -46,8 +45,8 @@ void *memcpy(void *destination, const void *source, uint64_t length) {
   return destination;
 }
 
-static unsigned int log(uint64_t n, int base) {
-  unsigned int count = 1;
+unsigned int log(uint64_t n, int base) {
+  unsigned int count = 0;
   while (n /= base)
     count++;
   return count;
@@ -71,7 +70,7 @@ int itoa(uint64_t n, char *buffer, int base) {
       i++;
   }*/
 
-  len += log(n, base);
+  len += log(n, base) + 1;
   while (n != 0) {
     int r = n % base;
     buffer[len - i++ - 1] = (r > 9) ? (r - 10) + 'A' : r + '0';

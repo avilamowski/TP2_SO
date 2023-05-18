@@ -38,8 +38,14 @@ void initializeKernelBinary() {
   clearBSS(&bss, &endOfKernel - &bss);
 
   uint64_t memAmountBytes = *((uint32_t *)memAmount) * (1 << 20);
+
+  uint64_t availableMem =
+      1 << log(memAmountBytes -
+                   (uint64_t)(sampleDataModuleAddress + userlandSize),
+               2);
+
   createMemoryManager((void *)MEMORY_MANAGER_ADDRESS,
-                      sampleDataModuleAddress + userlandSize, memAmountBytes);
+                      sampleDataModuleAddress + userlandSize, availableMem);
 }
 
 int main() {
