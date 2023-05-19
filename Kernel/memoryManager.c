@@ -46,37 +46,35 @@ MemoryManagerADT getMemoryManager() {
 
 void *allocMemory(const uint64_t size) {
   MemoryManagerADT memoryManager = getMemoryManager();
-  uint8_t expToAlloc = log(size, 2);
-  if (expToAlloc < MIN_EXP || expToAlloc > memoryManager->maxExp)
+  uint8_t idxToAlloc = log(size + sizeof(MemoryBlock), 2);
+  if (idxToAlloc < MIN_EXP || idxToAlloc > memoryManager->maxExp)
     return NULL;
   void *allocation = NULL;
 
-  if (memoryManager->blocks[expToAlloc] ==
+  if (memoryManager->blocks[idxToAlloc] ==
       NULL) { // TODO: Ver si cambia con headers
-    uint8_t closestExp = 0;
-    for (uint8_t i = expToAlloc + 1; i < memoryManager->maxExp && !closestExp;
+    uint8_t closestIdx = 0;
+    for (uint8_t i = idxToAlloc + 1; i < memoryManager->maxExp && !closestIdx;
          i++)
       if (memoryManager->blocks[i] != NULL)
-        closestExp = i;
-    for (; closestExp > expToAlloc; closestExp--)
-      split(memoryManager->blocks, closestExp);
+        closestIdx = i;
+    for (; closestIdx > idxToAlloc; closestIdx--)
+      split(memoryManager->blocks, closestIdx);
   }
-  MemoryBlock *block = memoryManager->blocks[expToAlloc];
-  memoryManager->blocks[expToAlloc] = removeMemoryBlock(block);
+  MemoryBlock *block = memoryManager->blocks[idxToAlloc];
+  memoryManager->blocks[idxToAlloc] = removeMemoryBlock(block);
   allocation = (void *)block + sizeof(MemoryBlock);
 
   return (void *)allocation;
 }
 
-static void split(MemoryBlock *blocks[], uint8_t exp) {
-  MemoryBlock *block = blocks[exp - 1];
-  blocks[exp - 1] = removeMemoryBlock(block);
+static void split(MemoryBlock *blocks[], uint8_t idx) {
+  MemoryBlock *block = blocks[idx];
+  blocks[idx] = removeMemoryBlock(block);
   MemoryBlock *buddyBlock =
-      (MemoryBlock *)(block +
-                      (1 << (exp - 1))); // TODO: Si se rompe es por el & xd
-  blocks[exp - 2] =
-      createMemoryBlock((void *)buddyBlock, exp - 1, blocks[exp - 2]);
-  blocks[exp - 2] = createMemoryBlock((void *)block, exp - 1, blocks[exp - 2]);
+      (MemoryBlock *)(block + (1 << (idx))); // TODO: Si se rompe es por el & xd
+  blocks[idx - 1] = createMemoryBlock((void *)buddyBlock, idx, blocks[idx - 1]);
+  blocks[idx - 1] = createMemoryBlock((void *)block, idx, blocks[idx - 1]);
 }
 
 static MemoryBlock *removeMemoryBlock(MemoryBlock *memoryBlock) {

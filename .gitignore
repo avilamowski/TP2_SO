@@ -12,3 +12,6 @@
 *.o
 
 .bash_history
+.gdbinit
+.gdb_history
+settings.json

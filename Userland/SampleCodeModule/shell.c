@@ -207,8 +207,7 @@ static void test(char *name) {
   char *a = (char *)malloc(10);
   strcpy(a, "Hola");
   char *b = (char *)malloc(1000);
-  strcpy(a, "Chau");
-  // char * c = (char *) malloc(1000000000);
-  printf("%s %s", a, b);
-  // printf("%d %d %d", a, b, c);
+  strcpy(b, "Chau");
+  char *c = (char *)malloc(1000000000);
+  printf("%d %d %d", a, b, c);
 }
