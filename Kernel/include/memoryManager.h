@@ -8,7 +8,7 @@ typedef struct MemoryManagerCDT *MemoryManagerADT;
 
 MemoryManagerADT
 createMemoryManager(void *const restrict memoryForMemoryManager,
-                    void *const restrict managedMemory, uint64_t memAmount);
+					void *const restrict managedMemory, uint64_t memAmount);
 
 void *allocMemory(const uint64_t size);
 

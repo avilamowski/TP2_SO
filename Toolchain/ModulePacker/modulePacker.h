@@ -13,16 +13,16 @@
 #define MAX_FILES 128
 
 typedef struct {
-  char **array;
-  int length;
+	char **array;
+	int length;
 } array_t;
 
 /* Used by main to communicate with parse_opt. */
 struct arguments {
-  char *args[MAX_FILES];
-  int silent, verbose;
-  char *output_file;
-  int count;
+	char *args[MAX_FILES];
+	int silent, verbose;
+	char *output_file;
+	int count;
 };
 
 int buildImage(array_t fileArray, char *output_file);

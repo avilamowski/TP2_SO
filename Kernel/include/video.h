@@ -5,7 +5,9 @@
 #include <stdint.h>
 
 /* Tamaños de fuente disponibles */
-typedef enum { FONT_12 = 0, FONT_24, FONT_36 } fontSize;
+typedef enum { FONT_12 = 0,
+			   FONT_24,
+			   FONT_36 } fontSize;
 
 /**
  * @brief  Pone todos los pixeles de la pantalla en negro y limpia el buffer de
@@ -22,7 +24,7 @@ void videoClear();
  * @param  color: Color de relleno
  */
 void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-              Color color);
+			  Color color);
 
 /**
  * @brief  Cambiar el color de la letra para STDIN

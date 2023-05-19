@@ -58,7 +58,7 @@ uint32_t getScreenResolution();
  * @param  color: Color de relleno
  */
 void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-              Color color);
+			  Color color);
 
 /**
  * @brief Devuelve la cantidad de ticks actuales
