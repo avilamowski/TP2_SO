@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 #define MIN_EXP 5 // Tamaño del MemoryBlock
+#define FREE 0
+#define USED 1
 typedef struct MemoryBlock {
 	uint8_t exp;
 	uint8_t used;
@@ -20,7 +22,8 @@ typedef struct MemoryManagerCDT {
 
 static void split(MemoryBlock *blocks[], uint8_t exp);
 static MemoryBlock *createMemoryBlock(void *ptrToAllocate, uint8_t exp, MemoryBlock *prev);
-static MemoryBlock *removeMemoryBlock(MemoryBlock *memoryBlock);
+static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memoryBlock);
+static MemoryBlock *merge(MemoryBlock *blocks[], MemoryBlock *block, MemoryBlock *buddy);
 
 MemoryManagerADT createMemoryManager(void *const restrict memoryForMemoryManager, void *const restrict managedMemory, uint64_t memAmount) {
 	MemoryManagerADT memoryManager = (MemoryManagerADT) memoryForMemoryManager;
@@ -44,22 +47,22 @@ MemoryManagerADT getMemoryManager() {
 void *allocMemory(const uint64_t size) {
 	MemoryManagerADT memoryManager = getMemoryManager();
 	uint8_t idxToAlloc = log(size + sizeof(MemoryBlock), 2);
-	if (idxToAlloc < MIN_EXP || idxToAlloc > memoryManager->maxExp)
+	idxToAlloc = idxToAlloc < MIN_EXP - 1 ? MIN_EXP - 1 : idxToAlloc;
+	if (idxToAlloc < MIN_EXP - 1 || idxToAlloc > memoryManager->maxExp)
 		return NULL;
 	void *allocation = NULL;
 
-	if (memoryManager->blocks[idxToAlloc] ==
-		NULL) { // TODO: Ver si cambia con headers
+	if (memoryManager->blocks[idxToAlloc] == NULL) { // TODO: Ver si cambia con headers
 		uint8_t closestIdx = 0;
-		for (uint8_t i = idxToAlloc + 1;
-			 i < memoryManager->maxExp && !closestIdx; i++)
+		for (uint8_t i = idxToAlloc + 1; i < memoryManager->maxExp && !closestIdx; i++)
 			if (memoryManager->blocks[i] != NULL)
 				closestIdx = i;
 		for (; closestIdx > idxToAlloc; closestIdx--)
 			split(memoryManager->blocks, closestIdx);
 	}
 	MemoryBlock *block = memoryManager->blocks[idxToAlloc];
-	memoryManager->blocks[idxToAlloc] = removeMemoryBlock(block);
+	removeMemoryBlock(memoryManager->blocks, block);
+	block->used = USED;
 	allocation = (void *) block + sizeof(MemoryBlock);
 
 	return (void *) allocation;
@@ -67,25 +70,44 @@ void *allocMemory(const uint64_t size) {
 
 static void split(MemoryBlock *blocks[], uint8_t idx) {
 	MemoryBlock *block = blocks[idx];
-	blocks[idx] = removeMemoryBlock(block);
+	removeMemoryBlock(blocks, block);
 	MemoryBlock *buddyBlock =
 		(MemoryBlock *) (block +
 						 (1 << (idx))); // TODO: Si se rompe es por el & xd
-	blocks[idx - 1] =
-		createMemoryBlock((void *) buddyBlock, idx, blocks[idx - 1]);
+	blocks[idx - 1] = createMemoryBlock((void *) buddyBlock, idx, blocks[idx - 1]);
 	blocks[idx - 1] = createMemoryBlock((void *) block, idx, blocks[idx - 1]);
 }
 
-static void hola() {
+void free(void *ptrAllocatedMemory) {
+	MemoryManagerADT memoryManager = getMemoryManager();
+	MemoryBlock *block = (MemoryBlock *) (ptrAllocatedMemory - sizeof(MemoryBlock));
+	block->used = FREE;
+	uint64_t relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
+	MemoryBlock *buddyBlock = block + ((relativePosition & (1 << (block->exp))) ? -1 : 1) * (1 << block->exp);
+	while (buddyBlock->used == FREE && buddyBlock->exp == block->exp) {
+		block = merge(memoryManager->blocks, block, buddyBlock);
+		// block->used = FREE;
+		relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
+		buddyBlock = block + ((relativePosition & (1 << (block->exp))) ? -1 : 1) * (1 << block->exp);
+	}
+	memoryManager->blocks[block->exp - 1] = createMemoryBlock((void *) block, block->exp, memoryManager->blocks[block->exp - 1]);
 }
 
-static MemoryBlock *removeMemoryBlock(MemoryBlock *memoryBlock) {
-	if (memoryBlock->prev != NULL) {
+static MemoryBlock *merge(MemoryBlock *blocks[], MemoryBlock *block, MemoryBlock *buddy) {
+	removeMemoryBlock(blocks, buddy);
+	MemoryBlock *leftBlock = block < buddy ? block : buddy;
+	leftBlock->exp++;
+	return leftBlock;
+}
+
+static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memoryBlock) {
+	if (memoryBlock->prev != NULL)
 		memoryBlock->prev->next = memoryBlock->next;
-	}
-	if (memoryBlock->next != NULL) {
+	else
+		blocks[memoryBlock->exp - 1] = memoryBlock->next;
+
+	if (memoryBlock->next != NULL)
 		memoryBlock->next->prev = memoryBlock->prev;
-	}
 	return memoryBlock->next;
 }
 
@@ -93,8 +115,11 @@ static MemoryBlock *createMemoryBlock(void *ptrToAllocate, uint8_t exp,
 									  MemoryBlock *next) {
 	MemoryBlock *memoryBlock = (MemoryBlock *) ptrToAllocate;
 	memoryBlock->exp = exp;
-	memoryBlock->used = 0;
+	memoryBlock->used = FREE;
 	memoryBlock->prev = NULL;
 	memoryBlock->next = next;
+	if (memoryBlock->next != NULL) {
+		memoryBlock->next->prev = memoryBlock;
+	}
 	return memoryBlock;
 }

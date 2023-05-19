@@ -1,5 +1,6 @@
 #ifndef _STRING_H
 #define _STRING_H
+#include <stdint.h>
 /**
  * @brief Determina si dos cadenas de caracteres son iguales o diferentes
  * @param s1: Cadena de caracteres
@@ -27,4 +28,6 @@ int strcpychar(char *dest, const char *origin, char limit);
  * @return Londitud de la cadena de destino
  */
 int strcpy(char *dest, const char *origin);
+
+void *memset(void *destiation, int32_t c, uint64_t length);
 #endif

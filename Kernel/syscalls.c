@@ -186,4 +186,5 @@ static void *syscall_malloc(uint64_t size) {
 
 // Free
 static void syscall_free(void *ptr) {
+	free(ptr);
 }

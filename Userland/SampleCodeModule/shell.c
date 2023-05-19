@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syscalls.h>
+#include <test_mm.h>
 #include <tron.h>
 
 /* Enum para la cantidad de argumentos recibidos */
@@ -205,11 +206,12 @@ static void man(char *command) {
 		printErr(INVALID_COMMAND);
 }
 
-static void test(char *name) {
-	char *a = (char *) malloc(10);
-	strcpy(a, "Hola");
-	char *b = (char *) malloc(1000);
-	strcpy(b, "Chau");
-	char *c = (char *) malloc(1000000000);
-	printf("%d %d %d", a, b, c);
+static void test(char *n) {
+	// char *a = (char *) malloc(10);
+	// strcpy(a, "Hola");
+	// char *b = (char *) malloc(1000);
+	// strcpy(b, "Chau");
+	// char *c = (char *) malloc(1000000000);
+	// printf("%d %d %d\n", a, b, c);
+	test_mm(1, (char *[]){n});
 }
