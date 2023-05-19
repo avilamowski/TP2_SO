@@ -2,6 +2,7 @@
 #include <lib.h>
 #include <memoryManager.h>
 #include <stdint.h>
+#include <video.h>
 
 #define MIN_EXP 5 // Tamaño del MemoryBlock
 #define FREE 0
@@ -47,16 +48,20 @@ MemoryManagerADT getMemoryManager() {
 void *allocMemory(const uint64_t size) {
 	MemoryManagerADT memoryManager = getMemoryManager();
 	uint8_t idxToAlloc = log(size + sizeof(MemoryBlock), 2);
+
 	idxToAlloc = idxToAlloc < MIN_EXP - 1 ? MIN_EXP - 1 : idxToAlloc;
-	if (idxToAlloc < MIN_EXP - 1 || idxToAlloc > memoryManager->maxExp)
+
+	if (idxToAlloc < MIN_EXP - 1 || idxToAlloc >= memoryManager->maxExp)
 		return NULL;
 	void *allocation = NULL;
 
-	if (memoryManager->blocks[idxToAlloc] == NULL) { // TODO: Ver si cambia con headers
+	if (memoryManager->blocks[idxToAlloc] == NULL) {
 		uint8_t closestIdx = 0;
 		for (uint8_t i = idxToAlloc + 1; i < memoryManager->maxExp && !closestIdx; i++)
 			if (memoryManager->blocks[i] != NULL)
 				closestIdx = i;
+		if (closestIdx == 0)
+			return NULL;
 		for (; closestIdx > idxToAlloc; closestIdx--)
 			split(memoryManager->blocks, closestIdx);
 	}
