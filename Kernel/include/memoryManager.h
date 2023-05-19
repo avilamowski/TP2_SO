@@ -10,7 +10,7 @@ MemoryManagerADT
 createMemoryManager(void *const restrict memoryForMemoryManager,
                     void *const restrict managedMemory, uint64_t memAmount);
 
-void *allocMemory(const size_t memoryToAllocate);
+void *allocMemory(const uint64_t size);
 
 MemoryManagerADT getMemoryManager();
 

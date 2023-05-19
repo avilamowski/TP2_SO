@@ -44,6 +44,7 @@ static void tronZen();
 static void fontSize(char *size);
 static void printMem(char *pos);
 static int getCommandIndex(char *command);
+static void test(char *testName);
 
 static Command commands[QTY_COMMANDS];
 
@@ -80,6 +81,8 @@ void init() {
       .g = (void *)&printMem, SINGLE_PARAM};
   commands[10] = (Command){"clear", "Limpia toda la pantalla",
                            .f = (void *)&clear, NO_PARAMS};
+  commands[11] = (Command){"test", "Permite ejecutar un programa de prueba",
+                           .g = (void *)&test, SINGLE_PARAM};
 }
 
 void run_shell() {
@@ -198,4 +201,14 @@ static void man(char *command) {
     printf("%s\n", usages[idx]);
   else
     printErr(INVALID_COMMAND);
+}
+
+static void test(char *name) {
+  char *a = (char *)malloc(10);
+  strcpy(a, "Hola");
+  char *b = (char *)malloc(1000);
+  strcpy(a, "Chau");
+  // char * c = (char *) malloc(1000000000);
+  printf("%s %s", a, b);
+  // printf("%d %d %d", a, b, c);
 }
