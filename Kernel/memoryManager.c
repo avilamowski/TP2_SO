@@ -79,8 +79,7 @@ static void split(MemoryBlock *blocks[], uint8_t idx) {
 	MemoryBlock *buddyBlock =
 		(MemoryBlock *) ((void *) block + (1 << idx)); // TODO: Si se rompe es por el & xd
 	createMemoryBlock(buddyBlock, idx, blocks[idx - 1]);
-	createMemoryBlock(block, idx, buddyBlock);
-	blocks[idx - 1] = block;
+	blocks[idx - 1] = createMemoryBlock(block, idx, buddyBlock);
 }
 
 void free(void *ptrAllocatedMemory) {
@@ -88,12 +87,11 @@ void free(void *ptrAllocatedMemory) {
 	MemoryBlock *block = (MemoryBlock *) (ptrAllocatedMemory - sizeof(MemoryBlock));
 	block->used = FREE;
 	uint64_t relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
-	MemoryBlock *buddyBlock = (MemoryBlock *) ((void *) block + ((relativePosition & (1 << (block->exp))) ? -1 : 1) * (1 << block->exp));
+	MemoryBlock *buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1 << block->exp)));
 	while (buddyBlock->used == FREE && buddyBlock->exp == block->exp) {
 		block = merge(memoryManager->blocks, block, buddyBlock);
-		// block->used = FREE;
 		relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
-		buddyBlock = (MemoryBlock *) ((void *) block + ((relativePosition & (1 << (block->exp))) ? -1 : 1) * (1 << block->exp));
+		buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1 << block->exp)));
 	}
 	memoryManager->blocks[block->exp - 1] = createMemoryBlock((void *) block, block->exp, memoryManager->blocks[block->exp - 1]);
 }
