@@ -207,11 +207,12 @@ static void man(char *command) {
 }
 
 static void test(char *n) {
-	char *a = (char *) malloc(atoi(n));
+	// char *a = (char *) malloc(atoi(n));
+	// free(a);
 	// strcpy(a, "Hola");
 	// char *b = (char *) malloc(1000);
 	// strcpy(b, "Chau");
 	// char *c = (char *) malloc(1000000000);
 	// printf("%d %d %d\n", a, b, c);
-	// test_mm(1, (char *[]){n});
+	test_mm(1, (char *[]){n});
 }
