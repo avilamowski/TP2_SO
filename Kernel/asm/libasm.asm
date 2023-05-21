@@ -72,17 +72,6 @@ getKeyPressed:
     pop rbp
     ret
 
-int_80:
-    push rbp
-    mov rbp, rsp
-
-    xor rax, rax
-    in al, 60h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
 startSound:
 	push rbp
     push rdx

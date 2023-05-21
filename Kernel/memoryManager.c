@@ -27,7 +27,7 @@ static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memory
 static MemoryBlock *merge(MemoryBlock *blocks[], MemoryBlock *block, MemoryBlock *buddy);
 
 MemoryManagerADT createMemoryManager(void *const restrict memoryForMemoryManager, void *const restrict managedMemory, uint64_t memAmount) {
-	MemoryManagerADT memoryManager = (MemoryManagerADT) memoryForMemoryManager;
+	MemoryManagerADT memoryManager = (MemoryManagerADT) memoryForMemoryManager; // TODO ver si ponemos la constante
 	memoryManager->firstAddress = managedMemory;
 	memoryManager->maxExp = log(memAmount, 2);
 	if (memoryManager->maxExp < MIN_EXP)
@@ -68,6 +68,8 @@ void *allocMemory(const uint64_t size) {
 	MemoryBlock *block = memoryManager->blocks[idxToAlloc];
 	removeMemoryBlock(memoryManager->blocks, block);
 	block->used = USED;
+	block->prev = NULL; // Reutilizar punteros para heap
+	block->next = NULL;
 	allocation = (void *) block + sizeof(MemoryBlock);
 
 	return (void *) allocation;

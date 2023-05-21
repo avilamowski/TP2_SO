@@ -82,4 +82,12 @@ void _hlt();
 
 unsigned int log(uint64_t n, int base);
 
+int stringArrayLen(char **array);
+
+int strcpy(char *dest, const char *origin);
+
+int strcpychar(char *dest, const char *origin, char limit);
+
+int strlen(const char *str);
+
 #endif

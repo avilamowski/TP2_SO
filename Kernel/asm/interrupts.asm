@@ -1,4 +1,4 @@
-
+GLOBAL _initialize_stack_frame
 GLOBAL _cli
 GLOBAL _sti
 GLOBAL picMasterMask
@@ -95,6 +95,40 @@ SECTION .text
 	push load_main
 	iretq
 %endmacro
+
+%macro pushStateNoRax 0
+    push rbx
+    push rcx
+    push rdx
+    push rbp
+    push rdi
+    push rsi
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+%endmacro
+
+_initialize_stack_frame:
+	; TODO: Alineamiento???
+	mov r8, rsp
+	mov rsp, rdx
+	push 0x0
+	push rdx
+	push 0x202
+	push 0x8
+	push rdi
+	mov rdi, rsi
+	mov rsi, rcx
+	push 0x0
+	pushStateNoRax
+	mov rax, rsp
+	mov rsp, r8
+	ret
 
 _hlt:
 	sti

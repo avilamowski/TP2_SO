@@ -22,5 +22,9 @@
 /* Direccion del MemoryManager */
 #define SYSTEM_VARIABLES 0x5A00
 #define MEMORY_MANAGER_ADDRESS 0x50000
+#define SCHEDULER_ADDRESS 0x51000
+
+/* Constantes */
+#define NULL ((void *) 0)
 
 #endif

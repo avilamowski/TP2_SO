@@ -1,3 +1,4 @@
+#include <defs.h>
 #include <lib.h>
 #include <stdint.h>
 
@@ -87,4 +88,33 @@ int strtoi(char *s, char **end) {
 		num = num * 10 + *(s++) - '0';
 	*end = s;
 	return num;
+}
+
+int stringArrayLen(char **array) {
+	int len = 0;
+	while (*(array++) != NULL)
+		len++;
+	return len;
+}
+
+// TODO: Ver de mover a un modulo de strings separado
+int strcpy(char *dest, const char *origin) {
+	return strcpychar(dest, origin, '\0');
+}
+
+int strcpychar(char *dest, const char *origin, char limit) {
+	int idx = 0;
+	while (origin[idx] != limit && origin[idx] != '\0') {
+		dest[idx] = origin[idx];
+		idx++;
+	}
+	dest[idx] = 0;
+	return idx;
+}
+
+int strlen(const char *str) {
+	int len = 0;
+	while (*(str++) != '\0')
+		len++;
+	return len;
 }
