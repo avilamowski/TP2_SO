@@ -3,6 +3,7 @@
 #include <lib.h>
 #include <memoryManager.h>
 #include <moduleLoader.h>
+#include <scheduler.h>
 #include <stdint.h>
 #include <video.h>
 
@@ -20,6 +21,7 @@ static void *const sampleDataModuleAddress = (void *) 0x500000;
 static void *const memAmount = (void *) (SYSTEM_VARIABLES + 132);
 
 typedef int (*EntryPoint)();
+int idle(int argc, char **argv);
 
 void clearBSS(void *bssAddress, uint64_t bssSize) {
 	memset(bssAddress, 0, bssSize);
@@ -43,12 +45,28 @@ void initializeKernelBinary() {
 		1 << log(memAmountBytes - (uint64_t) (sampleDataModuleAddress + userlandSize), 2);
 
 	createMemoryManager((void *) MEMORY_MANAGER_ADDRESS, sampleDataModuleAddress + userlandSize, availableMem);
+	createScheduler();
 }
 
 int main() {
+	char *argsIdle[3] = {"idle", "Hm?", NULL};
+	createProcess((MainFunction) &idle, argsIdle, "idle", 4);
 	load_idt();
-	((EntryPoint) sampleCodeModuleAddress)();
-	while (1)
+	return 0;
+}
+
+int idle(int argc, char **argv) {
+	char *argsShell[2] = {"shell", NULL};
+	createProcess((MainFunction) sampleCodeModuleAddress, argsShell, "shell", 4);
+	while (1) {
+		uint8_t oldM;
+		uint8_t h, m, s;
+		getTime(&h, &m, &s);
+		if (m != oldM) {
+			printf("\n%d:%d:%d %d %s\n", h, m, s, argc, argv[1]);
+		}
+		oldM = m;
 		_hlt();
+	}
 	return 0;
 }

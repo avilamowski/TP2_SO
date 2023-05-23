@@ -16,20 +16,26 @@ LinkedListADT createLinkedListADT() {
 	return list;
 }
 
-Node *appendNode(LinkedListADT list, void *data) {
+Node *appendElement(LinkedListADT list, void *data) {
 	if (list == NULL)
 		return NULL;
 	Node *newNode = (Node *) allocMemory(sizeof(Node));
-	newNode->next = NULL;
 	newNode->data = data;
+	return appendNode(list, newNode);
+}
+
+Node *appendNode(LinkedListADT list, Node *node) {
+	if (list == NULL)
+		return NULL;
+	node->next = NULL;
 	if (list->len > 0)
-		list->last->next = newNode;
+		list->last->next = node;
 	else
-		list->first = newNode;
-	newNode->prev = list->last;
-	list->last = newNode;
+		list->first = node;
+	node->prev = list->last;
+	list->last = node;
 	list->len++;
-	return newNode;
+	return node;
 }
 
 Node *getFirst(LinkedListADT list) {
@@ -46,7 +52,7 @@ int isEmpty(LinkedListADT list) {
 
 void *removeNode(LinkedListADT list, Node *node) {
 	if (list == NULL || node == NULL)
-		return;
+		return NULL;
 
 	if (list->first == node)
 		list->first = node->next;
@@ -60,6 +66,6 @@ void *removeNode(LinkedListADT list, Node *node) {
 
 	list->len--;
 	void *data = node->data;
-	free(node);
+	// free(node);
 	return data;
 }

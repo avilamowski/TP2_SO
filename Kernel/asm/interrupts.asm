@@ -23,6 +23,7 @@ EXTERN irqDispatcher
 EXTERN syscallDispatcher
 EXTERN exceptionDispatcher
 EXTERN load_main
+EXTERN schedule
 
 SECTION .text
 
@@ -115,19 +116,25 @@ SECTION .text
 
 _initialize_stack_frame:
 	; TODO: Alineamiento???
-	mov r8, rsp
-	mov rsp, rdx
+	mov r8, rsp 	; Preservar rsp
+	mov r9, rbp		; Preservar rbp
+	mov rsp, rdx 	; Carga sp del proceso
+	mov rbp, rdx
+	;push 0x0		; Alineamiento????
+	;and rsp, -16
 	push 0x0
 	push rdx
 	push 0x202
 	push 0x8
 	push rdi
-	mov rdi, rsi
-	mov rsi, rcx
-	push 0x0
-	pushStateNoRax
+	mov rdi, rsi 		; Primer argumento de wrapper, RIP
+	mov rsi, rcx		; Segundo argumento, args
+	;push 0x0
+	;pushStateNoRax
+	pushState
 	mov rax, rsp
 	mov rsp, r8
+	mov rbp, r9
 	ret
 
 _hlt:
@@ -163,7 +170,15 @@ picSlaveMask:
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:
-	irqHandlerMaster 0
+	pushState
+	mov rdi, rsp
+	call schedule
+	mov rsp, rax
+	mov al, 20h
+	out 20h, al
+	popState
+	iretq
+	; irqHandlerMaster 0
 
 ;Keyboard
 _irq01Handler:

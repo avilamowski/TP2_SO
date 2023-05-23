@@ -10,7 +10,8 @@ typedef struct Node {
 } Node;
 
 LinkedListADT createLinkedListADT();
-Node *appendNode(LinkedListADT list, void *data);
+Node *appendElement(LinkedListADT list, void *data);
+Node *appendNode(LinkedListADT list, Node *node);
 void *removeNode(LinkedListADT list, Node *node);
 Node *getFirst(LinkedListADT list);
 int isEmpty(LinkedListADT list);

@@ -2,7 +2,6 @@
 #include <lib.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include <string.h>
 #include <video.h>
 
 #define RGB_SIZE 3

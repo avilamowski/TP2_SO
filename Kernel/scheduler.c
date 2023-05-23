@@ -10,6 +10,7 @@ typedef struct SchedulerCDT {
 	LinkedListADT levels[QTY_LEVELS];
 	uint16_t currentPid;
 	uint16_t nextUnusedPid;
+	uint16_t qtyProcesses;
 	uint8_t remainingQuantum;
 } SchedulerCDT;
 
@@ -18,10 +19,9 @@ SchedulerADT createScheduler() {
 	for (int i = 0; i < MAX_PROCESSES; i++)
 		scheduler->processes[i] = NULL;
 	for (int i = 0; i < QTY_LEVELS; i++)
-		scheduler->levels[i] = NULL;
+		scheduler->levels[i] = createLinkedListADT();
 
 	scheduler->nextUnusedPid = 0;
-	// Node * process = (Node *) allocMemory(sizeof(Node));
 	return scheduler;
 }
 
@@ -42,18 +42,25 @@ static uint16_t getNextPid(SchedulerADT scheduler) {
 
 static void setPriority(SchedulerADT scheduler, Node *node, uint8_t newPriority) {
 	Process *process = (Process *) node->data;
-	if (newPriority <= 0 || newPriority > QTY_LEVELS)
+	if (newPriority < 0 || newPriority >= QTY_LEVELS)
 		return;
 	removeNode(scheduler->levels[process->priority], node);
 	process->priority = newPriority;
-	scheduler->processes[process->pid] = appendNode(scheduler->levels[process->priority], process);
+	scheduler->processes[process->pid] = appendNode(scheduler->levels[process->priority], node);
 }
 
 void *schedule(void *prevStackPointer) {
+	static firstTime = 1;
 	SchedulerADT scheduler = getSchedulerADT();
+	if (!scheduler->qtyProcesses)
+		return prevStackPointer;
+
 	Node *currentProcessNode = scheduler->processes[scheduler->currentPid];
 	Process *currentProcess = (Process *) currentProcessNode->data;
-	currentProcess->stackPos = prevStackPointer;
+	if (!firstTime)
+		currentProcess->stackPos = prevStackPointer;
+	else
+		firstTime = 0;
 	if (currentProcess->status == RUNNING)
 		currentProcess->status = READY;
 
@@ -62,18 +69,24 @@ void *schedule(void *prevStackPointer) {
 	setPriority(scheduler, currentProcessNode, newPriority);
 
 	scheduler->currentPid = getNextPid(scheduler);
-	currentProcess = scheduler->processes[scheduler->currentPid];
+	currentProcess = scheduler->processes[scheduler->currentPid]->data;
 	currentProcess->status = RUNNING;
 	return currentProcess->stackPos;
 }
 
 uint16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
 	SchedulerADT scheduler = getSchedulerADT();
+	if (scheduler->qtyProcesses >= MAX_PROCESSES) // TODO: Agregar panic?
+		return 0;
 	Process *process = (Process *) allocMemory(sizeof(Process));
 	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority);
 
-	Node *processNode = appendNode(scheduler->levels[process->priority], (void *) process);
+	Node *processNode = appendElement(scheduler->levels[process->priority], (void *) process);
 	scheduler->processes[process->pid] = processNode;
+
+	while (scheduler->processes[scheduler->nextUnusedPid] != NULL)
+		scheduler->nextUnusedPid++;
+	scheduler->qtyProcesses++;
 	return process->pid;
 }
 
@@ -82,8 +95,11 @@ void killProcess(uint16_t pid, int retValue) {
 	Node *processToKillNode = scheduler->processes[scheduler->currentPid];
 	Process *processToKill = (Process *) processToKillNode->data;
 	scheduler->processes[pid] = NULL;
-	// if (pid < scheduler->nextUnusedPid) scheduler->nextUnusedPid = pid;
-	// TODO chequear si hay que buscar linealmente el siguiente
 
+	scheduler->qtyProcesses--;
+	removeNode(scheduler->levels[processToKill->priority], processToKillNode);
+	// TODO: llamar al timer tick si el proceso es el current
+	// TODO: free heap?
+	free(processToKillNode);
 	free(processToKill);
 }
