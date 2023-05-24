@@ -19,6 +19,7 @@ typedef struct Process { // PCB
 	uint8_t priority;
 	ProcessStatus status;
 	// uint8_t * fd;
+	int32_t retValue;
 } Process;
 
 typedef struct ProcessSnapshot {

@@ -90,4 +90,6 @@ int strcpychar(char *dest, const char *origin, char limit);
 
 int strlen(const char *str);
 
+void forceTimerTick();
+
 #endif

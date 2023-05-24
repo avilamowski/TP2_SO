@@ -5,6 +5,7 @@ GLOBAL getKeyPressed
 GLOBAL startSound
 GLOBAL stopSound
 GLOBAL saveRegisters
+GLOBAL forceTimerTick
 
 section .text
     
@@ -106,4 +107,8 @@ stopSound:
 saveRegisters:
     mov rdi, rbp 
     call copyRegisters
+    ret
+
+forceTimerTick:
+    int 0x20
     ret

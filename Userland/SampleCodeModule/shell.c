@@ -228,6 +228,5 @@ static void runLoop(char *delay) {
 }
 
 static void runKill(char *pid) {
-	char *args[] = {"kill", pid, 0};
-	createProcess(&kill, args, "kill", 4);
+	killProcess((uint16_t) atoi(pid));
 }

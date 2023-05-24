@@ -22,12 +22,6 @@ int loop(int argc, char **argv) {
 	return 0;
 }
 
-int32_t kill(int argc, char **argv) {
-	uint16_t pid = atoi(argv[1]);
-	killProcess(pid);
-	return 0;
-}
-
 int nice(int argc, char **argv) {
 	return 0;
 }

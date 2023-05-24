@@ -82,18 +82,22 @@ void *schedule(void *prevStackPointer) {
 	if (!scheduler->qtyProcesses)
 		return prevStackPointer;
 
+	Process *currentProcess;
 	Node *currentProcessNode = scheduler->processes[scheduler->currentPid];
-	Process *currentProcess = (Process *) currentProcessNode->data;
-	if (!firstTime)
-		currentProcess->stackPos = prevStackPointer;
-	else
-		firstTime = 0;
-	if (currentProcess->status == RUNNING)
-		currentProcess->status = READY;
 
-	// TODO: Analizar si vale la pena hacerlo ciclico
-	uint8_t newPriority = currentProcess->priority > 0 ? currentProcess->priority - 1 : currentProcess->priority;
-	setPriority(currentProcess->pid, newPriority);
+	if (currentProcessNode != NULL) {
+		currentProcess = (Process *) currentProcessNode->data;
+		if (!firstTime)
+			currentProcess->stackPos = prevStackPointer;
+		else
+			firstTime = 0;
+		if (currentProcess->status == RUNNING)
+			currentProcess->status = READY;
+
+		// TODO: Analizar si vale la pena hacerlo ciclico
+		uint8_t newPriority = currentProcess->priority > 0 ? currentProcess->priority - 1 : currentProcess->priority;
+		setPriority(currentProcess->pid, newPriority);
+	}
 
 	scheduler->currentPid = getNextPid(scheduler);
 	currentProcess = scheduler->processes[scheduler->currentPid]->data;
@@ -118,17 +122,19 @@ uint16_t createProcess(MainFunction code, char **args, char *name, uint8_t prior
 }
 
 int32_t killProcess(uint16_t pid, int32_t retValue) {
+	if (pid == 0)
+		return -1;
 	SchedulerADT scheduler = getSchedulerADT();
-	Node *processToKillNode = scheduler->processes[scheduler->currentPid];
+	Node *processToKillNode = scheduler->processes[pid];
 	Process *processToKill = (Process *) processToKillNode->data;
 	scheduler->processes[pid] = NULL;
 
 	scheduler->qtyProcesses--;
 	removeNode(scheduler->levels[processToKill->priority], processToKillNode);
-	// TODO: Guardar retValue en PCB para zombie?
+	processToKill->retValue = retValue;
 	// TODO: llamar al timer tick si el proceso es el current
 	// TODO: free heap?
-	free(processToKillNode);
+	free(processToKillNode); // TODO: No liberar si es zombie
 	free(processToKill);
 	return retValue;
 }
