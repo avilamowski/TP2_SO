@@ -3,10 +3,13 @@
 #include <lib.h>
 #include <memory.h>
 #include <memoryManager.h>
+#include <process.h>
+#include <scheduler.h>
 #include <speaker.h>
 #include <stdint.h>
 #include <time.h>
 #include <video.h>
+
 /* File Descriptors*/
 #define STDIN 0
 #define STDOUT 1
@@ -29,6 +32,15 @@
 #define GET_FONT_COLOR 12
 #define MALLOC 13
 #define FREE 14
+#define CREATE_PROCESS 15
+#define EXIT_PROCESS 16
+#define GET_PID 17
+#define PS 18
+#define KILL_PROCESS 19
+#define CHANGE_PROCESS_STATE 20
+#define CHANGE_PROCESS_PRIORITY 21
+#define YIELD 22
+#define WAITPID 23
 
 static uint8_t syscall_read(uint32_t fd);
 static void syscall_write(uint32_t fd, char c);
@@ -46,6 +58,15 @@ static void syscall_setFontColor(uint8_t r, uint8_t g, uint8_t b);
 static uint32_t syscall_getFontColor();
 static void *syscall_malloc(uint64_t size);
 static void syscall_free(void *ptr);
+static uint16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority);
+static void syscall_exitProcess();
+static uint16_t syscall_getpid();
+static ProcessSnapshot *syscall_ps();
+static int32_t syscall_killProcess(uint16_t pid);
+static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority);
+static int8_t syscall_changeProcessState(uint16_t pid, uint8_t state);
+static void syscall_yield();
+static int32_t syscall_waitpid();
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 						   uint64_t arg2, uint64_t arg3, uint64_t arg4,
@@ -86,15 +107,35 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		case GET_FONT_COLOR:
 			return syscall_getFontColor();
 		case MALLOC:
-			return syscall_malloc((uint64_t) arg0);
+			return (uint64_t) syscall_malloc((uint64_t) arg0);
 		case FREE:
 			syscall_free((void *) arg0);
 			break;
+		case CREATE_PROCESS:
+			return syscall_createProcess((MainFunction) arg0, (char **) arg1, (char *) arg2, (uint8_t) arg3);
+		case EXIT_PROCESS:
+			syscall_exitProcess();
+			break;
+		case GET_PID:
+			return syscall_getpid();
+		case PS:
+			return (uint64_t) syscall_ps();
+		case KILL_PROCESS:
+			return syscall_killProcess((uint16_t) arg0);
+		case CHANGE_PROCESS_PRIORITY:
+			return syscall_changeProcessPriority((uint16_t) arg0, (uint8_t) arg1);
+		case CHANGE_PROCESS_STATE:
+			syscall_changeProcessState((uint16_t) arg0, (uint8_t) arg1);
+			break;
+		case YIELD:
+			syscall_yield();
+			break;
+		case WAITPID:
+			return syscall_waitpid();
 	}
 	return 0;
 }
 
-// Read char
 static uint8_t syscall_read(uint32_t fd) {
 	switch (fd) {
 		case STDIN:
@@ -105,7 +146,6 @@ static uint8_t syscall_read(uint32_t fd) {
 	return 0;
 }
 
-// Write char
 static void syscall_write(uint32_t fd, char c) {
 	Color prevColor = getFontColor();
 	if (fd == STDERR)
@@ -116,7 +156,6 @@ static void syscall_write(uint32_t fd, char c) {
 	setFontColor(prevColor);
 }
 
-// Clear
 static void syscall_clear() {
 	videoClear();
 }
@@ -136,7 +175,6 @@ static uint64_t *syscall_registerArray(uint64_t *regarr) {
 	return regarr;
 }
 
-// Set fontsize
 static void syscall_fontSize(uint8_t size) {
 	setFontSize(size - 1);
 }
@@ -146,45 +184,75 @@ static uint32_t syscall_resolution() {
 	return getScreenResolution();
 }
 
-// DrawRect
 static void syscall_drawRect(uint16_t x, uint16_t y, uint16_t width,
 							 uint16_t height, uint32_t color) {
 	ColorInt myColor = {bits: color};
 	drawRect(x, y, width, height, myColor.color);
 }
 
-// GetTicks
 static uint64_t syscall_getTicks() {
 	return ticksElapsed();
 }
 
-// PrintMem
 static void syscall_getMemory(uint64_t pos, uint8_t *vec) {
 	memcpy(vec, (uint8_t *) pos, 32);
 }
 
-// playSound
 static void syscall_playSound(uint64_t frequency, uint64_t ticks) {
 	playSound(frequency, ticks);
 }
 
-// Set fontsize
 static void syscall_setFontColor(uint8_t r, uint8_t g, uint8_t b) {
 	setFontColor((Color){b, g, r});
 }
 
-// Get fontsize
 static uint32_t syscall_getFontColor() {
 	ColorInt c = {color: getFontColor()};
 	return c.bits;
 }
 
-// Malloc
 static void *syscall_malloc(uint64_t size) {
 	return allocMemory(size);
 }
 
-// Free
 static void syscall_free(void *ptr) {
 	free(ptr);
+}
+
+static uint16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
+	return createProcess(code, args, name, priority);
+}
+
+static void syscall_exitProcess() {
+	uint16_t pid = getpid();
+	syscall_killProcess(pid);
+}
+
+static uint16_t syscall_getpid() {
+	return getpid();
+}
+
+static ProcessSnapshot *syscall_ps() {
+	return getProcessSnapshot();
+}
+
+static int32_t syscall_killProcess(uint16_t pid) {
+	return killProcess(pid, -1);
+}
+
+static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority) {
+	return setPriority(pid, priority);
+}
+
+static int8_t syscall_changeProcessState(uint16_t pid, uint8_t state) {
+	return setState(pid, state);
+}
+
+static void syscall_yield() {
+	_hlt();
+}
+
+static int32_t syscall_waitpid() {
+	// TODO
+	return 0;
 }

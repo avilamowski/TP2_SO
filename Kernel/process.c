@@ -35,3 +35,15 @@ void freeProcess(Process *process) {
 	free(process->name);
 	free(process);
 }
+
+ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process) {
+	strcpy(snapshot->name, process->name);
+	snapshot->pid = process->pid;
+	snapshot->parentPid = process->parentPid;
+	snapshot->stackBase = process->stackBase;
+	snapshot->stackPos = process->stackPos;
+	snapshot->priority = process->priority;
+	snapshot->status = process->status;
+	snapshot->foreground = 1; // TODO: Poner un valor representativo
+	return snapshot;
+}

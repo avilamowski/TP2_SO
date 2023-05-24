@@ -15,4 +15,8 @@ Node *appendNode(LinkedListADT list, Node *node);
 void *removeNode(LinkedListADT list, Node *node);
 Node *getFirst(LinkedListADT list);
 int isEmpty(LinkedListADT list);
+void begin(LinkedListADT list);
+int hasNext(LinkedListADT list);
+void *next(LinkedListADT list);
+
 #endif

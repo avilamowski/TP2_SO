@@ -1,5 +1,6 @@
 #include <libasm.h>
 #include <man.h>
+#include <process.h>
 #include <shell.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -48,6 +49,8 @@ static void fontSize(char *size);
 static void printMem(char *pos);
 static int getCommandIndex(char *command);
 static void test(char *testName);
+static void runLoop(char *delay);
+static void runKill(char *pid);
 
 static Command commands[QTY_COMMANDS];
 
@@ -86,6 +89,8 @@ void init() {
 							 .f = (void *) &clear, NO_PARAMS};
 	commands[11] = (Command){"test", "Permite ejecutar un programa de prueba",
 							 .g = (void *) &test, SINGLE_PARAM};
+	commands[12] = (Command){"loop", "Loop", .g = (void *) &runLoop, SINGLE_PARAM};
+	commands[13] = (Command){"kill", "Kill", .g = (void *) &runKill, SINGLE_PARAM};
 }
 
 void run_shell() {
@@ -215,4 +220,14 @@ static void test(char *n) {
 	// char *c = (char *) malloc(1000000000);
 	// printf("%d %d %d\n", a, b, c);
 	test_mm(1, (char *[]){n});
+}
+
+static void runLoop(char *delay) {
+	char *args[] = {"loop", delay, 0};
+	createProcess(&loop, args, "loop", 4);
+}
+
+static void runKill(char *pid) {
+	char *args[] = {"kill", pid, 0};
+	createProcess(&kill, args, "kill", 4);
 }

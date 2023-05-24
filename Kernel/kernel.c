@@ -59,13 +59,13 @@ int idle(int argc, char **argv) {
 	char *argsShell[2] = {"shell", NULL};
 	createProcess((MainFunction) sampleCodeModuleAddress, argsShell, "shell", 4);
 	while (1) {
-		uint8_t oldM;
-		uint8_t h, m, s;
-		getTime(&h, &m, &s);
-		if (m != oldM) {
-			printf("\n%d:%d:%d %d %s\n", h, m, s, argc, argv[1]);
-		}
-		oldM = m;
+		// uint8_t oldM;
+		// uint8_t h, m, s;
+		// getTime(&h, &m, &s);
+		// if (m != oldM) {
+		// 	printf("\n%d:%d:%d %d %s\n", h, m, s, argc, argv[1]);
+		// }
+		// oldM = m;
 		_hlt();
 	}
 	return 0;

@@ -21,6 +21,18 @@ typedef struct Process { // PCB
 	// uint8_t * fd;
 } Process;
 
+typedef struct ProcessSnapshot {
+	uint16_t pid;
+	uint16_t parentPid;
+	void *stackBase;
+	void *stackPos;
+	char *name;
+	uint8_t priority;
+	ProcessStatus status;
+	uint8_t foreground;
+} ProcessSnapshot;
+
 void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority);
+ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
 
 #endif

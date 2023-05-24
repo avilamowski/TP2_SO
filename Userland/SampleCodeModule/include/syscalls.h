@@ -104,4 +104,21 @@ void *malloc(uint64_t size);
 
 void free(void *ptr);
 
+uint16_t createProcess(void *code, char **args, char *name, uint8_t priority);
+
+void exit();
+
+uint16_t getpid();
+
+void *ps(); // TODO cambiar a ProcessSnapshot
+
+int32_t killProcess(uint16_t pid);
+
+int8_t changeProcessPriority(uint16_t pid, uint8_t priority);
+
+int8_t changeProcessState(uint16_t pid, uint8_t state);
+
+void yield();
+
+int32_t waitpid();
 #endif

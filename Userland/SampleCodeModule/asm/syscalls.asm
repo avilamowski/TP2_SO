@@ -14,6 +14,15 @@ GLOBAL setFontColor
 GLOBAL getFontColor
 GLOBAL malloc
 GLOBAL free
+GLOBAL createProcess
+GLOBAL exit
+GLOBAL getpid
+GLOBAL ps
+GLOBAL killProcess
+GLOBAL changeProcessState
+GLOBAL changeProcessPriority
+GLOBAL yield
+GLOBAL waitpid
 
 read:
     mov rax, 0
@@ -89,4 +98,49 @@ malloc:
 free:
     mov rax, 14
     int 80h
+    ret
+
+createProcess:
+    mov rax, 15
+    int 80h
+    ret
+
+exit:
+    mov rax, 16
+    int 80h
+    ret
+
+getpid:
+    mov rax, 17
+    int 80h
+    ret
+
+ps:
+    mov rax, 18
+    int 80h
+    ret
+
+killProcess:
+    mov rax, 19
+    int 80h
+    ret
+
+changeProcessState:
+    mov rax, 20
+    int 80h
+    ret
+
+changeProcessPriority:
+    mov rax, 21
+    int 80h
+    ret
+
+yield:
+    mov rax, 22
+    int 80h
+    ret
+
+waitpid:
+    mov rax, 23
+    int 80
     ret

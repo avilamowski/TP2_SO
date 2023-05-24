@@ -5,6 +5,7 @@
 typedef struct LinkedListCDT {
 	Node *first;
 	Node *last;
+	Node *current;
 	int len;
 } LinkedListCDT;
 
@@ -13,6 +14,7 @@ LinkedListADT createLinkedListADT() {
 	list->len = 0;
 	list->first = NULL;
 	list->last = NULL;
+	list->current = NULL;
 	return list;
 }
 
@@ -67,5 +69,27 @@ void *removeNode(LinkedListADT list, Node *node) {
 	list->len--;
 	void *data = node->data;
 	// free(node);
+	return data;
+}
+
+// Atención: Usar funciones de agregado/borrado cuando se itera sobre la lista
+// puede causar comportamiento indefinido.
+void begin(LinkedListADT list) {
+	if (list == NULL)
+		return;
+	list->current = list->first;
+}
+
+int hasNext(LinkedListADT list) {
+	if (list == NULL)
+		return -1;
+	return list->current != NULL;
+}
+
+void *next(LinkedListADT list) {
+	if (!hasNext(list))
+		return NULL;
+	void *data = list->current->data;
+	list->current = list->current->next;
 	return data;
 }
