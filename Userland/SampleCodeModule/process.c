@@ -4,8 +4,38 @@
 #include <stdlib.h>
 #include <syscalls.h>
 
-void *psPrint(int argc, char **argv) {
-	return 0;
+// TODO: Ver de mover a otro archivo
+typedef enum { BLOCKED = 0,
+			   READY,
+			   RUNNING,
+			   ZOMBIE } ProcessStatus;
+typedef struct ProcessSnapshot {
+	uint16_t pid;
+	uint16_t parentPid;
+	void *stackBase;
+	void *stackPos;
+	char *name;
+	uint8_t priority;
+	ProcessStatus status;
+	uint8_t foreground;
+} ProcessSnapshot;
+typedef struct ProcessSnapshotList {
+	uint16_t length;
+	ProcessSnapshot *snapshotList;
+} ProcessSnapshotList;
+
+void psPrint() {
+	//	char * statusNames [4] = {"BLOCKED", "READY", "RUNNING", "WALTUH"};
+	ProcessSnapshotList *snapshots = ps();
+	for (int i = 0; i < snapshots->length; i++) {
+		ProcessSnapshot *snapshot = &snapshots->snapshotList[i];
+		printf("PID: %d - PPID: %d - Nombre: %s - StackBase: %x - StackPos: %x - Prioridad: %d - Fg: %s - Estado: %s\n",
+			   snapshot->pid, snapshot->parentPid, snapshot->name, snapshot->stackBase, snapshot->stackPos, snapshot->priority,
+			   snapshot->foreground ? "Si" : "No", "WALTUH"); // TODO: Reemplazar WALTUH con status
+		free(snapshots->snapshotList[i].name);
+	}
+	free(snapshots->snapshotList);
+	free(snapshots);
 }
 
 int loop(int argc, char **argv) {
@@ -22,10 +52,17 @@ int loop(int argc, char **argv) {
 	return 0;
 }
 
-int nice(int argc, char **argv) {
+void nice(char *pid, char *priority) {
+	changeProcessPriority((uint16_t) atoi(pid), (uint8_t) atoi(priority));
 	return 0;
 }
 
-int block(int argc, char **argv) {
+void block(char *pid) {
+	changeProcessState((uint16_t) atoi(pid), BLOCKED);
+	return 0;
+}
+
+void unblock(char *pid) {
+	changeProcessState((uint16_t) atoi(pid), READY);
 	return 0;
 }

@@ -144,8 +144,9 @@ uint16_t getpid() {
 	return scheduler->currentPid;
 }
 
-ProcessSnapshot *getProcessSnapshot() {
+ProcessSnapshotList *getProcessSnapshot() {
 	SchedulerADT scheduler = getSchedulerADT();
+	ProcessSnapshotList *snapshotList = allocMemory(sizeof(ProcessSnapshotList));
 	ProcessSnapshot *psArray = allocMemory(scheduler->qtyProcesses * sizeof(ProcessSnapshot));
 	// TODO: Recorrer procesos bloqueados
 	int processIndex = 0;
@@ -153,10 +154,12 @@ ProcessSnapshot *getProcessSnapshot() {
 		if (!isEmpty(scheduler->levels[lvl])) {
 			begin(scheduler->levels[lvl]);
 			while (hasNext(scheduler->levels[lvl])) {
-				loadSnapshot(&psArray[processIndex], next(scheduler->levels[lvl]));
+				loadSnapshot(&psArray[processIndex], (Process *) next(scheduler->levels[lvl]));
 				processIndex++;
 			}
 		}
 	}
-	return psArray;
+	snapshotList->length = scheduler->qtyProcesses;
+	snapshotList->snapshotList = psArray;
+	return snapshotList;
 }

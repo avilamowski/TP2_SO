@@ -61,7 +61,7 @@ static void syscall_free(void *ptr);
 static uint16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority);
 static void syscall_exitProcess();
 static uint16_t syscall_getpid();
-static ProcessSnapshot *syscall_ps();
+static ProcessSnapshotList *syscall_ps();
 static int32_t syscall_killProcess(uint16_t pid);
 static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority);
 static int8_t syscall_changeProcessState(uint16_t pid, uint8_t state);
@@ -232,7 +232,7 @@ static uint16_t syscall_getpid() {
 	return getpid();
 }
 
-static ProcessSnapshot *syscall_ps() {
+static ProcessSnapshotList *syscall_ps() {
 	return getProcessSnapshot();
 }
 

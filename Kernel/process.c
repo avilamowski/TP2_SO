@@ -37,6 +37,7 @@ void freeProcess(Process *process) {
 }
 
 ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process) {
+	snapshot->name = allocMemory(strlen(process->name) + 1);
 	strcpy(snapshot->name, process->name);
 	snapshot->pid = process->pid;
 	snapshot->parentPid = process->parentPid;

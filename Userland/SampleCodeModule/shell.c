@@ -91,6 +91,11 @@ void init() {
 							 .g = (void *) &test, SINGLE_PARAM};
 	commands[12] = (Command){"loop", "Loop", .g = (void *) &runLoop, SINGLE_PARAM};
 	commands[13] = (Command){"kill", "Kill", .g = (void *) &runKill, SINGLE_PARAM};
+	commands[14] = (Command){"ps", "ps", .f = (void *) &psPrint, NO_PARAMS};
+	commands[15] = (Command){"nice", "69", .h = (void *) &nice, DUAL_PARAM};
+	commands[16] = (Command){"block", "bloquea el proceso con el pid recibido", .g = (void *) &block, SINGLE_PARAM};
+	commands[17] = (Command){"unblock", "desbloquea el proceso con el pid recibido", .g = (void *) &unblock, SINGLE_PARAM};
+	commands[18] = (Command){"yield", "desbloquea el proceso con el pid recibido", .g = (void *) &unblock, SINGLE_PARAM};
 }
 
 void run_shell() {

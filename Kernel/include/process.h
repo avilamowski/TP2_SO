@@ -33,6 +33,11 @@ typedef struct ProcessSnapshot {
 	uint8_t foreground;
 } ProcessSnapshot;
 
+typedef struct ProcessSnapshotList {
+	uint16_t length;
+	ProcessSnapshot *snapshotList;
+} ProcessSnapshotList;
+
 void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority);
 ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
 
