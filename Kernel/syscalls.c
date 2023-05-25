@@ -37,7 +37,7 @@
 #define GET_PID 17
 #define PS 18
 #define KILL_PROCESS 19
-#define CHANGE_PROCESS_STATE 20
+#define CHANGE_PROCESS_STATUS 20
 #define CHANGE_PROCESS_PRIORITY 21
 #define YIELD 22
 #define WAITPID 23
@@ -59,14 +59,14 @@ static uint32_t syscall_getFontColor();
 static void *syscall_malloc(uint64_t size);
 static void syscall_free(void *ptr);
 static uint16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority);
-static void syscall_exitProcess();
+static void syscall_exitProcess(int32_t retValue);
 static uint16_t syscall_getpid();
 static ProcessSnapshotList *syscall_ps();
 static int32_t syscall_killProcess(uint16_t pid);
 static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority);
-static int8_t syscall_changeProcessState(uint16_t pid, uint8_t state);
+static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status);
 static void syscall_yield();
-static int32_t syscall_waitpid();
+static int32_t syscall_waitpid(uint16_t pid);
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 						   uint64_t arg2, uint64_t arg3, uint64_t arg4,
@@ -114,7 +114,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		case CREATE_PROCESS:
 			return syscall_createProcess((MainFunction) arg0, (char **) arg1, (char *) arg2, (uint8_t) arg3);
 		case EXIT_PROCESS:
-			syscall_exitProcess();
+			syscall_exitProcess((int32_t) arg0);
 			break;
 		case GET_PID:
 			return syscall_getpid();
@@ -124,14 +124,14 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 			return syscall_killProcess((uint16_t) arg0);
 		case CHANGE_PROCESS_PRIORITY:
 			return syscall_changeProcessPriority((uint16_t) arg0, (uint8_t) arg1);
-		case CHANGE_PROCESS_STATE:
-			syscall_changeProcessState((uint16_t) arg0, (uint8_t) arg1);
+		case CHANGE_PROCESS_STATUS:
+			syscall_changeProcessStatus((uint16_t) arg0, (uint8_t) arg1);
 			break;
 		case YIELD:
 			syscall_yield();
 			break;
 		case WAITPID:
-			return syscall_waitpid();
+			return syscall_waitpid((uint16_t) arg0);
 	}
 	return 0;
 }
@@ -223,9 +223,8 @@ static uint16_t syscall_createProcess(MainFunction code, char **args, char *name
 	return createProcess(code, args, name, priority);
 }
 
-static void syscall_exitProcess() {
-	uint16_t pid = getpid();
-	syscall_killProcess(pid);
+static void syscall_exitProcess(int32_t retValue) {
+	killCurrentProcess(retValue);
 }
 
 static uint16_t syscall_getpid() {
@@ -244,15 +243,14 @@ static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority) {
 	return setPriority(pid, priority);
 }
 
-static int8_t syscall_changeProcessState(uint16_t pid, uint8_t state) {
-	return setState(pid, state);
+static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status) {
+	return setStatus(pid, status);
 }
 
 static void syscall_yield() {
 	_hlt();
 }
 
-static int32_t syscall_waitpid() {
-	// TODO
-	return 0;
+static int32_t syscall_waitpid(uint16_t pid) {
+	return getZombieRetValue(pid);
 }

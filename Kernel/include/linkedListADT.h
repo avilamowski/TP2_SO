@@ -18,5 +18,7 @@ int isEmpty(LinkedListADT list);
 void begin(LinkedListADT list);
 int hasNext(LinkedListADT list);
 void *next(LinkedListADT list);
+void freeLinkedListADT(LinkedListADT list);
+int getLength(LinkedListADT list);
 
 #endif

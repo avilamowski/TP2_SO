@@ -116,7 +116,7 @@ int32_t killProcess(uint16_t pid);
 
 int8_t changeProcessPriority(uint16_t pid, uint8_t priority);
 
-int8_t changeProcessState(uint16_t pid, uint8_t state);
+int8_t changeProcessStatus(uint16_t pid, uint8_t status);
 
 void yield();
 

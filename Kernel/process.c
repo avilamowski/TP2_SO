@@ -1,6 +1,7 @@
 #include <defs.h>
 #include <interrupts.h>
 #include <lib.h>
+#include <linkedListADT.h>
 #include <memoryManager.h>
 #include <process.h>
 
@@ -14,13 +15,13 @@ void processWrapper(MainFunction code, char **args) {
 
 	// TODO: Desbloquear padre con waitpid???
 	// giveForeground(processList[getCurrentPID()]->parent);
-
-	// killProcess(getCurrentPID(), retValue);
+	killCurrentProcess(retValue);
 }
 
 void initProcess(Process *process, uint16_t pid, uint16_t parentPid, int code(int argc, char **args), char **args, char *name, uint8_t priority) {
 	process->pid = pid;
 	process->parentPid = parentPid;
+	process->waitingForPid = 0;
 	process->stackBase = allocMemory(STACK_SIZE);
 	process->name = allocMemory(strlen(name) + 1);
 	strcpy(process->name, name);
@@ -28,9 +29,11 @@ void initProcess(Process *process, uint16_t pid, uint16_t parentPid, int code(in
 	void *stackEnd = (void *) ((uint64_t) process->stackBase + STACK_SIZE);
 	process->stackPos = _initialize_stack_frame(&processWrapper, code, stackEnd, args);
 	process->status = READY;
+	process->zombieChildren = createLinkedListADT();
 }
 
 void freeProcess(Process *process) {
+	freeLinkedListADT(process->zombieChildren);
 	free(process->stackBase);
 	free(process->name);
 	free(process);
@@ -47,4 +50,16 @@ ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process) {
 	snapshot->status = process->status;
 	snapshot->foreground = 1; // TODO: Poner un valor representativo
 	return snapshot;
+}
+
+int processIsWaiting(Process *process, uint16_t pidToWait) {
+	return process->waitingForPid = pidToWait && process->status == BLOCKED;
+}
+
+int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess) {
+	LinkedListADT zombieChildren = nextProcess->zombieChildren;
+	begin(zombieChildren);
+	while (hasNext(zombieChildren))
+		loadSnapshot(&psArray[processIndex++], (Process *) next(zombieChildren));
+	return processIndex;
 }

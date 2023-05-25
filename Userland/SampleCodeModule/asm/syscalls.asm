@@ -19,7 +19,7 @@ GLOBAL exit
 GLOBAL getpid
 GLOBAL ps
 GLOBAL killProcess
-GLOBAL changeProcessState
+GLOBAL changeProcessStatus
 GLOBAL changeProcessPriority
 GLOBAL yield
 GLOBAL waitpid
@@ -125,7 +125,7 @@ killProcess:
     int 80h
     ret
 
-changeProcessState:
+changeProcessStatus:
     mov rax, 20
     int 80h
     ret
@@ -142,5 +142,5 @@ yield:
 
 waitpid:
     mov rax, 23
-    int 80
+    int 80h
     ret

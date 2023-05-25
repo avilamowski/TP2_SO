@@ -52,6 +52,12 @@ int isEmpty(LinkedListADT list) {
 	return !list->len;
 }
 
+int getLength(LinkedListADT list) {
+	if (list == NULL)
+		return -1;
+	return list->len;
+}
+
 void *removeNode(LinkedListADT list, Node *node) {
 	if (list == NULL || node == NULL)
 		return NULL;
@@ -68,6 +74,8 @@ void *removeNode(LinkedListADT list, Node *node) {
 
 	list->len--;
 	void *data = node->data;
+	node->next = NULL;
+	node->prev = NULL;
 	// free(node);
 	return data;
 }
@@ -92,4 +100,8 @@ void *next(LinkedListADT list) {
 	void *data = list->current->data;
 	list->current = list->current->next;
 	return data;
+}
+
+void freeLinkedListADT(LinkedListADT list) {
+	free(list);
 }

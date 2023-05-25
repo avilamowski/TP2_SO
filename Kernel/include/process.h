@@ -1,5 +1,6 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
+#include <linkedListADT.h>
 #include <stdint.h>
 
 typedef enum { BLOCKED = 0,
@@ -11,6 +12,7 @@ typedef int (*MainFunction)(int argc, char **args);
 typedef struct Process { // PCB
 	uint16_t pid;
 	uint16_t parentPid;
+	uint16_t waitingForPid;
 	void *stackBase; // MemoryBlock
 	void *stackPos;
 	// void * heap;  // Lista de MemoryBlocks
@@ -20,6 +22,7 @@ typedef struct Process { // PCB
 	ProcessStatus status;
 	// uint8_t * fd;
 	int32_t retValue;
+	LinkedListADT zombieChildren;
 } Process;
 
 typedef struct ProcessSnapshot {
@@ -40,5 +43,7 @@ typedef struct ProcessSnapshotList {
 
 void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority);
 ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
+int processIsWaiting(Process *process, uint16_t pidToWait);
+int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess);
 
 #endif

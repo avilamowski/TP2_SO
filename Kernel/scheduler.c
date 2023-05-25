@@ -1,14 +1,16 @@
 #include <defs.h>
+#include <lib.h>
 #include <linkedListADT.h>
 #include <memoryManager.h>
 #include <scheduler.h>
-#define QTY_LEVELS 5
+#include <video.h>
+#define QTY_READY_LEVELS 5
+#define BLOCKED_INDEX QTY_READY_LEVELS
 #define MAX_PROCESSES (1 << 10)
 
 typedef struct SchedulerCDT {
 	Node *processes[MAX_PROCESSES];
-	LinkedListADT levels[QTY_LEVELS];
-	LinkedListADT blockedProcesses;
+	LinkedListADT levels[QTY_READY_LEVELS + 1];
 	uint16_t currentPid;
 	uint16_t nextUnusedPid;
 	uint16_t qtyProcesses;
@@ -19,9 +21,8 @@ SchedulerADT createScheduler() {
 	SchedulerADT scheduler = (SchedulerADT) SCHEDULER_ADDRESS;
 	for (int i = 0; i < MAX_PROCESSES; i++)
 		scheduler->processes[i] = NULL;
-	for (int i = 0; i < QTY_LEVELS; i++)
+	for (int i = 0; i < QTY_READY_LEVELS + 1; i++)
 		scheduler->levels[i] = createLinkedListADT();
-	scheduler->blockedProcesses = createLinkedListADT();
 	scheduler->nextUnusedPid = 0;
 	return scheduler;
 }
@@ -32,7 +33,7 @@ SchedulerADT getSchedulerADT() {
 
 static uint16_t getNextPid(SchedulerADT scheduler) {
 	Process *process = NULL;
-	for (int lvl = QTY_LEVELS - 1; lvl >= 0 && process == NULL; lvl--) {
+	for (int lvl = QTY_READY_LEVELS - 1; lvl >= 0 && process == NULL; lvl--) {
 		if (!isEmpty(scheduler->levels[lvl])) {
 			process = (Process *) (getFirst(scheduler->levels[lvl]))->data;
 		}
@@ -47,33 +48,40 @@ int32_t setPriority(uint16_t pid, uint8_t newPriority) {
 	if (node == NULL)
 		return -1;
 	Process *process = (Process *) node->data;
-	if (newPriority < 0 || newPriority >= QTY_LEVELS)
+	if (newPriority < 0 || newPriority >= QTY_READY_LEVELS)
 		return -1;
-	removeNode(scheduler->levels[process->priority], node);
+	if (process->status == READY || process->status == RUNNING) {
+		removeNode(scheduler->levels[process->priority], node);
+		scheduler->processes[process->pid] = appendNode(scheduler->levels[newPriority], node);
+	}
 	process->priority = newPriority;
-	scheduler->processes[process->pid] = appendNode(scheduler->levels[process->priority], node);
 	return newPriority;
 }
 
-int8_t setState(uint16_t pid, uint8_t newState) {
+int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 	SchedulerADT scheduler = getSchedulerADT();
 	Node *node = scheduler->processes[pid];
 	if (node == NULL)
 		return -1;
 	Process *process = (Process *) node->data;
-	if (newState == BLOCKED) {
-		removeNode(scheduler->levels[process->priority], node);
-		// TODO: Ver donde lo metemos
-	}
-	else if (newState == READY) {
-		// TODO: Ver si hay que sacarlo de una lista de blocked
-		// Se asume que ya tiene un nivel predefinido
-		scheduler->processes[process->pid] = appendNode(scheduler->levels[process->priority], node);
-	}
-	else {
+	ProcessStatus oldStatus = process->status;
+	if (newStatus == RUNNING || newStatus == ZOMBIE || oldStatus == ZOMBIE)
 		return -1;
+	if (newStatus == process->status)
+		return newStatus;
+	if (newStatus == BLOCKED) {
+		removeNode(scheduler->levels[process->priority], node);
+		appendNode(scheduler->levels[BLOCKED_INDEX], node);
 	}
-	return newState;
+	else if (oldStatus == BLOCKED) {
+		removeNode(scheduler->levels[BLOCKED_INDEX], node);
+		// Se asume que ya tiene un nivel predefinido
+		appendNode(scheduler->levels[process->priority], node);
+	}
+	process->status = newStatus;
+	if (oldStatus == RUNNING)
+		forceTimerTick();
+	return newStatus;
 }
 
 void *schedule(void *prevStackPointer) {
@@ -121,21 +129,50 @@ uint16_t createProcess(MainFunction code, char **args, char *name, uint8_t prior
 	return process->pid;
 }
 
+static void destroyZombie(SchedulerADT scheduler, Process *zombie) {
+	// TODO: free heap?
+	Node *zombieNode = scheduler->processes[zombie->pid];
+	scheduler->qtyProcesses--;
+	scheduler->processes[zombie->pid] = NULL;
+	freeProcess(zombie);
+	free(zombieNode);
+}
+
+int32_t killCurrentProcess(int32_t retValue) {
+	SchedulerADT scheduler = getSchedulerADT();
+	return killProcess(scheduler->currentPid, retValue);
+}
+
 int32_t killProcess(uint16_t pid, int32_t retValue) {
 	if (pid == 0)
 		return -1;
 	SchedulerADT scheduler = getSchedulerADT();
 	Node *processToKillNode = scheduler->processes[pid];
+	if (processToKillNode == NULL)
+		return -1;
 	Process *processToKill = (Process *) processToKillNode->data;
-	scheduler->processes[pid] = NULL;
-
-	scheduler->qtyProcesses--;
 	removeNode(scheduler->levels[processToKill->priority], processToKillNode);
 	processToKill->retValue = retValue;
-	// TODO: llamar al timer tick si el proceso es el current
-	// TODO: free heap?
-	free(processToKillNode); // TODO: No liberar si es zombie
-	free(processToKill);
+
+	processToKill->status = ZOMBIE;
+
+	begin(processToKill->zombieChildren);
+	while (hasNext(processToKill->zombieChildren)) {
+		destroyZombie(scheduler, (Process *) next(processToKill->zombieChildren));
+	}
+
+	Node *parentNode = scheduler->processes[processToKill->parentPid];
+	if (parentNode != NULL && ((Process *) parentNode->data)->status != ZOMBIE) {
+		Process *parent = (Process *) parentNode->data;
+		appendNode(parent->zombieChildren, processToKillNode);
+		if (processIsWaiting(parent, processToKill->pid))
+			setStatus(processToKill->parentPid, READY);
+	}
+	else {
+		destroyZombie(scheduler, processToKill);
+	}
+	if (pid == scheduler->currentPid)
+		forceTimerTick();
 	return retValue;
 }
 
@@ -148,18 +185,34 @@ ProcessSnapshotList *getProcessSnapshot() {
 	SchedulerADT scheduler = getSchedulerADT();
 	ProcessSnapshotList *snapshotList = allocMemory(sizeof(ProcessSnapshotList));
 	ProcessSnapshot *psArray = allocMemory(scheduler->qtyProcesses * sizeof(ProcessSnapshot));
-	// TODO: Recorrer procesos bloqueados
 	int processIndex = 0;
-	for (int lvl = QTY_LEVELS - 1; lvl >= 0; lvl--) {
-		if (!isEmpty(scheduler->levels[lvl])) {
-			begin(scheduler->levels[lvl]);
-			while (hasNext(scheduler->levels[lvl])) {
-				loadSnapshot(&psArray[processIndex], (Process *) next(scheduler->levels[lvl]));
-				processIndex++;
+	for (int lvl = QTY_READY_LEVELS; lvl >= 0; lvl--) { // Se cuentan tambien los bloqueados
+		begin(scheduler->levels[lvl]);
+		while (hasNext(scheduler->levels[lvl])) {
+			Process *nextProcess = (Process *) next(scheduler->levels[lvl]);
+			loadSnapshot(&psArray[processIndex], nextProcess);
+			processIndex++;
+			if (nextProcess->status != ZOMBIE) {
+				getZombiesSnapshots(processIndex, psArray, nextProcess);
+				processIndex += getLength(nextProcess->zombieChildren);
 			}
 		}
 	}
 	snapshotList->length = scheduler->qtyProcesses;
 	snapshotList->snapshotList = psArray;
 	return snapshotList;
+}
+
+int32_t getZombieRetValue(uint16_t pid) {
+	SchedulerADT scheduler = getSchedulerADT();
+	Node *processNode = scheduler->processes[pid];
+	if (processNode == NULL)
+		return -1;
+	Process *process = (Process *) processNode->data;
+	if (process->parentPid != scheduler->currentPid)
+		return -1;
+	if (process->status != ZOMBIE) {
+		setStatus(scheduler->currentPid, BLOCKED);
+	}
+	return process->retValue;
 }

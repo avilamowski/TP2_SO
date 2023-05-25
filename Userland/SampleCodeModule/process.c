@@ -24,6 +24,8 @@ typedef struct ProcessSnapshotList {
 	ProcessSnapshot *snapshotList;
 } ProcessSnapshotList;
 
+static int spawnAndBlock(int argc, char **argv);
+
 void psPrint() {
 	//	char * statusNames [4] = {"BLOCKED", "READY", "RUNNING", "WALTUH"};
 	ProcessSnapshotList *snapshots = ps();
@@ -58,11 +60,26 @@ void nice(char *pid, char *priority) {
 }
 
 void block(char *pid) {
-	changeProcessState((uint16_t) atoi(pid), BLOCKED);
+	changeProcessStatus((uint16_t) atoi(pid), BLOCKED);
 	return 0;
 }
 
 void unblock(char *pid) {
-	changeProcessState((uint16_t) atoi(pid), READY);
+	changeProcessStatus((uint16_t) atoi(pid), READY);
+	return 0;
+}
+
+int testProgram(int argc, char **argv) {
+	printf("Inicio\n");
+	char *args[2] = {"ResidentEvil", 0};
+	uint16_t pid = createProcess(&spawnAndBlock, args, "ResidentEvil", 4);
+	uint32_t ret_value = waitpid(pid);
+	printf("Finalizo! pid del hijo:%d %d\n", pid, ret_value);
+	return 0;
+}
+
+static int spawnAndBlock(int argc, char **argv) {
+	uint16_t pid = getpid();
+	changeProcessStatus(pid, BLOCKED);
 	return 0;
 }
