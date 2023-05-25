@@ -7,7 +7,7 @@
 #define KBDIN 3
 
 /* Cantidad maxima de caracteres para los buffers */
-#define MAX_CHARS 256
+#define MAX_CHARS 512
 
 #include <color.h>
 #include <stdarg.h>

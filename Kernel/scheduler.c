@@ -183,7 +183,7 @@ uint16_t getpid() {
 
 ProcessSnapshotList *getProcessSnapshot() {
 	SchedulerADT scheduler = getSchedulerADT();
-	ProcessSnapshotList *snapshotList = allocMemory(sizeof(ProcessSnapshotList));
+	ProcessSnapshotList *snapshotsArray = allocMemory(sizeof(ProcessSnapshotList));
 	ProcessSnapshot *psArray = allocMemory(scheduler->qtyProcesses * sizeof(ProcessSnapshot));
 	int processIndex = 0;
 	for (int lvl = QTY_READY_LEVELS; lvl >= 0; lvl--) { // Se cuentan tambien los bloqueados
@@ -198,9 +198,9 @@ ProcessSnapshotList *getProcessSnapshot() {
 			}
 		}
 	}
-	snapshotList->length = scheduler->qtyProcesses;
-	snapshotList->snapshotList = psArray;
-	return snapshotList;
+	snapshotsArray->length = scheduler->qtyProcesses;
+	snapshotsArray->snapshotList = psArray;
+	return snapshotsArray;
 }
 
 int32_t getZombieRetValue(uint16_t pid) {

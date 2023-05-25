@@ -27,13 +27,15 @@ typedef struct ProcessSnapshotList {
 static int spawnAndBlock(int argc, char **argv);
 
 void psPrint() {
-	//	char * statusNames [4] = {"BLOCKED", "READY", "RUNNING", "WALTUH"};
+	char *statusNames[4] = {"BLOCKED", "READY", "RUNNING", "WALTUH"};
 	ProcessSnapshotList *snapshots = ps();
 	for (int i = 0; i < snapshots->length; i++) {
 		ProcessSnapshot *snapshot = &snapshots->snapshotList[i];
-		printf("PID: %d - PPID: %d - Nombre: %s - StackBase: %x - StackPos: %x - Prioridad: %d - Fg: %s - Estado: %s\n",
-			   snapshot->pid, snapshot->parentPid, snapshot->name, snapshot->stackBase, snapshot->stackPos, snapshot->priority,
-			   snapshot->foreground ? "Si" : "No", "WALTUH"); // TODO: Reemplazar WALTUH con status
+		// printf("%s\n", statusNames[snapshot->status]);
+		printf("PID: %d - PPID: %d - Nombre: %s - StackBase: %x - StackPos: %x",
+			   snapshot->pid, snapshot->parentPid, snapshot->name, snapshot->stackBase, snapshot->stackPos);
+		printf("- Prioridad: %d - Fg: %s - Estado: %s\n",
+			   snapshot->priority, snapshot->foreground ? "Si" : "No", statusNames[snapshot->status]);
 		free(snapshots->snapshotList[i].name);
 	}
 	free(snapshots->snapshotList);

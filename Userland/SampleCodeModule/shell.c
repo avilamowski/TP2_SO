@@ -219,12 +219,12 @@ static void man(char *command) {
 static void test(char *n) {
 	// test_mm(1, (char *[]){n});
 	char *args[] = {"ZombieCreator", 0};
-	createProcess(&testProgram, args, "ZombieCreator", 4);
+	createProcess(&testProgram, args, "ZombieCreator", (uint8_t) 4);
 }
 
 static void runLoop(char *delay) {
 	char *args[] = {"loop", delay, 0};
-	createProcess(&loop, args, "loop", 4);
+	createProcess(&loop, args, "loop", (uint8_t) 4);
 }
 
 static void runKill(char *pid) {
