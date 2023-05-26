@@ -27,7 +27,7 @@ typedef struct ProcessSnapshotList {
 static int spawnAndBlock(int argc, char **argv);
 
 void psPrint() {
-	char *statusNames[4] = {"BLOCKED", "READY", "RUNNING", "WALTUH"};
+	char *statusNames[4] = {"BLOCKED", "READY", "RUNNING", "WALKER"};
 	ProcessSnapshotList *snapshots = ps();
 	for (int i = 0; i < snapshots->length; i++) {
 		ProcessSnapshot *snapshot = &snapshots->snapshotList[i];

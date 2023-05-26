@@ -151,7 +151,11 @@ int32_t killProcess(uint16_t pid, int32_t retValue) {
 	if (processToKillNode == NULL)
 		return -1;
 	Process *processToKill = (Process *) processToKillNode->data;
-	removeNode(scheduler->levels[processToKill->priority], processToKillNode);
+	if (processToKill->status == ZOMBIE)
+		return -1;
+
+	uint8_t priorityIndex = processToKill->status != BLOCKED ? processToKill->priority : BLOCKED_INDEX;
+	removeNode(scheduler->levels[priorityIndex], processToKillNode);
 	processToKill->retValue = retValue;
 
 	processToKill->status = ZOMBIE;
