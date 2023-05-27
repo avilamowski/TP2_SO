@@ -113,10 +113,10 @@ void *schedule(void *prevStackPointer) {
 	return currentProcess->stackPos;
 }
 
-uint16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
+int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
 	SchedulerADT scheduler = getSchedulerADT();
 	if (scheduler->qtyProcesses >= MAX_PROCESSES) // TODO: Agregar panic?
-		return 0;
+		return -1;
 	Process *process = (Process *) allocMemory(sizeof(Process));
 	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority);
 
@@ -177,7 +177,7 @@ int32_t killProcess(uint16_t pid, int32_t retValue) {
 	}
 	if (pid == scheduler->currentPid)
 		forceTimerTick();
-	return retValue;
+	return 0;
 }
 
 uint16_t getpid() {

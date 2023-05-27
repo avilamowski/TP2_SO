@@ -3,8 +3,8 @@
 #include <stdint.h>
 void psPrint();
 int loop(int argc, char **argv);
-void nice(char *pid, char *priority);
-void block(char *pid);
-void unblock(char *pid);
+void nice(uint16_t pid, uint8_t priority);
+int8_t block(uint16_t pid);
+int8_t unblock(uint16_t pid);
 int testProgram(int argc, char **argv);
 #endif

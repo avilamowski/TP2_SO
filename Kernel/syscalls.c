@@ -58,7 +58,7 @@ static void syscall_setFontColor(uint8_t r, uint8_t g, uint8_t b);
 static uint32_t syscall_getFontColor();
 static void *syscall_malloc(uint64_t size);
 static void syscall_free(void *ptr);
-static uint16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority);
+static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority);
 static void syscall_exitProcess(int32_t retValue);
 static uint16_t syscall_getpid();
 static ProcessSnapshotList *syscall_ps();
@@ -219,7 +219,7 @@ static void syscall_free(void *ptr) {
 	free(ptr);
 }
 
-static uint16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
+static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
 	return createProcess(code, args, name, priority);
 }
 

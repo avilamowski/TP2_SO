@@ -8,6 +8,8 @@
 #include <string.h>
 #include <syscalls.h>
 #include <test_mm.h>
+#include <test_prio.h>
+#include <test_processes.h>
 #include <tron.h>
 
 /* Enum para la cantidad de argumentos recibidos */
@@ -48,9 +50,12 @@ static void tronZen();
 static void fontSize(char *size);
 static void printMem(char *pos);
 static int getCommandIndex(char *command);
-static void test(char *testName);
+static void test(char *name, char *param);
 static void runLoop(char *delay);
 static void runKill(char *pid);
+static void runBlock(char *pid);
+static void runUnblock(char *pid);
+static void runNice(char *pid, char *priority);
 
 static Command commands[QTY_COMMANDS];
 
@@ -88,13 +93,13 @@ void init() {
 	commands[10] = (Command){"clear", "Limpia toda la pantalla",
 							 .f = (void *) &clear, NO_PARAMS};
 	commands[11] = (Command){"test", "Permite ejecutar un programa de prueba",
-							 .g = (void *) &test, SINGLE_PARAM};
+							 .h = (void *) &test, DUAL_PARAM};
 	commands[12] = (Command){"loop", "Loop", .g = (void *) &runLoop, SINGLE_PARAM};
 	commands[13] = (Command){"kill", "Kill", .g = (void *) &runKill, SINGLE_PARAM};
 	commands[14] = (Command){"ps", "ps", .f = (void *) &psPrint, NO_PARAMS};
-	commands[15] = (Command){"nice", "69", .h = (void *) &nice, DUAL_PARAM};
-	commands[16] = (Command){"block", "bloquea el proceso con el pid recibido", .g = (void *) &block, SINGLE_PARAM};
-	commands[17] = (Command){"unblock", "desbloquea el proceso con el pid recibido", .g = (void *) &unblock, SINGLE_PARAM};
+	commands[15] = (Command){"nice", "69", .h = (void *) &runNice, DUAL_PARAM};
+	commands[16] = (Command){"block", "bloquea el proceso con el pid recibido", .g = (void *) &runBlock, SINGLE_PARAM};
+	commands[17] = (Command){"unblock", "desbloquea el proceso con el pid recibido", .g = (void *) &runUnblock, SINGLE_PARAM};
 	commands[18] = (Command){"yield", "desbloquea el proceso con el pid recibido", .g = (void *) &unblock, SINGLE_PARAM};
 }
 
@@ -216,10 +221,28 @@ static void man(char *command) {
 		printErr(INVALID_COMMAND);
 }
 
-static void test(char *n) {
-	// test_mm(1, (char *[]){n});
-	char *args[] = {"ZombieCreator", 0};
-	createProcess(&testProgram, args, "ZombieCreator", (uint8_t) 4);
+static void test(char *name, char *param) {
+	printf(name);
+	if (!strcmp(name, "test-mm")) {
+		// char * args[] = {"test_mm", param, 0};
+		// createProcess(&test_mm, args, "test_mm", 4);
+		test_mm(1, (char *[]){param});
+	}
+	else if (!strcmp(name, "test-processes")) {
+		// char * args[] = {"test_processes", param, 0};
+		// createProcess(&test_processes, args, "test_processes", 4);
+		test_processes(1, (char *[]){param});
+	}
+	else if (!strcmp(name, "test-prio")) {
+		char *args[] = {"test_prio", param, 0};
+		createProcess(&test_prio, args, "test_prio", 4);
+	}
+	else {
+		printErr(INVALID_COMMAND);
+		// TODO: Mover?
+		char *args[] = {"ZombieCreator", 0};
+		createProcess(&testProgram, args, "ZombieCreator", (uint8_t) 4);
+	}
 }
 
 static void runLoop(char *delay) {
@@ -229,4 +252,16 @@ static void runLoop(char *delay) {
 
 static void runKill(char *pid) {
 	killProcess((uint16_t) atoi(pid));
+}
+
+static void runUnblock(char *pid) {
+	unblock((uint16_t) atoi(pid));
+}
+
+static void runBlock(char *pid) {
+	block((uint16_t) atoi(pid));
+}
+
+static void runNice(char *pid, char *priority) {
+	nice((uint16_t) atoi(pid), (uint8_t) atoi(priority));
 }

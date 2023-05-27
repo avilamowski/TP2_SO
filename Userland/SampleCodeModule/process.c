@@ -45,6 +45,7 @@ void psPrint() {
 int loop(int argc, char **argv) {
 	uint16_t pid = getpid();
 	int seconds = atoi(argv[1]);
+	// printf("sec: %d", seconds);
 	int currentTime = 0, oldTime = 0, initialTime = getSeconds();
 	while (1) {
 		currentTime = getSeconds();
@@ -56,25 +57,22 @@ int loop(int argc, char **argv) {
 	return 0;
 }
 
-void nice(char *pid, char *priority) {
-	changeProcessPriority((uint16_t) atoi(pid), (uint8_t) atoi(priority));
-	return 0;
+void nice(uint16_t pid, uint8_t priority) {
+	changeProcessPriority(pid, priority);
 }
 
-void block(char *pid) {
-	changeProcessStatus((uint16_t) atoi(pid), BLOCKED);
-	return 0;
+int8_t block(uint16_t pid) {
+	return changeProcessStatus(pid, BLOCKED);
 }
 
-void unblock(char *pid) {
-	changeProcessStatus((uint16_t) atoi(pid), READY);
-	return 0;
+int8_t unblock(uint16_t pid) {
+	return changeProcessStatus(pid, READY);
 }
 
 int testProgram(int argc, char **argv) {
-	printf("Inicio\n");
+	printf("Inicio %d\n", argc);
 	char *args[2] = {"ResidentEvil", 0};
-	uint16_t pid = createProcess(&spawnAndBlock, args, "ResidentEvil", 4);
+	int16_t pid = createProcess(&spawnAndBlock, args, "ResidentEvil", 4);
 	uint32_t ret_value = waitpid(pid);
 	printf("Finalizo! pid del hijo:%d %d\n", pid, ret_value);
 	return 0;

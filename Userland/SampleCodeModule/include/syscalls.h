@@ -104,7 +104,7 @@ void *malloc(uint64_t size);
 
 void free(void *ptr);
 
-uint16_t createProcess(void *code, char **args, char *name, uint8_t priority);
+int16_t createProcess(void *code, char **args, char *name, uint8_t priority);
 
 void exit();
 
