@@ -16,6 +16,7 @@ typedef struct Process { // PCB
 	void *stackBase; // MemoryBlock
 	void *stackPos;
 	// void * heap;  // Lista de MemoryBlocks
+	char **argv;
 	char *name;
 	// uint32_t flags;
 	uint8_t priority;

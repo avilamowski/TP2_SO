@@ -8,13 +8,14 @@
 
 #define STACK_SIZE (1 << 12)
 
+static char **allocArguments();
+
 void processWrapper(MainFunction code, char **args) {
 	int len = stringArrayLen(args);
-	// printf("qty: %d, argv[0]: %s, argv[1]: %s\n", len, args[0], args[1]);
+	printf("qty: %d, argv[0]: %s, argv[1]: %s\n", len, args[0], args[1]);
 
 	int retValue = code(len, args);
 
-	// TODO: Free de cada argumento?
 	// giveForeground(processList[getCurrentPID()]->parent);
 	killCurrentProcess(retValue);
 }
@@ -24,19 +25,39 @@ void initProcess(Process *process, uint16_t pid, uint16_t parentPid, int code(in
 	process->parentPid = parentPid;
 	process->waitingForPid = 0;
 	process->stackBase = allocMemory(STACK_SIZE);
+	process->argv = allocArguments(args);
 	process->name = allocMemory(strlen(name) + 1);
 	strcpy(process->name, name);
 	process->priority = priority;
 	void *stackEnd = (void *) ((uint64_t) process->stackBase + STACK_SIZE);
-	process->stackPos = _initialize_stack_frame(&processWrapper, code, stackEnd, args);
+	process->stackPos = _initialize_stack_frame(&processWrapper, code, stackEnd, (void *) process->argv);
 	process->status = READY;
 	process->zombieChildren = createLinkedListADT();
+}
+
+static char **allocArguments(char **args) {
+	int argc = stringArrayLen(args), totalArgsLen;
+	int argsLen[argc];
+	for (int i = 0; i < argc; i++) {
+		argsLen[i] = strlen(args[i]) + 1;
+		totalArgsLen += argsLen[i];
+	}
+	char **newArgsArray = (char **) allocMemory(totalArgsLen + sizeof(char **) * (argc + 1));
+	char *charPosition = (char *) newArgsArray + (sizeof(char **) * (argc + 1));
+	for (int i = 0; i < argc; i++) {
+		newArgsArray[i] = charPosition;
+		memcpy(charPosition, args[i], argsLen[i]);
+		charPosition += argsLen[i];
+	}
+	newArgsArray[argc] = NULL;
+	return newArgsArray;
 }
 
 void freeProcess(Process *process) {
 	freeLinkedListADT(process->zombieChildren);
 	free(process->stackBase);
 	free(process->name);
+	free(process->argv);
 	free(process);
 }
 

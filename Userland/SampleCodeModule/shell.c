@@ -239,7 +239,7 @@ static void test(char *name, char *param) {
 		createProcess(&test_prio, args, "test_prio", 4);
 	}
 	else if (!strcmp(name, "test-sync")) {
-		char *args[] = {"test_sync", param, 1, 0};
+		char *args[] = {"test_sync", param, "1", 0};
 		createProcess(&test_sync, args, "test_sync", 4);
 	}
 	else {
