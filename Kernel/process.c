@@ -12,7 +12,7 @@ static char **allocArguments();
 
 void processWrapper(MainFunction code, char **args) {
 	int len = stringArrayLen(args);
-	printf("qty: %d, argv[0]: %s, argv[1]: %s\n", len, args[0], args[1]);
+	// printf("qty: %d, argv[0]: %s, argv[1]: %s\n", len, args[0], args[1]);
 
 	int retValue = code(len, args);
 

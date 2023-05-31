@@ -71,7 +71,6 @@ static ProcessSnapshotList *syscall_ps();
 static int32_t syscall_killProcess(uint16_t pid);
 static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority);
 static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status);
-static void syscall_yield();
 static int32_t syscall_waitpid(uint16_t pid);
 
 uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
@@ -134,7 +133,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 			syscall_changeProcessStatus((uint16_t) arg0, (uint8_t) arg1);
 			break;
 		case YIELD:
-			syscall_yield();
+			yield();
 			break;
 		case WAITPID:
 			return syscall_waitpid((uint16_t) arg0);
@@ -262,12 +261,8 @@ static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority) {
 static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status) {
 	int8_t newStatus = setStatus(pid, status);
 	if (newStatus != -1 && getpid() == pid)
-		forceTimerTick();
+		yield();
 	return newStatus;
-}
-
-static void syscall_yield() {
-	_hlt();
 }
 
 static int32_t syscall_waitpid(uint16_t pid) {

@@ -223,35 +223,38 @@ static void man(char *command) {
 }
 
 static void test(char *name, char *param) {
-	printf(name);
 	if (!strcmp(name, "test-mm")) {
-		// char * args[] = {"test_mm", param, 0};
-		// createProcess(&test_mm, args, "test_mm", 4);
-		test_mm(1, (char *[]){param});
+		char *args[] = {"test_mm", param, NULL};
+		createProcess(&test_mm, args, "test_mm", 4);
+		// test_mm(1, (char *[]){param});
 	}
 	else if (!strcmp(name, "test-processes")) {
-		// char * args[] = {"test_processes", param, 0};
-		// createProcess(&test_processes, args, "test_processes", 4);
-		test_processes(1, (char *[]){param});
+		char *args[] = {"test_processes", param, NULL};
+		createProcess(&test_processes, args, "test_processes", 4);
+		// test_processes(1, (char *[]){param});
 	}
 	else if (!strcmp(name, "test-prio")) {
-		char *args[] = {"test_prio", param, 0};
+		char *args[] = {"test_prio", param, NULL};
 		createProcess(&test_prio, args, "test_prio", 4);
 	}
 	else if (!strcmp(name, "test-sync")) {
-		char *args[] = {"test_sync", param, "1", 0};
+		char *args[] = {"test_sync", param, "1", NULL};
 		createProcess(&test_sync, args, "test_sync", 4);
+	}
+	else if (!strcmp(name, "test-no-sync")) {
+		char *args[] = {"test_sync", param, "0", NULL};
+		createProcess(&test_sync, args, "test_no_sync", 4);
 	}
 	else {
 		printErr(INVALID_COMMAND);
 		// TODO: Mover?
-		char *args[] = {"ZombieCreator", 0};
+		char *args[] = {"ZombieCreator", NULL};
 		createProcess(&testProgram, args, "ZombieCreator", (uint8_t) 4);
 	}
 }
 
 static void runLoop(char *delay) {
-	char *args[] = {"loop", delay, 0};
+	char *args[] = {"loop", delay, NULL};
 	createProcess(&loop, args, "loop", (uint8_t) 4);
 }
 

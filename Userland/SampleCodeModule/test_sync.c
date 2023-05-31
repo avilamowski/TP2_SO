@@ -24,15 +24,15 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
 	if (argc != 4)
 		return -1;
 
-	if ((n = satoi(argv[0])) <= 0)
+	if ((n = satoi(argv[1])) <= 0)
 		return -1;
-	if ((inc = satoi(argv[1])) == 0)
+	if ((inc = satoi(argv[2])) == 0)
 		return -1;
-	if ((use_sem = satoi(argv[2])) < 0)
+	if ((use_sem = satoi(argv[3])) < 0)
 		return -1;
 
 	if (use_sem)
-		if (!semOpen(SEM_ID)) {
+		if (semOpen(SEM_ID) == -1) {
 			printf("test_sync: ERROR opening semaphore\n");
 			return -1;
 		}
@@ -61,26 +61,26 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
 	// Agregado para que sea compatible con nuestra implementacion
 	int8_t useSem = satoi(argv[2]);
 	if (useSem) {
-		if (!semInit(SEM_ID, 1)) {
+		if (semInit(SEM_ID, 1) == -1) {
 			printf("test_sync: ERROR creating semaphore\n");
 			return -1;
 		}
 	}
 
-	char *argvDec[] = {"my_process_inc", argv[1], "-1", argv[2], NULL};
+	char *argvDec[] = {"my_process_dec", argv[1], "-1", argv[2], NULL};
 	char *argvInc[] = {"my_process_inc", argv[1], "1", argv[2], NULL};
 
 	global = 0;
 
 	uint64_t i;
 	for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-		pids[i] = createProcess(&my_process_inc, argvDec, "my_process_inc", 3);
-		pids[i + TOTAL_PAIR_PROCESSES] = createProcess(&my_process_inc, argvInc, "my_process_inc", 3);
+		pids[i] = createProcess(&my_process_inc, argvDec, "my_process_dec", 4);
+		pids[i + TOTAL_PAIR_PROCESSES] = createProcess(&my_process_inc, argvInc, "my_process_inc", 4);
 	}
 
 	for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-		semWait(pids[i]);
-		semWait(pids[i + TOTAL_PAIR_PROCESSES]);
+		waitpid(pids[i]);
+		waitpid(pids[i + TOTAL_PAIR_PROCESSES]);
 	}
 
 	printf("Final value: %d\n", global);

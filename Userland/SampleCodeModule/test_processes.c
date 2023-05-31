@@ -1,5 +1,6 @@
 #include <process.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <syscalls.h>
 #include <test_util.h>
 
@@ -19,19 +20,18 @@ int64_t test_processes(int argc, char *argv[]) {
 	uint64_t max_processes;
 	// char *argvAux[] = {0};
 
-	if (argc != 1)
+	if (argc != 2)
 		return -1;
 
-	if ((max_processes = satoi(argv[0])) <= 0)
+	if ((max_processes = satoi(argv[1])) <= 0)
 		return -1;
 
 	p_rq p_rqs[max_processes];
-
 	while (1) {
 		printf("x");
 		// Create max_processes processes
 		for (rq = 0; rq < max_processes; rq++) {
-			char *args[] = {"endless_loop", 0};
+			char *args[] = {"endless_loop", NULL};
 			p_rqs[rq].pid = createProcess(&endless_loop, args, "endless_loop", 0);
 
 			if (p_rqs[rq].pid == -1) {
@@ -57,6 +57,7 @@ int64_t test_processes(int argc, char *argv[]) {
 								return -1;
 							}
 							p_rqs[rq].state = KILLED;
+							waitpid(p_rqs[rq].pid);
 							alive--;
 						}
 						break;

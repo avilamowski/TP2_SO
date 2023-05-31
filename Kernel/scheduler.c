@@ -5,8 +5,12 @@
 #include <scheduler.h>
 #include <video.h>
 #define QTY_READY_LEVELS 5
+#define MAX_PRIORITY 4
+#define MIN_PRIORITY 0
 #define BLOCKED_INDEX QTY_READY_LEVELS
 #define MAX_PROCESSES (1 << 12)
+#define IDLE_PID 0
+#define QUANTUM_COEF 2
 
 typedef struct SchedulerCDT {
 	Node *processes[MAX_PROCESSES];
@@ -14,7 +18,7 @@ typedef struct SchedulerCDT {
 	uint16_t currentPid;
 	uint16_t nextUnusedPid;
 	uint16_t qtyProcesses;
-	uint8_t remainingQuantum;
+	int8_t remainingQuantum;
 } SchedulerCDT;
 
 SchedulerADT createScheduler() {
@@ -33,19 +37,19 @@ SchedulerADT getSchedulerADT() {
 
 static uint16_t getNextPid(SchedulerADT scheduler) {
 	Process *process = NULL;
-	for (int lvl = QTY_READY_LEVELS - 1; lvl >= 0 && process == NULL; lvl--) {
-		if (!isEmpty(scheduler->levels[lvl])) {
+	for (int lvl = QTY_READY_LEVELS - 1; lvl >= 0 && process == NULL; lvl--)
+		if (!isEmpty(scheduler->levels[lvl]))
 			process = (Process *) (getFirst(scheduler->levels[lvl]))->data;
-		}
-	}
-	// TODO: Panic si process es null?
+
+	if (process == NULL)
+		return IDLE_PID;
 	return process->pid;
 }
 
 int32_t setPriority(uint16_t pid, uint8_t newPriority) {
 	SchedulerADT scheduler = getSchedulerADT();
 	Node *node = scheduler->processes[pid];
-	if (node == NULL)
+	if (node == NULL || pid == IDLE_PID)
 		return -1;
 	Process *process = (Process *) node->data;
 	if (newPriority < 0 || newPriority >= QTY_READY_LEVELS)
@@ -61,7 +65,7 @@ int32_t setPriority(uint16_t pid, uint8_t newPriority) {
 int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 	SchedulerADT scheduler = getSchedulerADT();
 	Node *node = scheduler->processes[pid];
-	if (node == NULL)
+	if (node == NULL || pid == IDLE_PID)
 		return -1;
 	Process *process = (Process *) node->data;
 	ProcessStatus oldStatus = process->status;
@@ -85,7 +89,9 @@ int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 void *schedule(void *prevStackPointer) {
 	static int firstTime = 1;
 	SchedulerADT scheduler = getSchedulerADT();
-	if (!scheduler->qtyProcesses)
+
+	scheduler->remainingQuantum--;
+	if (!scheduler->qtyProcesses || scheduler->remainingQuantum > 0)
 		return prevStackPointer;
 
 	Process *currentProcess;
@@ -100,13 +106,13 @@ void *schedule(void *prevStackPointer) {
 		if (currentProcess->status == RUNNING)
 			currentProcess->status = READY;
 
-		// TODO: Analizar si vale la pena hacerlo ciclico
 		uint8_t newPriority = currentProcess->priority > 0 ? currentProcess->priority - 1 : currentProcess->priority;
 		setPriority(currentProcess->pid, newPriority);
 	}
 
 	scheduler->currentPid = getNextPid(scheduler);
 	currentProcess = scheduler->processes[scheduler->currentPid]->data;
+	scheduler->remainingQuantum = QUANTUM_COEF * (MAX_PRIORITY - currentProcess->priority);
 	currentProcess->status = RUNNING;
 	return currentProcess->stackPos;
 }
@@ -118,7 +124,13 @@ int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priori
 	Process *process = (Process *) allocMemory(sizeof(Process));
 	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority);
 
-	Node *processNode = appendElement(scheduler->levels[process->priority], (void *) process);
+	Node *processNode;
+	if (process->pid != IDLE_PID)
+		processNode = appendElement(scheduler->levels[process->priority], (void *) process);
+	else {
+		processNode = allocMemory(sizeof(Node));
+		processNode->data = (void *) process;
+	}
 	scheduler->processes[process->pid] = processNode;
 
 	while (scheduler->processes[scheduler->nextUnusedPid] != NULL)
@@ -142,7 +154,7 @@ int32_t killCurrentProcess(int32_t retValue) {
 }
 
 int32_t killProcess(uint16_t pid, int32_t retValue) {
-	if (pid == 0)
+	if (pid == IDLE_PID)
 		return -1;
 	SchedulerADT scheduler = getSchedulerADT();
 	Node *processToKillNode = scheduler->processes[pid];
@@ -174,7 +186,7 @@ int32_t killProcess(uint16_t pid, int32_t retValue) {
 		destroyZombie(scheduler, processToKill);
 	}
 	if (pid == scheduler->currentPid)
-		forceTimerTick();
+		yield();
 	return 0;
 }
 
@@ -188,6 +200,8 @@ ProcessSnapshotList *getProcessSnapshot() {
 	ProcessSnapshotList *snapshotsArray = allocMemory(sizeof(ProcessSnapshotList));
 	ProcessSnapshot *psArray = allocMemory(scheduler->qtyProcesses * sizeof(ProcessSnapshot));
 	int processIndex = 0;
+
+	loadSnapshot(&psArray[processIndex++], (Process *) scheduler->processes[IDLE_PID]->data);
 	for (int lvl = QTY_READY_LEVELS; lvl >= 0; lvl--) { // Se cuentan tambien los bloqueados
 		begin(scheduler->levels[lvl]);
 		while (hasNext(scheduler->levels[lvl])) {
@@ -207,21 +221,31 @@ ProcessSnapshotList *getProcessSnapshot() {
 
 int32_t getZombieRetValue(uint16_t pid) {
 	SchedulerADT scheduler = getSchedulerADT();
-	Node *processNode = scheduler->processes[pid];
-	if (processNode == NULL)
+	Node *zombieNode = scheduler->processes[pid];
+	if (zombieNode == NULL)
 		return -1;
-	Process *process = (Process *) processNode->data;
-	if (process->parentPid != scheduler->currentPid)
+	Process *zombieProcess = (Process *) zombieNode->data;
+	if (zombieProcess->parentPid != scheduler->currentPid)
 		return -1;
-	if (process->status != ZOMBIE) {
+	if (zombieProcess->status != ZOMBIE) {
 		setStatus(scheduler->currentPid, BLOCKED);
-		forceTimerTick();
+		yield();
 	}
-	return process->retValue;
+	Process *parent = (Process *) scheduler->processes[zombieProcess->parentPid]->data;
+	removeNode(parent->zombieChildren, zombieNode);
+	destroyZombie(scheduler, zombieProcess);
+	return zombieProcess->retValue;
 }
 
 int32_t processIsAlive(uint16_t pid) {
 	SchedulerADT scheduler = getSchedulerADT();
-	Process *process = scheduler->processes[pid];
+	Process *process = scheduler->processes[pid]->data;
 	return process != NULL && process->status != ZOMBIE;
+}
+
+void yield() {
+	SchedulerADT scheduler = getSchedulerADT();
+	scheduler->remainingQuantum = 0;
+	setPriority(scheduler->currentPid, MAX_PRIORITY);
+	forceTimerTick();
 }

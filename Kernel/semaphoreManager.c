@@ -97,7 +97,7 @@ static void acquireMutex(Semaphore *sem) {
 		uint16_t pid = getpid();
 		appendElement(sem->semaphoreQueue, (void *) pid);
 		setStatus(pid, BLOCKED);
-		forceTimerTick();
+		yield();
 	}
 }
 
@@ -132,7 +132,7 @@ static int down(Semaphore *sem) {
 		appendElement(sem->semaphoreQueue, (void *) pid);
 		setStatus(pid, BLOCKED);
 		releaseMutex(sem);
-		forceTimerTick();
+		yield();
 
 		acquireMutex(sem);
 	}
