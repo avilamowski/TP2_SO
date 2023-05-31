@@ -23,6 +23,11 @@ GLOBAL changeProcessStatus
 GLOBAL changeProcessPriority
 GLOBAL yield
 GLOBAL waitpid
+GLOBAL semInit
+GLOBAL semOpen
+GLOBAL semClose
+GLOBAL semPost
+GLOBAL semWait
 
 read:
     mov rax, 0
@@ -144,3 +149,29 @@ waitpid:
     mov rax, 23
     int 80h
     ret
+
+semInit:
+    mov rax, 24
+    int 80h
+    ret
+    
+semOpen:
+    mov rax, 25
+    int 80h
+    ret
+    
+semClose:
+    mov rax, 26
+    int 80h
+    ret
+    
+semPost:
+    mov rax, 27
+    int 80h
+    ret
+    
+semWait:
+    mov rax, 28
+    int 80h
+    ret
+    

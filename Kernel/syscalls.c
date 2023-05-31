@@ -5,6 +5,7 @@
 #include <memoryManager.h>
 #include <process.h>
 #include <scheduler.h>
+#include <semaphoreManager.h>
 #include <speaker.h>
 #include <stdint.h>
 #include <time.h>
@@ -41,6 +42,11 @@
 #define CHANGE_PROCESS_PRIORITY 21
 #define YIELD 22
 #define WAITPID 23
+#define SEM_INIT 24
+#define SEM_OPEN 25
+#define SEM_CLOSE 26
+#define SEM_POST 27
+#define SEM_WAIT 28
 
 static uint8_t syscall_read(uint32_t fd);
 static void syscall_write(uint32_t fd, char c);
@@ -132,6 +138,16 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 			break;
 		case WAITPID:
 			return syscall_waitpid((uint16_t) arg0);
+		case SEM_INIT:
+			return semInit((uint16_t) arg0, (uint32_t) arg1);
+		case SEM_OPEN:
+			return semOpen((uint16_t) arg0);
+		case SEM_CLOSE:
+			return semClose((uint16_t) arg0);
+		case SEM_POST:
+			return semPost((uint16_t) arg0);
+		case SEM_WAIT:
+			return semWait((uint16_t) arg0);
 	}
 	return 0;
 }
@@ -244,7 +260,10 @@ static int8_t syscall_changeProcessPriority(uint16_t pid, uint8_t priority) {
 }
 
 static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status) {
-	return setStatus(pid, status);
+	int8_t newStatus = setStatus(pid, status);
+	if (newStatus != -1 && getpid() == pid)
+		forceTimerTick();
+	return newStatus;
 }
 
 static void syscall_yield() {

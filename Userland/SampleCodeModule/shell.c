@@ -10,6 +10,7 @@
 #include <test_mm.h>
 #include <test_prio.h>
 #include <test_processes.h>
+#include <test_sync.h>
 #include <tron.h>
 
 /* Enum para la cantidad de argumentos recibidos */
@@ -236,6 +237,10 @@ static void test(char *name, char *param) {
 	else if (!strcmp(name, "test-prio")) {
 		char *args[] = {"test_prio", param, 0};
 		createProcess(&test_prio, args, "test_prio", 4);
+	}
+	else if (!strcmp(name, "test-sync")) {
+		char *args[] = {"test_sync", param, 1, 0};
+		createProcess(&test_sync, args, "test_sync", 4);
 	}
 	else {
 		printErr(INVALID_COMMAND);

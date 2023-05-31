@@ -21,8 +21,9 @@
 
 /* Direccion del MemoryManager */
 #define SYSTEM_VARIABLES 0x5A00
-#define MEMORY_MANAGER_ADDRESS 0x50000
-#define SCHEDULER_ADDRESS 0x51000
+#define MEMORY_MANAGER_ADDRESS 0x50000	  // MemoryManagerCDT
+#define SCHEDULER_ADDRESS 0x51000		  // SchedulerCDT
+#define SEMAPHORE_MANAGER_ADDRESS 0x60000 // Lista de semaforos
 
 /* Constantes */
 #define NULL ((void *) 0)

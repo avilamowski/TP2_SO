@@ -6,6 +6,8 @@ GLOBAL startSound
 GLOBAL stopSound
 GLOBAL saveRegisters
 GLOBAL forceTimerTick
+GLOBAL _xadd
+GLOBAL _xchg
 
 section .text
     
@@ -112,3 +114,13 @@ saveRegisters:
 forceTimerTick:
     int 0x20
     ret
+
+_xadd:
+  mov rax, rdi
+  lock xadd [rsi], eax
+  ret
+
+_xchg:
+  mov rax, rsi
+  xchg [rdi], eax
+  ret

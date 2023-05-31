@@ -34,4 +34,7 @@ int strtoh(char *s, char **end);
  * @return Longitud del buffer (numero que se convirtio en cadena de caracteres)
  */
 int itoa(uint64_t n, char *buffer, int base);
+
+#define NULL ((void *) 0) // TODO: sacar
+
 #endif

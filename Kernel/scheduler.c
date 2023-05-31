@@ -6,7 +6,7 @@
 #include <video.h>
 #define QTY_READY_LEVELS 5
 #define BLOCKED_INDEX QTY_READY_LEVELS
-#define MAX_PROCESSES (1 << 10)
+#define MAX_PROCESSES (1 << 12)
 
 typedef struct SchedulerCDT {
 	Node *processes[MAX_PROCESSES];
@@ -79,8 +79,6 @@ int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 		appendNode(scheduler->levels[process->priority], node);
 	}
 	process->status = newStatus;
-	if (oldStatus == RUNNING)
-		forceTimerTick();
 	return newStatus;
 }
 
@@ -217,6 +215,13 @@ int32_t getZombieRetValue(uint16_t pid) {
 		return -1;
 	if (process->status != ZOMBIE) {
 		setStatus(scheduler->currentPid, BLOCKED);
+		forceTimerTick();
 	}
 	return process->retValue;
+}
+
+int32_t processIsAlive(uint16_t pid) {
+	SchedulerADT scheduler = getSchedulerADT();
+	Process *process = scheduler->processes[pid];
+	return process != NULL && process->status != ZOMBIE;
 }

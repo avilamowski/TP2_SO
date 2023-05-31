@@ -14,4 +14,5 @@ ProcessSnapshotList *getProcessSnapshot();
 int32_t setPriority(uint16_t pid, uint8_t newPriority);
 int8_t setStatus(uint16_t pid, uint8_t newStatus);
 int32_t getZombieRetValue(uint16_t pid);
+int32_t processIsAlive(uint16_t pid);
 #endif

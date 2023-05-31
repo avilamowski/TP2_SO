@@ -102,6 +102,17 @@ void *next(LinkedListADT list) {
 	return data;
 }
 
+void freeLinkedListADTDeep(LinkedListADT list) {
+	Node *current = list->first;
+	Node *next;
+	while (current != NULL) {
+		next = current->next;
+		free(current);
+		current = next;
+	}
+	freeLinkedListADT(list);
+}
+
 void freeLinkedListADT(LinkedListADT list) {
 	free(list);
 }

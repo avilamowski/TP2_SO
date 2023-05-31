@@ -45,5 +45,6 @@ void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunctio
 ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
 int processIsWaiting(Process *process, uint16_t pidToWait);
 int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess);
+void freeProcess(Process *process);
 
 #endif

@@ -92,4 +92,8 @@ int strlen(const char *str);
 
 void forceTimerTick();
 
+int _xchg(int *lock, int value);
+
+int _xadd(int inc, int *value);
+
 #endif
