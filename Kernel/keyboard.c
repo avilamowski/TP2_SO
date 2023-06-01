@@ -1,16 +1,17 @@
 #include <keyboard.h>
 #include <lib.h>
+#include <semaphoreManager.h>
 #include <stdint.h>
 #include <time.h>
 #include <video.h>
-#define BUFFER_CAPACITY 10		 /* Longitud maxima del vector _buffer */
-#define HOTKEY 29				 /* Scancode para el snapshot de registros */
-static uint8_t _bufferStart = 0; /* Indice del comienzo de la cola */
-static char _bufferSize = 0;	 /* Longitud de la cola */
-static uint8_t _buffer[BUFFER_CAPACITY] = {
-	0};								/* Vector ciclico que guarda las teclas
-									 * que se van leyendo del teclado */
-static const char charHexMap[256] = /* Mapa de scancode a ASCII */
+
+#define BUFFER_CAPACITY 10					   /* Longitud maxima del vector _buffer */
+#define HOTKEY 29							   /* Scancode para el snapshot de registros */
+static uint8_t _bufferStart = 0;			   /* Indice del comienzo de la cola */
+static char _bufferSize = 0;				   /* Longitud de la cola */
+static uint8_t _buffer[BUFFER_CAPACITY] = {0}; /* Vector ciclico que guarda las teclas
+												* que se van leyendo del teclado */
+static const char charHexMap[256] =			   /* Mapa de scancode a ASCII */
 	{0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-',
 	 '=', '\b', ' ', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
 	 '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
@@ -26,6 +27,10 @@ static int getBufferIndex(int offset) {
 	return (_bufferStart + offset) % (BUFFER_CAPACITY);
 }
 
+void initializeKeyboardDriver() {
+	semInit(IO_SEM_ID, 0);
+}
+
 void keyboardHandler() {
 	uint8_t key = getKeyPressed();
 	if (_bufferSize < BUFFER_CAPACITY - 1) {
@@ -36,6 +41,7 @@ void keyboardHandler() {
 			}
 			_buffer[getBufferIndex(_bufferSize)] = key;
 			_bufferSize++;
+			semPost(IO_SEM_ID);
 		}
 	}
 }
@@ -51,5 +57,6 @@ char getScancode() {
 }
 
 char getAscii() {
+	semWait(IO_SEM_ID);
 	return charHexMap[(int) getScancode()];
 }

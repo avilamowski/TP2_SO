@@ -1,5 +1,6 @@
 #include <defs.h>
 #include <interrupts.h>
+#include <keyboard.h>
 #include <lib.h>
 #include <memoryManager.h>
 #include <moduleLoader.h>
@@ -48,27 +49,22 @@ void initializeKernelBinary() {
 	createMemoryManager((void *) MEMORY_MANAGER_ADDRESS, sampleDataModuleAddress + userlandSize, availableMem);
 	createScheduler();
 	createSemaphoreManager();
+	initializeKeyboardDriver();
 }
 
 int main() {
 	char *argsIdle[3] = {"idle", "Hm?", NULL};
-	createProcess((MainFunction) &idle, argsIdle, "idle", 4);
+	int16_t fileDescriptors[] = {DEV_NULL, DEV_NULL, STDERR};
+	createProcess((MainFunction) &idle, argsIdle, "idle", 4, fileDescriptors);
 	load_idt();
 	return 0;
 }
 
 int idle(int argc, char **argv) {
 	char *argsShell[2] = {"shell", NULL};
-	createProcess((MainFunction) sampleCodeModuleAddress, argsShell, "shell", 4);
-	while (1) {
-		// uint8_t oldM;
-		// uint8_t h, m, s;
-		// getTime(&h, &m, &s);
-		// if (m != oldM) {
-		// 	printf("\n%d:%d:%d %d %s\n", h, m, s, argc, argv[1]);
-		// }
-		// oldM = m;
+	int16_t fileDescriptors[] = {STDIN, STDOUT, STDERR};
+	createProcess((MainFunction) sampleCodeModuleAddress, argsShell, "shell", 4, fileDescriptors);
+	while (1)
 		_hlt();
-	}
 	return 0;
 }

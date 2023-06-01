@@ -2,7 +2,7 @@
 #define _PROCESS_H
 #include <linkedListADT.h>
 #include <stdint.h>
-
+#define BUILT_IN_DESCRIPTORS 3
 typedef enum { BLOCKED = 0,
 			   READY,
 			   RUNNING,
@@ -21,7 +21,7 @@ typedef struct Process { // PCB
 	// uint32_t flags;
 	uint8_t priority;
 	ProcessStatus status;
-	// uint8_t * fd;
+	int16_t fileDescriptors[BUILT_IN_DESCRIPTORS];
 	int32_t retValue;
 	LinkedListADT zombieChildren;
 } Process;
@@ -42,7 +42,7 @@ typedef struct ProcessSnapshotList {
 	ProcessSnapshot *snapshotList;
 } ProcessSnapshotList;
 
-void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority);
+void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]);
 ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
 int processIsWaiting(Process *process, uint16_t pidToWait);
 int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess);

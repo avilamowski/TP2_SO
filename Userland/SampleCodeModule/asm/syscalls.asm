@@ -14,7 +14,7 @@ GLOBAL setFontColor
 GLOBAL getFontColor
 GLOBAL malloc
 GLOBAL free
-GLOBAL createProcess
+GLOBAL createProcessWithFds
 GLOBAL exit
 GLOBAL getpid
 GLOBAL ps
@@ -28,6 +28,8 @@ GLOBAL semOpen
 GLOBAL semClose
 GLOBAL semPost
 GLOBAL semWait
+GLOBAL pipeOpen
+GLOBAL pipeClose
 
 read:
     mov rax, 0
@@ -105,7 +107,7 @@ free:
     int 80h
     ret
 
-createProcess:
+createProcessWithFds:
     mov rax, 15
     int 80h
     ret
@@ -174,4 +176,13 @@ semWait:
     mov rax, 28
     int 80h
     ret
-    
+
+pipeOpen:  
+    mov rax, 29
+    int 80h
+    ret
+
+pipeClose:
+    mov rax, 30
+    int 80h
+    ret

@@ -1,5 +1,5 @@
-#ifndef _SEMAPHORES_H
-#define _SEMAPHORES_H
+#ifndef _SEMAPHORE_MANAGER_H
+#define _SEMAPHORE_MANAGER_H
 
 #include <stdint.h>
 typedef struct SemaphoreManagerCDT *SemaphoreManagerADT;

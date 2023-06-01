@@ -4,19 +4,9 @@
 #include <color.h>
 #include <stdint.h>
 
-/**
- * @brief Escribe a partir del descriptor recibido un caracter
- * @param fd: FileDescriptor (STDOUT | STDERR)
- * @param c: Caracter a escribir
- */
-void write(int fd, char c);
+int64_t write(int16_t fd, char *sourceBuffer, uint64_t len);
 
-/**
- * @brief Lee un byte a partir del descriptor recibido
- * @param fd: FileDescriptor (STDIN | KBDIN)
- * @return Byte leido
- */
-uint8_t read(int fd);
+int64_t read(int16_t fd, char *destinationBuffer, uint64_t len);
 
 /**
  * @brief Devuelve la hora expresada en segundos
@@ -104,7 +94,7 @@ void *malloc(uint64_t size);
 
 void free(void *ptr);
 
-int16_t createProcess(void *code, char **args, char *name, uint8_t priority);
+int16_t createProcessWithFds(void *code, char **args, char *name, uint8_t priority, int16_t *fileDescriptors);
 
 void exit();
 
@@ -131,5 +121,9 @@ int8_t semClose(uint16_t id);
 int8_t semPost(uint16_t id);
 
 int8_t semWait(uint16_t id);
+
+int8_t pipeOpen(uint16_t id, uint8_t mode);
+
+int8_t pipeClose(uint16_t id, uint8_t mode);
 
 #endif

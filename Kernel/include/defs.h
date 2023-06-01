@@ -23,9 +23,18 @@
 #define SYSTEM_VARIABLES 0x5A00
 #define MEMORY_MANAGER_ADDRESS 0x50000	  // MemoryManagerCDT
 #define SCHEDULER_ADDRESS 0x51000		  // SchedulerCDT
-#define SEMAPHORE_MANAGER_ADDRESS 0x60000 // Lista de semaforos
+#define SEMAPHORE_MANAGER_ADDRESS 0x60000 // SemaphoreCDT
+#define PIPE_MANAGER_ADDRESS 0x70000	  // PipeManagerCDT
 
 /* Constantes */
 #define NULL ((void *) 0)
+#define EOF ((char) -1)
+
+/* File Descriptors*/
+#define DEV_NULL -1
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
+// #define KBDIN 3
 
 #endif

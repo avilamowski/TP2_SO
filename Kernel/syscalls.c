@@ -1,8 +1,10 @@
 #include <color.h>
+#include <defs.h>
 #include <keyboard.h>
 #include <lib.h>
 #include <memory.h>
 #include <memoryManager.h>
+#include <pipeManager.h>
 #include <process.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
@@ -10,12 +12,6 @@
 #include <stdint.h>
 #include <time.h>
 #include <video.h>
-
-/* File Descriptors*/
-#define STDIN 0
-#define STDOUT 1
-#define STDERR 2
-#define KBDIN 3
 
 /* IDs de syscalls */
 #define READ 0
@@ -47,9 +43,11 @@
 #define SEM_CLOSE 26
 #define SEM_POST 27
 #define SEM_WAIT 28
+#define PIPE_OPEN 29
+#define PIPE_CLOSE 30
 
-static uint8_t syscall_read(uint32_t fd);
-static void syscall_write(uint32_t fd, char c);
+static int64_t syscall_read(int16_t fd, char *destinationBuffer, uint64_t len);
+static int64_t syscall_write(int16_t fd, char *sourceBuffer, uint64_t len);
 static void syscall_clear();
 static uint32_t syscall_seconds();
 static uint64_t *syscall_registerArray(uint64_t *regarr);
@@ -64,7 +62,7 @@ static void syscall_setFontColor(uint8_t r, uint8_t g, uint8_t b);
 static uint32_t syscall_getFontColor();
 static void *syscall_malloc(uint64_t size);
 static void syscall_free(void *ptr);
-static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority);
+static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]);
 static void syscall_exitProcess(int32_t retValue);
 static uint16_t syscall_getpid();
 static ProcessSnapshotList *syscall_ps();
@@ -78,10 +76,9 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 						   uint64_t arg5) {
 	switch (nr) {
 		case READ:
-			return syscall_read((uint32_t) arg0);
+			return syscall_read((int16_t) arg0, (char *) arg1, (uint64_t) arg2);
 		case WRITE:
-			syscall_write((uint32_t) arg0, (char) arg1);
-			break;
+			return syscall_write((int16_t) arg0, (char *) arg1, (uint64_t) arg2);
 		case CLEAR:
 			syscall_clear();
 			break;
@@ -117,7 +114,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 			syscall_free((void *) arg0);
 			break;
 		case CREATE_PROCESS:
-			return syscall_createProcess((MainFunction) arg0, (char **) arg1, (char *) arg2, (uint8_t) arg3);
+			return syscall_createProcess((MainFunction) arg0, (char **) arg1, (char *) arg2, (uint8_t) arg3, (int16_t *) arg4);
 		case EXIT_PROCESS:
 			syscall_exitProcess((int32_t) arg0);
 			break;
@@ -147,28 +144,51 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 			return semPost((uint16_t) arg0);
 		case SEM_WAIT:
 			return semWait((uint16_t) arg0);
+		case PIPE_OPEN:
+			return pipeOpen((uint16_t) arg0, (uint8_t) arg1);
+		case PIPE_CLOSE:
+			return pipeClose((uint16_t) arg0);
 	}
 	return 0;
 }
 
-static uint8_t syscall_read(uint32_t fd) {
-	switch (fd) {
-		case STDIN:
-			return getAscii();
-		case KBDIN:
-			return getScancode();
+static int64_t syscall_read(int16_t fd, char *destinationBuffer, uint64_t len) {
+	if (fd == DEV_NULL)
+		return 0;
+	else if (fd < DEV_NULL)
+		return -1;
+
+	int16_t fdValue = fd < BUILT_IN_DESCRIPTORS ? getCurrentProcessFileDescriptor(fd) : fd;
+	if (fdValue >= BUILT_IN_DESCRIPTORS) {
+		return readPipe(fdValue, destinationBuffer, len);
 	}
-	return 0;
+	else if (fdValue == STDIN) {
+		for (uint64_t i = 0; i < len; i++)
+			destinationBuffer[i] = getAscii();
+		return len; // TODO: Ver si hay que acotar por Ctrl C o D
+	}
+	return -1;
 }
 
-static void syscall_write(uint32_t fd, char c) {
-	Color prevColor = getFontColor();
-	if (fd == STDERR)
-		setFontColor(ERROR_COLOR);
-	else if (fd != STDOUT)
-		return;
-	printChar(c);
-	setFontColor(prevColor);
+static int64_t syscall_write(int16_t fd, char *sourceBuffer, uint64_t len) {
+	if (fd == DEV_NULL)
+		return 0;
+	else if (fd < DEV_NULL)
+		return -1;
+	int16_t fdValue = fd < BUILT_IN_DESCRIPTORS ? getCurrentProcessFileDescriptor(fd) : fd;
+	if (fdValue >= BUILT_IN_DESCRIPTORS) {
+		return writePipe(fdValue, sourceBuffer, len);
+	}
+	else if (fdValue == STDOUT || fdValue == STDERR) {
+		Color prevColor = getFontColor();
+		if (fd == STDERR)
+			setFontColor(ERROR_COLOR);
+		for (uint64_t i = 0; i < len; i++)
+			printChar(sourceBuffer[i]);
+		setFontColor(prevColor);
+		return len; // TODO: ver si hay que acotar por Ctrl C o D
+	}
+	return -1;
 }
 
 static void syscall_clear() {
@@ -234,8 +254,8 @@ static void syscall_free(void *ptr) {
 	free(ptr);
 }
 
-static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
-	return createProcess(code, args, name, priority);
+static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]) {
+	return createProcess(code, args, name, priority, fileDescriptors);
 }
 
 static void syscall_exitProcess(int32_t retValue) {

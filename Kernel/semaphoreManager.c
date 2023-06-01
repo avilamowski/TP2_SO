@@ -10,8 +10,8 @@
 
 typedef struct Semaphore {
 	uint32_t value;
+	int mutex;					  // 0 libre, 1 ocupado
 	LinkedListADT semaphoreQueue; // LinkedListADT de pids
-	uint8_t mutex;				  // 0 libre, 1 ocupado
 	LinkedListADT mutexQueue;	  // LinkedListADT de pids
 } Semaphore;
 
@@ -25,7 +25,7 @@ static int down(Semaphore *sem);
 
 typedef struct SemaphoreManagerCDT {
 	Semaphore *semaphores[MAX_SEMAPHORES];
-	uint16_t qtySemaphores;
+	uint16_t qtySemaphores; // TODO: Sacar?
 } SemaphoreManagerCDT;
 
 SemaphoreManagerADT createSemaphoreManager() {
@@ -95,7 +95,7 @@ static void freeSemaphore(Semaphore *sem) {
 static void acquireMutex(Semaphore *sem) {
 	if (_xchg(&(sem->mutex), 1)) {
 		uint16_t pid = getpid();
-		appendElement(sem->semaphoreQueue, (void *) pid);
+		appendElement(sem->semaphoreQueue, (void *) ((uint64_t) pid));
 		setStatus(pid, BLOCKED);
 		yield();
 	}
@@ -105,8 +105,8 @@ static void resumeFirstAvailableProcess(LinkedListADT queue) {
 	Node *current;
 	while ((current = getFirst(queue)) != NULL) {
 		removeNode(queue, current);
-		if (processIsAlive((uint16_t) current->data)) {
-			setStatus((uint16_t) current->data, READY);
+		if (processIsAlive((uint16_t) ((uint64_t) current->data))) {
+			setStatus((uint16_t) ((uint64_t) current->data), READY);
 			break;
 		}
 	}
@@ -129,7 +129,7 @@ static int down(Semaphore *sem) {
 	acquireMutex(sem);
 	if (sem->value <= 0) {
 		uint16_t pid = getpid();
-		appendElement(sem->semaphoreQueue, (void *) pid);
+		appendElement(sem->semaphoreQueue, (void *) ((uint64_t) pid));
 		setStatus(pid, BLOCKED);
 		releaseMutex(sem);
 		yield();

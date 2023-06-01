@@ -117,12 +117,12 @@ void *schedule(void *prevStackPointer) {
 	return currentProcess->stackPos;
 }
 
-int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority) {
+int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]) {
 	SchedulerADT scheduler = getSchedulerADT();
 	if (scheduler->qtyProcesses >= MAX_PROCESSES) // TODO: Agregar panic?
 		return -1;
 	Process *process = (Process *) allocMemory(sizeof(Process));
-	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority);
+	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority, fileDescriptors);
 
 	Node *processNode;
 	if (process->pid != IDLE_PID)
@@ -248,4 +248,20 @@ void yield() {
 	scheduler->remainingQuantum = 0;
 	setPriority(scheduler->currentPid, MAX_PRIORITY);
 	forceTimerTick();
+}
+
+int8_t changeFD(uint16_t pid, uint8_t position, int16_t newFd) {
+	SchedulerADT scheduler = getSchedulerADT();
+	Node *processNode = scheduler->processes[pid];
+	if (pid == IDLE_PID || processNode == NULL)
+		return -1;
+	Process *process = (Process *) processNode->data;
+	process->fileDescriptors[position] = newFd;
+	return 0;
+}
+
+int16_t getCurrentProcessFileDescriptor(uint8_t fdIndex) {
+	SchedulerADT scheduler = getSchedulerADT();
+	Process *process = scheduler->processes[scheduler->currentPid]->data;
+	return process->fileDescriptors[fdIndex];
 }

@@ -26,7 +26,7 @@ static struct argp_option options[] = {
 /* Our argp parser. */
 static struct argp argp = {options, parse_opt, args_doc, doc};
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
 	struct arguments arguments;
 
 	arguments.output_file = OUTPUT_FILE;

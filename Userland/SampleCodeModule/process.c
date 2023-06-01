@@ -83,3 +83,8 @@ static int spawnAndBlock(int argc, char **argv) {
 	changeProcessStatus(pid, BLOCKED);
 	return 0;
 }
+
+int16_t createProcess(void *code, char **args, char *name, uint8_t priority) {
+	int16_t fileDescriptors[] = {STDIN, STDOUT, STDERR};
+	return createProcessWithFds(code, args, name, priority, fileDescriptors);
+}

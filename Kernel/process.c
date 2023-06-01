@@ -3,24 +3,28 @@
 #include <lib.h>
 #include <linkedListADT.h>
 #include <memoryManager.h>
+#include <pipeManager.h>
 #include <process.h>
+#include <scheduler.h>
 #include <video.h>
 
 #define STACK_SIZE (1 << 12)
 
 static char **allocArguments();
+static void assignFileDescriptor(Process *process, uint8_t fdIndex, int16_t fdValue, uint8_t mode);
 
 void processWrapper(MainFunction code, char **args) {
 	int len = stringArrayLen(args);
 	// printf("qty: %d, argv[0]: %s, argv[1]: %s\n", len, args[0], args[1]);
-
 	int retValue = code(len, args);
 
 	// giveForeground(processList[getCurrentPID()]->parent);
 	killCurrentProcess(retValue);
 }
 
-void initProcess(Process *process, uint16_t pid, uint16_t parentPid, int code(int argc, char **args), char **args, char *name, uint8_t priority) {
+void initProcess(Process *process, uint16_t pid, uint16_t parentPid,
+				 MainFunction code, char **args, char *name,
+				 uint8_t priority, int16_t fileDescriptors[]) {
 	process->pid = pid;
 	process->parentPid = parentPid;
 	process->waitingForPid = 0;
@@ -33,6 +37,16 @@ void initProcess(Process *process, uint16_t pid, uint16_t parentPid, int code(in
 	process->stackPos = _initialize_stack_frame(&processWrapper, code, stackEnd, (void *) process->argv);
 	process->status = READY;
 	process->zombieChildren = createLinkedListADT();
+
+	assignFileDescriptor(process, STDIN, fileDescriptors[STDIN], READ);
+	assignFileDescriptor(process, STDOUT, fileDescriptors[STDOUT], WRITE);
+	assignFileDescriptor(process, STDERR, fileDescriptors[STDERR], WRITE);
+}
+
+static void assignFileDescriptor(Process *process, uint8_t fdIndex, int16_t fdValue, uint8_t mode) {
+	process->fileDescriptors[fdIndex] = fdValue;
+	if (fdValue >= BUILT_IN_DESCRIPTORS)
+		pipeOpenForPid(process->pid, fdValue, mode);
 }
 
 static char **allocArguments(char **args) {
