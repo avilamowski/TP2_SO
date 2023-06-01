@@ -12,6 +12,7 @@
 
 static char **allocArguments();
 static void assignFileDescriptor(Process *process, uint8_t fdIndex, int16_t fdValue, uint8_t mode);
+static void closeFileDescriptor(int16_t fdValue);
 
 void processWrapper(MainFunction code, char **args) {
 	int len = stringArrayLen(args);
@@ -19,6 +20,9 @@ void processWrapper(MainFunction code, char **args) {
 	int retValue = code(len, args);
 
 	// giveForeground(processList[getCurrentPID()]->parent);
+	closeFileDescriptor(getCurrentProcessFileDescriptor(STDIN));
+	closeFileDescriptor(getCurrentProcessFileDescriptor(STDOUT));
+	closeFileDescriptor(getCurrentProcessFileDescriptor(STDERR));
 	killCurrentProcess(retValue);
 }
 
@@ -47,6 +51,11 @@ static void assignFileDescriptor(Process *process, uint8_t fdIndex, int16_t fdVa
 	process->fileDescriptors[fdIndex] = fdValue;
 	if (fdValue >= BUILT_IN_DESCRIPTORS)
 		pipeOpenForPid(process->pid, fdValue, mode);
+}
+
+static void closeFileDescriptor(int16_t fdValue) {
+	if (fdValue >= BUILT_IN_DESCRIPTORS)
+		pipeClose(fdValue);
 }
 
 static char **allocArguments(char **args) {

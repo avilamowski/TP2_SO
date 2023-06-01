@@ -8,4 +8,6 @@ int8_t block(uint16_t pid);
 int8_t unblock(uint16_t pid);
 int testProgram(int argc, char **argv);
 int16_t createProcess(void *code, char **args, char *name, uint8_t priority);
+int filter(int argc, char **argv);
+int echo(int argc, char **argv);
 #endif

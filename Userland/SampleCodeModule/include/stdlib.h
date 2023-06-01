@@ -35,6 +35,10 @@ int strtoh(char *s, char **end);
  */
 int itoa(uint64_t n, char *buffer, int base);
 
+#define toLower(n) ((n) >= 'A' && (n) <= 'Z' ? (n) - ('A' - 'a') : (n))
+#define isNumber(n) ((n) >= '0' && (n) <= '9')
+#define isHex(n) ((n) >= 'a' && (n) <= 'f')
+
 #define NULL ((void *) 0) // TODO: sacar
 
 #endif

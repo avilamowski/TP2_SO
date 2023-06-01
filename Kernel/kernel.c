@@ -4,6 +4,7 @@
 #include <lib.h>
 #include <memoryManager.h>
 #include <moduleLoader.h>
+#include <pipeManager.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
 #include <stdint.h>
@@ -49,6 +50,7 @@ void initializeKernelBinary() {
 	createMemoryManager((void *) MEMORY_MANAGER_ADDRESS, sampleDataModuleAddress + userlandSize, availableMem);
 	createScheduler();
 	createSemaphoreManager();
+	createPipeManager();
 	initializeKeyboardDriver();
 }
 

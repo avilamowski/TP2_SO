@@ -245,6 +245,17 @@ static void test(char *name, char *param) {
 		char *args[] = {"test_sync", param, "0", NULL};
 		createProcess(&test_sync, args, "test_no_sync", 4);
 	}
+	else if (!strcmp(name, "test-filter")) {
+		uint16_t filterPid, echoPid;
+		char *argsFilter[] = {"test_filter", NULL};
+		int16_t fdsFilter[3] = {404, STDOUT, STDERR};
+		filterPid = createProcessWithFds(&filter, argsFilter, "test_filter", 4, fdsFilter);
+		int16_t fdsEcho[3] = {DEV_NULL, 404, STDERR};
+		char *argsEcho[] = {"test_echo", param, NULL};
+		echoPid = createProcessWithFds(&echo, argsEcho, "test_echo", 4, fdsEcho);
+		waitpid(filterPid);
+		waitpid(echoPid);
+	}
 	else {
 		printErr(INVALID_COMMAND);
 		// TODO: Mover?

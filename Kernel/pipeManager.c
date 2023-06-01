@@ -80,11 +80,22 @@ int8_t pipeClose(uint16_t id) {
 	int16_t index;
 	if ((index = getPipeIndexById(id)) == -1)
 		return -1;
-	if (pipeManager->pipes[index] == NULL)
+	Pipe *pipe = pipeManager->pipes[index];
+	if (pipe == NULL)
 		return -1;
 
-	freePipe(pipeManager->pipes[index]);
-	pipeManager->pipes[index] = NULL;
+	uint16_t pid = getpid();
+	if (pid == pipe->inputPid) {
+		char eofString[1] = {EOF};
+		writePipe(id, eofString, 1);
+	}
+	else if (pid == pipe->outputPid) {
+		freePipe(pipeManager->pipes[index]);
+		pipeManager->pipes[index] = NULL;
+	}
+	else
+		return -1;
+
 	return 0;
 }
 
@@ -99,6 +110,8 @@ static Pipe *createPipe() {
 	pipe->inputPid = -1;
 	pipe->outputPid = -1;
 	pipe->isBlocking = 0;
+	for (int i = 0; i < PIPE_SIZE; i++)
+		pipe->buffer[i] = 0;
 	return pipe;
 }
 
@@ -107,12 +120,11 @@ int64_t writePipe(uint16_t id, char *sourceBuffer, uint64_t len) {
 	Pipe *pipe = getPipeById(pipeManager, id);
 	if (pipe == NULL ||
 		pipe->inputPid != getpid() ||
-		pipe->buffer[bufferPosition(pipe)] == EOF ||
 		len == 0)
 		return -1;
 
 	uint64_t writtenBytes = 0;
-	while (writtenBytes < len && sourceBuffer[writtenBytes] != EOF) {
+	while (writtenBytes < len && pipe->buffer[bufferPosition(pipe)] != EOF) {
 		if (pipe->currentSize == PIPE_SIZE) {
 			pipe->isBlocking = 1;
 			setStatus((uint16_t) pipe->inputPid, BLOCKED);
@@ -123,9 +135,9 @@ int64_t writePipe(uint16_t id, char *sourceBuffer, uint64_t len) {
 
 		while (pipe->currentSize < PIPE_SIZE && writtenBytes < len) {
 			pipe->buffer[bufferPosition(pipe)] = sourceBuffer[writtenBytes];
-			pipe->currentSize++;
 			if (sourceBuffer[writtenBytes++] == EOF)
 				break;
+			pipe->currentSize++;
 		}
 		if (pipe->isBlocking) {
 			setStatus((uint16_t) pipe->outputPid, READY);
@@ -140,20 +152,20 @@ int64_t readPipe(uint16_t id, char *destinationBuffer, uint64_t len) {
 	Pipe *pipe = getPipeById(pipeManager, id);
 	if (pipe == NULL ||
 		pipe->outputPid != getpid() ||
-		len == 0 ||
-		pipe->buffer[pipe->startPosition] == EOF)
+		len == 0)
 		return -1;
-
+	destinationBuffer[0] = '\0';
 	uint64_t readBytes = 0;
 	while (readBytes < len && destinationBuffer[readBytes] != EOF) {
-		if (pipe->currentSize == 0) {
+		if (pipe->currentSize == 0 && pipe->buffer[pipe->startPosition] != EOF) {
 			pipe->isBlocking = 1;
 			setStatus((uint16_t) pipe->outputPid, BLOCKED);
 			yield();
 		}
-		while (pipe->currentSize > 0 && readBytes < len) {
+		while ((pipe->currentSize > 0 || pipe->buffer[pipe->startPosition] == EOF) && readBytes < len) {
 			destinationBuffer[readBytes] = pipe->buffer[pipe->startPosition];
-			if (destinationBuffer[readBytes++] != EOF) {
+			if (destinationBuffer[readBytes] != EOF) {
+				readBytes++;
 				pipe->currentSize--;
 				pipe->startPosition = (pipe->startPosition + 1) % PIPE_SIZE;
 			}

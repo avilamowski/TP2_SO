@@ -4,7 +4,10 @@
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
+#define DEV_NULL -1
 //#define KBDIN 3
+
+#define EOF ((char) -1)
 
 /* Cantidad maxima de caracteres para los buffers */
 #define MAX_CHARS 512

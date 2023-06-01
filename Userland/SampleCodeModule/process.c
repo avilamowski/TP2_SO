@@ -88,3 +88,18 @@ int16_t createProcess(void *code, char **args, char *name, uint8_t priority) {
 	int16_t fileDescriptors[] = {STDIN, STDOUT, STDERR};
 	return createProcessWithFds(code, args, name, priority, fileDescriptors);
 }
+
+int filter(int argc, char **argv) {
+	char c;
+	while ((c = getchar()) != EOF) {
+		if (toLower(c) == 'a' || toLower(c) == 'e' || toLower(c) == 'i' || toLower(c) == 'o' || toLower(c) == 'u')
+			putchar(c);
+	}
+	putchar('\n');
+	return 0;
+}
+
+int echo(int argc, char **argv) {
+	puts(argv[1]);
+	return 0;
+}
