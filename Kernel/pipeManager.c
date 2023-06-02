@@ -154,9 +154,9 @@ int64_t readPipe(uint16_t id, char *destinationBuffer, uint64_t len) {
 		pipe->outputPid != getpid() ||
 		len == 0)
 		return -1;
-	destinationBuffer[0] = '\0';
+	uint8_t eofRead = 0;
 	uint64_t readBytes = 0;
-	while (readBytes < len && destinationBuffer[readBytes] != EOF) {
+	while (readBytes < len && !eofRead) {
 		if (pipe->currentSize == 0 && pipe->buffer[pipe->startPosition] != EOF) {
 			pipe->isBlocking = 1;
 			setStatus((uint16_t) pipe->outputPid, BLOCKED);
@@ -164,13 +164,12 @@ int64_t readPipe(uint16_t id, char *destinationBuffer, uint64_t len) {
 		}
 		while ((pipe->currentSize > 0 || pipe->buffer[pipe->startPosition] == EOF) && readBytes < len) {
 			destinationBuffer[readBytes] = pipe->buffer[pipe->startPosition];
-			if (destinationBuffer[readBytes] != EOF) {
-				readBytes++;
-				pipe->currentSize--;
-				pipe->startPosition = (pipe->startPosition + 1) % PIPE_SIZE;
-			}
-			else
+			if (destinationBuffer[readBytes++] == EOF) {
+				eofRead = 1;
 				break;
+			}
+			pipe->currentSize--;
+			pipe->startPosition = (pipe->startPosition + 1) % PIPE_SIZE;
 		}
 		if (pipe->isBlocking) {
 			setStatus((uint16_t) pipe->inputPid, READY);
