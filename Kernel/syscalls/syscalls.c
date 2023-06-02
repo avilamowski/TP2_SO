@@ -2,10 +2,10 @@
 #include <defs.h>
 #include <keyboard.h>
 #include <lib.h>
-#include <memory.h>
 #include <memoryManager.h>
 #include <pipeManager.h>
 #include <process.h>
+#include <registers.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
 #include <speaker.h>
