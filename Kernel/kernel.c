@@ -58,7 +58,7 @@ void initializeKernelBinary() {
 int main() {
 	char *argsIdle[3] = {"idle", "Hm?", NULL};
 	int16_t fileDescriptors[] = {DEV_NULL, DEV_NULL, STDERR};
-	createProcess((MainFunction) &idle, argsIdle, "idle", 4, fileDescriptors);
+	createProcess((MainFunction) &idle, argsIdle, "idle", 4, fileDescriptors, 1);
 	load_idt();
 	return 0;
 }
@@ -66,7 +66,7 @@ int main() {
 int idle(int argc, char **argv) {
 	char *argsShell[2] = {"shell", NULL};
 	int16_t fileDescriptors[] = {STDIN, STDOUT, STDERR};
-	createProcess((MainFunction) sampleCodeModuleAddress, argsShell, "shell", 4, fileDescriptors);
+	createProcess((MainFunction) sampleCodeModuleAddress, argsShell, "shell", 4, fileDescriptors, 1);
 	while (1)
 		_hlt();
 	return 0;

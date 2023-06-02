@@ -212,7 +212,7 @@ _syscallHandler:
 
 	push r9
 	mov r9, r8
-	mov r8, r10
+	mov r8, rcx
 	mov rcx, rdx
 	mov rdx, rsi
 	mov rsi, rdi

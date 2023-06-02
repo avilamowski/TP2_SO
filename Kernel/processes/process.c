@@ -30,7 +30,7 @@ void processWrapper(MainFunction code, char **args) {
 
 void initProcess(Process *process, uint16_t pid, uint16_t parentPid,
 				 MainFunction code, char **args, char *name,
-				 uint8_t priority, int16_t fileDescriptors[]) {
+				 uint8_t priority, int16_t fileDescriptors[], uint8_t unkillable) {
 	process->pid = pid;
 	process->parentPid = parentPid;
 	process->waitingForPid = 0;
@@ -43,6 +43,7 @@ void initProcess(Process *process, uint16_t pid, uint16_t parentPid,
 	process->stackPos = _initialize_stack_frame(&processWrapper, code, stackEnd, (void *) process->argv);
 	process->status = READY;
 	process->zombieChildren = createLinkedListADT();
+	process->unkillable = unkillable;
 
 	assignFileDescriptor(process, STDIN, fileDescriptors[STDIN], READ);
 	assignFileDescriptor(process, STDOUT, fileDescriptors[STDOUT], WRITE);
@@ -95,7 +96,7 @@ ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process) {
 	snapshot->stackPos = process->stackPos;
 	snapshot->priority = process->priority;
 	snapshot->status = process->status;
-	snapshot->foreground = 1; // TODO: Poner un valor representativo
+	snapshot->foreground = process->fileDescriptors[STDIN] == STDIN;
 	return snapshot;
 }
 

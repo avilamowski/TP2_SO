@@ -6,7 +6,7 @@
 typedef struct SchedulerCDT *SchedulerADT;
 
 SchedulerADT createScheduler();
-int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]);
+int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[], uint8_t unkillable);
 int32_t killProcess(uint16_t pid, int32_t retValue);
 int32_t killCurrentProcess(int32_t retValue);
 uint16_t getpid();
@@ -18,4 +18,5 @@ int32_t processIsAlive(uint16_t pid);
 void yield();
 int8_t changeFD(uint16_t pid, uint8_t position, int16_t newFd);
 int16_t getCurrentProcessFileDescriptor(uint8_t fdIndex);
+void killForegroundProcess();
 #endif

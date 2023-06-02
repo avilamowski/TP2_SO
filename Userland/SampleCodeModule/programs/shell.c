@@ -266,7 +266,8 @@ static void test(char *name, char *param) {
 
 static void runLoop(char *delay) {
 	char *args[] = {"loop", delay, NULL};
-	createProcess(&loop, args, "loop", (uint8_t) 4);
+	uint16_t pid = createProcess(&loop, args, "loop", (uint8_t) 4);
+	waitpid(pid);
 }
 
 static void runKill(char *pid) {

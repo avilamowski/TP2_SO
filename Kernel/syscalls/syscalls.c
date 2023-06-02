@@ -10,6 +10,7 @@
 #include <semaphoreManager.h>
 #include <speaker.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <time.h>
 #include <video.h>
 
@@ -153,8 +154,10 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 }
 
 static int64_t syscall_read(int16_t fd, char *destinationBuffer, uint64_t len) {
-	if (fd == DEV_NULL)
+	if (fd == DEV_NULL) {
+		destinationBuffer[0] = EOF;
 		return 0;
+	}
 	else if (fd < DEV_NULL)
 		return -1;
 
@@ -255,7 +258,7 @@ static void syscall_free(void *ptr) {
 }
 
 static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]) {
-	return createProcess(code, args, name, priority, fileDescriptors);
+	return createProcess(code, args, name, priority, fileDescriptors, 0);
 }
 
 static void syscall_exitProcess(int32_t retValue) {

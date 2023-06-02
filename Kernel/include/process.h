@@ -14,7 +14,7 @@ typedef struct Process { // PCB
 	// void * heap;  // Lista de MemoryBlocks
 	char **argv;
 	char *name;
-	// uint32_t flags;
+	uint8_t unkillable;
 	uint8_t priority;
 	ProcessStatus status;
 	int16_t fileDescriptors[BUILT_IN_DESCRIPTORS];
@@ -22,7 +22,7 @@ typedef struct Process { // PCB
 	LinkedListADT zombieChildren;
 } Process;
 
-void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]);
+void initProcess(Process *process, uint16_t pid, uint16_t parentPid, MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[], uint8_t unkillable);
 ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
 int processIsWaiting(Process *process, uint16_t pidToWait);
 int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess);

@@ -20,6 +20,7 @@ typedef struct SchedulerCDT {
 	uint16_t nextUnusedPid;
 	uint16_t qtyProcesses;
 	int8_t remainingQuantum;
+	int8_t killFgProcess;
 } SchedulerCDT;
 
 SchedulerADT createScheduler() {
@@ -29,6 +30,7 @@ SchedulerADT createScheduler() {
 	for (int i = 0; i < QTY_READY_LEVELS + 1; i++)
 		scheduler->levels[i] = createLinkedListADT();
 	scheduler->nextUnusedPid = 0;
+	scheduler->killFgProcess = 0;
 	return scheduler;
 }
 
@@ -113,17 +115,23 @@ void *schedule(void *prevStackPointer) {
 
 	scheduler->currentPid = getNextPid(scheduler);
 	currentProcess = scheduler->processes[scheduler->currentPid]->data;
+
+	if (scheduler->killFgProcess && currentProcess->fileDescriptors[STDIN] == STDIN) {
+		scheduler->killFgProcess = 0;
+		if (killCurrentProcess(-1) != -1)
+			forceTimerTick();
+	}
 	scheduler->remainingQuantum = QUANTUM_COEF * (MAX_PRIORITY - currentProcess->priority);
 	currentProcess->status = RUNNING;
 	return currentProcess->stackPos;
 }
 
-int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]) {
+int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[], uint8_t unkillable) {
 	SchedulerADT scheduler = getSchedulerADT();
 	if (scheduler->qtyProcesses >= MAX_PROCESSES) // TODO: Agregar panic?
 		return -1;
 	Process *process = (Process *) allocMemory(sizeof(Process));
-	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority, fileDescriptors);
+	initProcess(process, scheduler->nextUnusedPid, scheduler->currentPid, code, args, name, priority, fileDescriptors, unkillable);
 
 	Node *processNode;
 	if (process->pid != IDLE_PID)
@@ -162,7 +170,7 @@ int32_t killProcess(uint16_t pid, int32_t retValue) {
 	if (processToKillNode == NULL)
 		return -1;
 	Process *processToKill = (Process *) processToKillNode->data;
-	if (processToKill->status == ZOMBIE)
+	if (processToKill->status == ZOMBIE || processToKill->unkillable)
 		return -1;
 
 	uint8_t priorityIndex = processToKill->status != BLOCKED ? processToKill->priority : BLOCKED_INDEX;
@@ -265,4 +273,9 @@ int16_t getCurrentProcessFileDescriptor(uint8_t fdIndex) {
 	SchedulerADT scheduler = getSchedulerADT();
 	Process *process = scheduler->processes[scheduler->currentPid]->data;
 	return process->fileDescriptors[fdIndex];
+}
+
+void killForegroundProcess() {
+	SchedulerADT scheduler = getSchedulerADT();
+	scheduler->killFgProcess = 1;
 }
