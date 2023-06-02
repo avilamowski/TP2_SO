@@ -2,6 +2,7 @@
 #include <lib.h>
 #include <memoryManager.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <video.h>
 
 #define MIN_EXP 5 // Tamaño del MemoryBlock

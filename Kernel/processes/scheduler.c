@@ -3,6 +3,7 @@
 #include <linkedListADT.h>
 #include <memoryManager.h>
 #include <scheduler.h>
+#include <stdlib.h>
 #include <video.h>
 #define QTY_READY_LEVELS 5
 #define MAX_PRIORITY 4

@@ -1,6 +1,7 @@
 #include <defs.h>
 #include <linkedListADT.h>
 #include <memoryManager.h>
+#include <stdlib.h>
 
 typedef struct LinkedListCDT {
 	Node *first;

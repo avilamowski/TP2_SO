@@ -4,9 +4,9 @@
 #include <syscalls.h>
 #include <test_util.h>
 
-enum State { RUNNING,
-			 BLOCKED,
-			 KILLED };
+enum State { PROCESS_RUNNING,
+			 PROCESS_BLOCKED,
+			 PROCESS_KILLED };
 
 typedef struct P_rq {
 	int32_t pid;
@@ -39,7 +39,7 @@ int64_t test_processes(int argc, char *argv[]) {
 				return -1;
 			}
 			else {
-				p_rqs[rq].state = RUNNING;
+				p_rqs[rq].state = PROCESS_RUNNING;
 				alive++;
 			}
 		}
@@ -51,24 +51,24 @@ int64_t test_processes(int argc, char *argv[]) {
 
 				switch (action) {
 					case 0:
-						if (p_rqs[rq].state == RUNNING || p_rqs[rq].state == BLOCKED) {
+						if (p_rqs[rq].state == PROCESS_RUNNING || p_rqs[rq].state == PROCESS_BLOCKED) {
 							if (killProcess(p_rqs[rq].pid) == -1) {
 								printf("test_processes: ERROR killing process\n");
 								return -1;
 							}
-							p_rqs[rq].state = KILLED;
+							p_rqs[rq].state = PROCESS_KILLED;
 							waitpid(p_rqs[rq].pid);
 							alive--;
 						}
 						break;
 
 					case 1:
-						if (p_rqs[rq].state == RUNNING) {
+						if (p_rqs[rq].state == PROCESS_RUNNING) {
 							if (block(p_rqs[rq].pid) == -1) {
 								printf("test_processes: ERROR blocking process\n");
 								return -1;
 							}
-							p_rqs[rq].state = BLOCKED;
+							p_rqs[rq].state = PROCESS_BLOCKED;
 						}
 						break;
 				}
@@ -76,12 +76,12 @@ int64_t test_processes(int argc, char *argv[]) {
 
 			// Randomly unblocks processes
 			for (rq = 0; rq < max_processes; rq++)
-				if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2) {
+				if (p_rqs[rq].state == PROCESS_BLOCKED && GetUniform(100) % 2) {
 					if (unblock(p_rqs[rq].pid) == -1) {
 						printf("test_processes: ERROR unblocking process\n");
 						return -1;
 					}
-					p_rqs[rq].state = RUNNING;
+					p_rqs[rq].state = PROCESS_RUNNING;
 				}
 		}
 	}

@@ -8,6 +8,7 @@
 #include <scheduler.h>
 #include <semaphoreManager.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <video.h>
 
 extern uint8_t text;

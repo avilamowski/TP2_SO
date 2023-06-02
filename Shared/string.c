@@ -9,6 +9,13 @@ int strcmp(const char *s1, const char *s2) {
 	return *s1 - *s2;
 }
 
+int strlen(const char *str) {
+	int len = 0;
+	while (*(str++) != '\0')
+		len++;
+	return len;
+}
+
 int strcpy(char *dest, const char *origin) {
 	return strcpychar(dest, origin, '\0');
 }
@@ -21,14 +28,4 @@ int strcpychar(char *dest, const char *origin, char limit) {
 	}
 	dest[idx] = 0;
 	return idx;
-}
-
-void *memset(void *destiation, int32_t c, uint64_t length) {
-	uint8_t chr = (uint8_t) c;
-	char *dst = (char *) destiation;
-
-	while (length--)
-		dst[length] = chr;
-
-	return destiation;
 }

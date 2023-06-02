@@ -29,5 +29,5 @@ int strcpychar(char *dest, const char *origin, char limit);
  */
 int strcpy(char *dest, const char *origin);
 
-void *memset(void *destiation, int32_t c, uint64_t length);
+int strlen(const char *str);
 #endif

@@ -6,6 +6,8 @@
 #include <pipeManager.h>
 #include <process.h>
 #include <scheduler.h>
+#include <stdlib.h>
+#include <string.h>
 #include <video.h>
 
 #define STACK_SIZE (1 << 12)

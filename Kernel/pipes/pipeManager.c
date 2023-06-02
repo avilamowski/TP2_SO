@@ -4,6 +4,7 @@
 #include <process.h>
 #include <scheduler.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #define MAX_PIPES (1 << 12)
 #define bufferPosition(pipe) (((pipe)->startPosition + (pipe)->currentSize) % PIPE_SIZE)

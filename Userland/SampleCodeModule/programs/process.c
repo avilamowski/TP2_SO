@@ -1,28 +1,9 @@
+#include <globals.h>
 #include <process.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <syscalls.h>
-
-// TODO: Ver de mover a otro archivo
-typedef enum { BLOCKED = 0,
-			   READY,
-			   RUNNING,
-			   ZOMBIE } ProcessStatus;
-typedef struct ProcessSnapshot {
-	uint16_t pid;
-	uint16_t parentPid;
-	void *stackBase;
-	void *stackPos;
-	char *name;
-	uint8_t priority;
-	ProcessStatus status;
-	uint8_t foreground;
-} ProcessSnapshot;
-typedef struct ProcessSnapshotList {
-	uint16_t length;
-	ProcessSnapshot *snapshotList;
-} ProcessSnapshotList;
 
 static int spawnAndBlock(int argc, char **argv);
 
