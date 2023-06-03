@@ -79,8 +79,3 @@ int filter(int argc, char **argv) {
 	putchar('\n');
 	return 0;
 }
-
-int echo(int argc, char **argv) {
-	puts(argv[1]);
-	return 0;
-}

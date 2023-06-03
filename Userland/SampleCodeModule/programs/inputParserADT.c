@@ -15,6 +15,7 @@ typedef struct InputParserCDT {
 #define AMPERSAND '&'
 
 static ShellProgram *parseProgram(InputParserADT parser, char **input);
+static void cleanSpaces(char **input);
 
 InputParserADT parseInput(char *input) {
 	InputParserADT inputParserADT = malloc(sizeof(InputParserCDT));
@@ -24,17 +25,22 @@ InputParserADT parseInput(char *input) {
 	inputParserADT->qtyPrograms = 1;
 	inputParserADT->background = 0;
 
+	cleanSpaces(&input);
+	if (*input == '\n' || *input == '\0') {
+		inputParserADT->qtyPrograms = 0;
+		return inputParserADT;
+	}
 	ShellProgram *firstProgram = parseProgram(inputParserADT, &input);
 	ShellProgram *secondProgram = NULL;
 	if (*input == PIPE) {
 		input++;
-		while (*input == ' ') // TODO: Ver si pasar a una funcion
-			input++;
-		secondProgram = parseProgram(inputParserADT, &input);
+		cleanSpaces(&input);
+		inputParserADT->qtyPrograms++;
 	}
 
 	if (*input == AMPERSAND)
 		inputParserADT->background = 1;
+
 	inputParserADT->shellPrograms[0] = firstProgram;
 	inputParserADT->shellPrograms[1] = secondProgram;
 	return inputParserADT;
@@ -47,8 +53,7 @@ static ShellProgram *parseProgram(InputParserADT parser, char **input) {
 
 	program->name = malloc(MAX_COMMAND_LENGTH);
 	*input += strcpycharlimited(program->name, *input, ' ', MAX_COMMAND_LENGTH);
-	while (**input == ' ')
-		(*input)++;
+	cleanSpaces(input);
 
 	program->params[qtyParams] = malloc(MAX_COMMAND_LENGTH);
 	strcpy(program->params[qtyParams++], program->name);
@@ -64,14 +69,18 @@ static ShellProgram *parseProgram(InputParserADT parser, char **input) {
 		}
 		else {
 			*input += lastParamCopiedLength;
-			while (**input == ' ')
-				(*input)++;
+			cleanSpaces(input);
 			qtyParams++;
 		}
 	} while (lastParamCopiedLength > 0);
 
 	program->params[qtyParams] = NULL;
 	return program;
+}
+
+static void cleanSpaces(char **input) {
+	while (**input == ' ')
+		(*input)++;
 }
 
 int8_t getProgramQuantity(InputParserADT parser) {

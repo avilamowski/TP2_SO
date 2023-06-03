@@ -30,6 +30,7 @@ GLOBAL semPost
 GLOBAL semWait
 GLOBAL pipeOpen
 GLOBAL pipeClose
+GLOBAL pipeGet
 
 read:
     mov rax, 0
@@ -184,5 +185,10 @@ pipeOpen:
 
 pipeClose:
     mov rax, 30
+    int 80h
+    ret
+
+pipeGet:
+    mov rax, 31
     int 80h
     ret

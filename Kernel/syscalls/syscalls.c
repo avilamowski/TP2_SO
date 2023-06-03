@@ -42,8 +42,9 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		(Syscall) syscall_createProcess, (Syscall) killCurrentProcess, (Syscall) getpid,
 		(Syscall) getProcessSnapshot, (Syscall) syscall_killProcess, (Syscall) syscall_changeProcessStatus,
 		(Syscall) setPriority, (Syscall) yield, (Syscall) getZombieRetValue, // waitpid
-		(Syscall) semInit, (Syscall) semClose, (Syscall) semPost,
-		(Syscall) semWait, (Syscall) pipeOpen, (Syscall) pipeClose};
+		(Syscall) semInit, (Syscall) semOpen, (Syscall) semClose,
+		(Syscall) semPost, (Syscall) semWait, (Syscall) pipeOpen,
+		(Syscall) pipeClose, (Syscall) getLastFreePipe};
 	return syscalls[nr](arg0, arg1, arg2, arg3, arg4, arg5);
 }
 

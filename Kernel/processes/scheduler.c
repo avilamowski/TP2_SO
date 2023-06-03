@@ -143,7 +143,7 @@ int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priori
 	scheduler->processes[process->pid] = processNode;
 
 	while (scheduler->processes[scheduler->nextUnusedPid] != NULL)
-		scheduler->nextUnusedPid++;
+		scheduler->nextUnusedPid = (scheduler->nextUnusedPid + 1) % MAX_PROCESSES;
 	scheduler->qtyProcesses++;
 	return process->pid;
 }

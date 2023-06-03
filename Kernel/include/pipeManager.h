@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 #define PIPE_SIZE (1 << 12)
-#define READ 0
-#define WRITE 1
+
 typedef struct PipeManagerCDT *PipeManagerADT;
 PipeManagerADT createPipeManager();
+int16_t getLastFreePipe();
 int8_t pipeOpen(uint16_t id, uint8_t mode);
 int8_t pipeOpenForPid(uint16_t pid, uint16_t id, uint8_t mode);
 int8_t pipeClose(uint16_t id);

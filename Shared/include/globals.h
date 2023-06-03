@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define READ 0
+#define WRITE 1
+
 typedef enum { BLOCKED = 0,
 			   READY,
 			   RUNNING,

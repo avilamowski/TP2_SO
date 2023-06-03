@@ -14,7 +14,6 @@ typedef struct Pipe {
 	uint16_t startPosition;
 	uint16_t currentSize;
 	int16_t inputPid, outputPid;
-	// int16_t semWriteId, semReadId;
 	uint8_t isBlocking;
 } Pipe;
 
@@ -25,7 +24,8 @@ static Pipe *createPipe();
 
 typedef struct PipeManagerCDT {
 	Pipe *pipes[MAX_PIPES];
-	// TODO: Agregar cantidad???
+	uint16_t lastFreePipe;
+	uint16_t qtyPipes;
 } PipeManagerCDT;
 
 static PipeManagerADT getPipeManager() {
@@ -50,7 +50,21 @@ PipeManagerADT createPipeManager() {
 	PipeManagerADT pipeManager = (PipeManagerADT) PIPE_MANAGER_ADDRESS;
 	for (int i = 0; i < MAX_PIPES; i++)
 		pipeManager->pipes[i] = NULL;
+	pipeManager->lastFreePipe = MAX_PIPES - 1;
+	pipeManager->qtyPipes = 0;
 	return pipeManager;
+}
+
+int16_t getLastFreePipe() {
+	PipeManagerADT pipeManager = getPipeManager();
+	if (pipeManager->qtyPipes >= MAX_PIPES)
+		return -1;
+	while (pipeManager->pipes[pipeManager->lastFreePipe] != NULL)
+		pipeManager->lastFreePipe = (pipeManager->lastFreePipe + MAX_PIPES - 1) % MAX_PIPES;
+	Pipe *pipe = createPipe();
+	pipeManager->pipes[pipeManager->lastFreePipe] = pipe;
+	pipeManager->qtyPipes++;
+	return pipeManager->lastFreePipe;
 }
 
 int8_t pipeOpen(uint16_t id, uint8_t mode) {
@@ -63,6 +77,7 @@ int8_t pipeOpenForPid(uint16_t pid, uint16_t id, uint8_t mode) {
 		return -1;
 	PipeManagerADT pipeManager = getPipeManager();
 	Pipe *pipe = pipeManager->pipes[index];
+	pipeManager->qtyPipes++;
 	if (pipe == NULL) {
 		pipe = createPipe();
 		pipeManager->pipes[index] = pipe;
@@ -93,6 +108,7 @@ int8_t pipeClose(uint16_t id) {
 	else if (pid == pipe->outputPid) {
 		freePipe(pipeManager->pipes[index]);
 		pipeManager->pipes[index] = NULL;
+		pipeManager->qtyPipes--;
 	}
 	else
 		return -1;

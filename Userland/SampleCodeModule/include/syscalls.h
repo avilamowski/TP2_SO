@@ -126,4 +126,6 @@ int8_t pipeOpen(uint16_t id, uint8_t mode);
 
 int8_t pipeClose(uint16_t id, uint8_t mode);
 
+int16_t pipeGet();
+
 #endif

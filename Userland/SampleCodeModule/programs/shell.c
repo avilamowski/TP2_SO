@@ -27,6 +27,14 @@
 #define CHECK_MAN "Escriba \"man %s\" para ver como funciona el comando\n"
 #define CHECK_MAN_FONT \
 	"Escriba \"man font-size\" para ver las dimensiones validas\n"
+#define continueIfInvalid(parser, index) \
+	;                                    \
+	if ((index) == -1) {                 \
+		freeParser(parser);              \
+		printErr(INVALID_COMMAND);       \
+		return;                          \
+	}
+#define FATAL_ERROR_PIPES "Ocurrio un error fatal relacionado con los pipes"
 
 typedef struct {
 	char *name;		   // Nombre del comando
@@ -35,6 +43,7 @@ typedef struct {
 } Command;
 
 static void help(int argc, char **argv);
+static void echo(int argc, char **argv);
 static void man(int argc, char **argv);
 static void printInfoReg();
 static void time();
@@ -50,6 +59,8 @@ static void runUnblock(int argc, char **argv);
 static void runNice(int argc, char **argv);
 
 static int getCommandIndex(char *command);
+static void createSingleProcess(InputParserADT parser);
+static void createPipedProcesses(InputParserADT parser);
 
 const static Command commands[QTY_COMMANDS] = {
 	{"help", "Listado de comandos", (MainFunction) help},
@@ -71,6 +82,8 @@ const static Command commands[QTY_COMMANDS] = {
 	{"block", "bloquea el proceso con el pid recibido", (MainFunction) runBlock},
 	{"unblock", "desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},
 	{"yield", "desbloquea el proceso con el pid recibido", (MainFunction) unblock},
+	{"echo", "imprime por pantalla su primer parametro", (MainFunction) echo},
+	{"filter", "filtra las vocales del input", (MainFunction) filter},
 	{"test-mm", "test_mm", (MainFunction) test_mm},
 	{"test-prio", "test_prio", (MainFunction) test_prio},
 	{"test-processes", "test_processes", (MainFunction) test_processes}};
@@ -82,27 +95,58 @@ void run_shell() {
 		char rawInput[MAX_CHARS] = {0};
 		scanf("%S", rawInput);
 		InputParserADT parser = parseInput(rawInput);
-		if (parser == NULL)
+		if (parser == NULL) {
 			printErr(INVALID_COMMAND);
-
-		if (getProgramQuantity(parser) == 1) {
-			ShellProgram *program = getProgram(parser, 0);
-			int index = getCommandIndex(program->name);
-			if (index == -1) {
-				printErr(INVALID_COMMAND);
-				continue;
-			}
-			if (isInBackground(parser)) {
-				int16_t fileDescriptors[] = {DEV_NULL, STDOUT, STDERR};
-				createProcessWithFds((void *) commands[index].code, program->params, program->name, 4, fileDescriptors);
-			}
-			else {
-				int16_t pid = createProcess((void *) commands[index].code, program->params, program->name, 4);
-				waitpid(pid);
-			}
+			continue;
 		}
 
+		if (getProgramQuantity(parser) == 1)
+			createSingleProcess(parser);
+		else if (getProgramQuantity(parser) == 2)
+			createPipedProcesses(parser);
 		freeParser(parser);
+	}
+}
+
+static void createSingleProcess(InputParserADT parser) {
+	ShellProgram *program = getProgram(parser, 0);
+	int index = getCommandIndex(program->name);
+	continueIfInvalid(parser, index);
+	if (isInBackground(parser)) {
+		int16_t fileDescriptors[] = {DEV_NULL, STDOUT, STDERR};
+		createProcessWithFds((void *) commands[index].code, program->params, program->name, 4, fileDescriptors);
+	}
+	else {
+		int16_t pid = createProcess((void *) commands[index].code, program->params, program->name, 4);
+		waitpid(pid);
+	}
+}
+
+static void createPipedProcesses(InputParserADT parser) {
+	ShellProgram *firstProgram = getProgram(parser, 0);
+	int firstIndex = getCommandIndex(firstProgram->name);
+	continueIfInvalid(parser, firstIndex);
+
+	ShellProgram *secondProgram = getProgram(parser, 1);
+	int secondIndex = getCommandIndex(secondProgram->name);
+	continueIfInvalid(parser, secondIndex);
+
+	int16_t newPipeId = pipeGet();
+	if (newPipeId == -1) {
+		printErr(FATAL_ERROR_PIPES);
+		freeParser(parser);
+		return;
+	}
+
+	int16_t fileDescriptors1[] = {isInBackground(parser) ? DEV_NULL : STDIN, newPipeId, STDERR};
+	int16_t firstPid = createProcessWithFds((void *) commands[firstIndex].code, firstProgram->params, firstProgram->name, 4, fileDescriptors1);
+
+	int16_t fileDescriptors2[] = {newPipeId, STDOUT, STDERR};
+	int16_t secondPid = createProcessWithFds((void *) commands[secondIndex].code, secondProgram->params, secondProgram->name, 4, fileDescriptors2);
+
+	if (!isInBackground(parser)) {
+		waitpid(firstPid);
+		waitpid(secondPid);
 	}
 }
 
@@ -127,6 +171,14 @@ static void help(int argc, char **argv) {
 	}
 	for (int i = 0; i < QTY_COMMANDS; i++)
 		printf("%s: %s\n", commands[i].name, commands[i].description);
+}
+
+static void echo(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	printf("%s\n", argv[1]);
 }
 
 static void div(int argc, char **argv) {
