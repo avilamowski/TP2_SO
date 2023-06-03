@@ -42,5 +42,37 @@ char *usages[QTY_COMMANDS] = {
 	"de una direccion de memoria enviada como parametro\n"
 	"Ejemplo: printmem 10ff8c",
 
-	"Uso: clear - limpia la pantalla. No recibe parametros"};
+	"Uso: clear - limpia la pantalla. No recibe parametros\n",
+
+	"Uso: test [TEST] [PARAM] - permite ejecutar un programa de prueba",
+
+	"Uso: loop [INTERVALO] - muestra su PID cada una cierta cantidad de tiempo\n"
+	"Ejemplo: loop 1",
+
+	"Uso: kill [PID] - mata a un proceso dado su PID",
+
+	"Uso: ps - muestra la informacion de los procesos vivos y zombificados.\n"
+	"No recibe parametros",
+
+	"Uso: nice [PID] [PRIORIDAD] - cambia la prioridad de un proceso dado su ID y la nueva prioridad",
+
+	"Uso: block - ", // TODO
+
+	"Uso: unblock - ", // TODO
+
+	"Uso: echo [PARAM] - imprime por pantalla su primer parametro\n"
+	"Ejemplo: echo hola",
+
+	"Uso: wc - cuenta la cantidad de lineas del input",
+
+	"Uso: cat - imprime el STDIN tal como lo recibe",
+
+	"Uso: filter - filtra las vocales del input",
+
+	"Uso: test_mm [BYTES] - ejecuta el test de memory manager utilizando una cierta cantidad de bytes",
+
+	"Uso: test_prio [] - ejecuta el test de prioridades", // TODO
+
+	"Uso: test_processes - ejecuta el test de procesos" // TODO
+};
 #endif

@@ -75,19 +75,19 @@ const static Command commands[] = {
 	{"printmem", "Realiza un vuelco de memoria de los 32 bytes posteriores a una direccion de memoria en formato hexadecimal enviada por parametro", (MainFunction) printMem},
 	{"clear", "Limpia toda la pantalla", (MainFunction) clear},
 	{"test", "Permite ejecutar un programa de prueba", (MainFunction) test},
-	{"loop", "Loop", (MainFunction) loop},
-	{"kill", "Kill", (MainFunction) runKill},
-	{"ps", "ps", (MainFunction) psPrint},
-	{"nice", "69", (MainFunction) runNice},
-	{"block", "bloquea el proceso con el pid recibido", (MainFunction) runBlock},
-	{"unblock", "desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},
-	{"echo", "imprime por pantalla su primer parametro", (MainFunction) echo},
-	{"wc", "cuenta la cantidad de lineas del input", (MainFunction) wc},
-	{"cat", "imprime el STDIN tal como lo recibe", (MainFunction) cat},
-	{"filter", "filtra las vocales del input", (MainFunction) filter},
-	{"test-mm", "test_mm", (MainFunction) test_mm},
-	{"test-prio", "test_prio", (MainFunction) test_prio},
-	{"test-processes", "test_processes", (MainFunction) test_processes}};
+	{"loop", "El proceso imprime su ID con un saludo cada una determinada cantidad de segundos", (MainFunction) loop},
+	{"kill", "Mata a un proceso dado su PID", (MainFunction) runKill},
+	{"ps", "Muestra la informacion de los procesos vivos y zombificados", (MainFunction) psPrint},
+	{"nice", "Cambia la prioridad de un proceso dado su ID y la nueva prioridad", (MainFunction) runNice},
+	{"block", "Bloquea el proceso con el pid recibido", (MainFunction) runBlock},
+	{"unblock", "Desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},
+	{"echo", "Imprime por pantalla su primer parametro", (MainFunction) echo},
+	{"wc", "Cuenta la cantidad de lineas del input", (MainFunction) wc},
+	{"cat", "Imprime el STDIN tal como lo recibe", (MainFunction) cat},
+	{"filter", "Filtra las vocales del input", (MainFunction) filter},
+	{"test-mm", "Test_mm", (MainFunction) test_mm},
+	{"test-prio", "Test_prio", (MainFunction) test_prio},
+	{"test-processes", "Test_processes", (MainFunction) test_processes}};
 
 void run_shell() {
 	puts(WELCOME);

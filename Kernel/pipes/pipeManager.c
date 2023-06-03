@@ -92,7 +92,6 @@ int8_t pipeOpenForPid(uint16_t pid, uint16_t id, uint8_t mode) {
 }
 
 int8_t pipeClose(uint16_t id) {
-	PipeManagerADT pipeManager = getPipeManager();
 	return pipeCloseForPid(getpid(), id);
 }
 
