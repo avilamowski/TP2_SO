@@ -107,8 +107,10 @@ static void resumeFirstAvailableProcess(LinkedListADT queue) {
 	Node *current;
 	while ((current = getFirst(queue)) != NULL) {
 		removeNode(queue, current);
-		if (processIsAlive((uint16_t) ((uint64_t) current->data))) {
-			setStatus((uint16_t) ((uint64_t) current->data), READY);
+		uint16_t pid = (uint16_t) ((uint64_t) current->data);
+		free(current);
+		if (processIsAlive(pid)) {
+			setStatus(pid, READY);
 			break;
 		}
 	}
