@@ -7,7 +7,7 @@
 #include <time.h>
 #include <video.h>
 
-#define BUFFER_CAPACITY 10 /* Longitud maxima del vector _buffer */
+#define BUFFER_CAPACITY 64 /* Longitud maxima del vector _buffer */
 #define LCTRL 29
 #define C_HEX 0x2E
 #define D_HEX 0x20
@@ -42,25 +42,25 @@ void initializeKeyboardDriver() {
 
 void keyboardHandler() {
 	uint8_t key = getKeyPressed();
-	if (_bufferSize < BUFFER_CAPACITY - 1) {
-		if (!(key & RELEASED)) {
-			if (key == LCTRL)
-				_ctrl = 1;
-			if (_ctrl) {
-				if (key == C_HEX)
-					killForegroundProcess();
-				else if (key == R_HEX)
-					saveRegisters();
-				else if (key == D_HEX)
-					writeKey(EOF);
-				return;
+	if (!(key & RELEASED)) {
+		if (key == LCTRL)
+			_ctrl = 1;
+		else if (_ctrl) {
+			if (key == C_HEX) {
+				_bufferStart = _bufferSize = 0;
+				killForegroundProcess();
 			}
+			else if (key == R_HEX)
+				saveRegisters();
+			else if (key == D_HEX && _bufferSize < BUFFER_CAPACITY - 1)
+				writeKey(EOF);
+		}
+		else if (_bufferSize < BUFFER_CAPACITY - 1)
 			writeKey(key);
-		}
-		else {
-			if (key == (LCTRL | RELEASED))
-				_ctrl = 0;
-		}
+	}
+	else {
+		if (key == (LCTRL | RELEASED))
+			_ctrl = 0;
 	}
 }
 
