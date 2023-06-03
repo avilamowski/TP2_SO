@@ -1,6 +1,6 @@
 #ifndef _SHELL_H
 #define _SHELL_H
-#define QTY_COMMANDS 18
+#define QTY_COMMANDS 22
 /**
  * @brief Corre la terminal
  *

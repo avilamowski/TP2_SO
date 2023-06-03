@@ -1,3 +1,5 @@
+#include <globals.h>
+#include <inputParserADT.h>
 #include <libasm.h>
 #include <man.h>
 #include <process.h>
@@ -13,10 +15,6 @@
 #include <test_sync.h>
 #include <tron.h>
 
-/* Enum para la cantidad de argumentos recibidos */
-typedef enum { NO_PARAMS = 0,
-			   SINGLE_PARAM,
-			   DUAL_PARAM } functionType;
 #define QTY_BYTES 32 /* Cantidad de bytes de respuesta del printmem */
 #define DEFAULT_FONT_SIZE 1
 #define MIN_FONT_SIZE 1
@@ -33,110 +31,72 @@ typedef enum { NO_PARAMS = 0,
 typedef struct {
 	char *name;		   // Nombre del comando
 	char *description; // Descripcion del comando (para help)
-	union {			   // Puntero a la funcion
-		int (*f)(void);
-		int (*g)(char *);
-		int (*h)(char *, char *);
-	};
-	functionType ftype; // Cantidad de argumentos del comando
+	MainFunction code;
 } Command;
 
-static void help();
-static void man(char *command);
+static void help(int argc, char **argv);
+static void man(int argc, char **argv);
 static void printInfoReg();
 static void time();
-static int div(char *num, char *div);
+static void div(int argc, char **argv);
 static void tron();
 static void tronZen();
-static void fontSize(char *size);
-static void printMem(char *pos);
-static int getCommandIndex(char *command);
-static void test(char *name, char *param);
-static void runLoop(char *delay);
+static void fontSize(int argc, char **argv);
+static void printMem(int argc, char **argv);
+static void test(int argc, char **argv);
 static void runKill(char *pid);
 static void runBlock(char *pid);
 static void runUnblock(char *pid);
 static void runNice(char *pid, char *priority);
 
-static Command commands[QTY_COMMANDS];
+static int getCommandIndex(char *command);
 
-void init() {
-	commands[0] =
-		(Command){"help", "Listado de comandos", .f = (void *) &help, NO_PARAMS};
-	commands[1] = (Command){"man", "Manual de uso de los comandos",
-							.g = (void *) &man, SINGLE_PARAM};
-	commands[2] = (Command){"inforeg",
-							"Informacion de los registos que fueron capturados "
-							"en un momento arbitrario de ejecucion del sistema",
-							.f = (void *) &printInfoReg, NO_PARAMS};
-	commands[3] = (Command){"time", "Despliega la hora actual UTC - 3",
-							.f = (void *) &time, NO_PARAMS};
-	commands[4] = (Command){
-		"div",
-		"Hace la division entera de dos numeros naturales enviados por parametro",
-		.h = (void *) &div, DUAL_PARAM};
-	commands[5] = (Command){"kaboom", "Ejecuta una excepcion de Invalid Opcode",
-							.f = (void *) &kaboom, NO_PARAMS};
-	commands[6] = (Command){"tron", "Juego Tron Light Cycles", .f = (void *) &tron,
-							NO_PARAMS};
-	commands[7] =
-		(Command){"tron-zen", "Juego Tron Light Cycles con un unico jugador",
-				  .f = (void *) &tronZen, NO_PARAMS};
-	commands[8] = (Command){"font-size",
-							"Cambio de dimensiones de la fuente. Para hacerlo "
-							"escribir el comando seguido de un numero",
-							.g = (void *) &fontSize, SINGLE_PARAM};
-	commands[9] = (Command){
-		"printmem",
-		"Realiza un vuelco de memoria de los 32 bytes posteriores a una "
-		"direccion de memoria en formato hexadecimal enviada por parametro",
-		.g = (void *) &printMem, SINGLE_PARAM};
-	commands[10] = (Command){"clear", "Limpia toda la pantalla",
-							 .f = (void *) &clear, NO_PARAMS};
-	commands[11] = (Command){"test", "Permite ejecutar un programa de prueba",
-							 .h = (void *) &test, DUAL_PARAM};
-	commands[12] = (Command){"loop", "Loop", .g = (void *) &runLoop, SINGLE_PARAM};
-	commands[13] = (Command){"kill", "Kill", .g = (void *) &runKill, SINGLE_PARAM};
-	commands[14] = (Command){"ps", "ps", .f = (void *) &psPrint, NO_PARAMS};
-	commands[15] = (Command){"nice", "69", .h = (void *) &runNice, DUAL_PARAM};
-	commands[16] = (Command){"block", "bloquea el proceso con el pid recibido", .g = (void *) &runBlock, SINGLE_PARAM};
-	commands[17] = (Command){"unblock", "desbloquea el proceso con el pid recibido", .g = (void *) &runUnblock, SINGLE_PARAM};
-	commands[18] = (Command){"yield", "desbloquea el proceso con el pid recibido", .g = (void *) &unblock, SINGLE_PARAM};
-}
+const static Command commands[QTY_COMMANDS] = {
+	{"help", "Listado de comandos", (MainFunction) help},
+	{"man", "Manual de uso de los comandos", (MainFunction) man},
+	{"inforeg", "Informacion de los registos que fueron capturados en un momento arbitrario de ejecucion del sistema", (MainFunction) printInfoReg},
+	{"time", "Despliega la hora actual UTC - 3", (MainFunction) time},
+	{"div", "Hace la division entera de dos numeros naturales enviados por parametro", (MainFunction) div},
+	{"kaboom", "Ejecuta una excepcion de Invalid Opcode", (MainFunction) kaboom},
+	{"tron", "Juego Tron Light Cycles", (MainFunction) tron},
+	{"tron-zen", "Juego Tron Light Cycles con un unico jugador", (MainFunction) tronZen},
+	{"font-size", "Cambio de dimensiones de la fuente. Para hacerlo escribir el comando seguido de un numero", (MainFunction) fontSize},
+	{"printmem", "Realiza un vuelco de memoria de los 32 bytes posteriores a una direccion de memoria en formato hexadecimal enviada por parametro", (MainFunction) printMem},
+	{"clear", "Limpia toda la pantalla", (MainFunction) clear},
+	{"test", "Permite ejecutar un programa de prueba", (MainFunction) test},
+	{"loop", "Loop", (MainFunction) loop},
+	{"kill", "Kill", (MainFunction) runKill},
+	{"ps", "ps", (MainFunction) psPrint},
+	{"nice", "69", (MainFunction) runNice},
+	{"block", "bloquea el proceso con el pid recibido", (MainFunction) runBlock},
+	{"unblock", "desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},
+	{"yield", "desbloquea el proceso con el pid recibido", (MainFunction) unblock},
+	{"test-mm", "test_mm", (MainFunction) test_mm},
+	{"test-prio", "test_prio", (MainFunction) test_prio},
+	{"test-processes", "test_processes", (MainFunction) test_processes}};
 
 void run_shell() {
-	init();
-	int index;
 	puts(WELCOME);
 	while (1) {
 		putchar('>');
-		char command[MAX_CHARS] = {0};
-		char arg1[MAX_CHARS];
-		char arg2[MAX_CHARS];
-		int qtyParams = scanf("%s %s %s", command, arg1, arg2);
-		index = getCommandIndex(command);
-		if (index == -1) {
-			if (command[0] != 0)
+		char rawInput[MAX_CHARS] = {0};
+		scanf("%S", rawInput);
+		InputParserADT parser = parseInput(rawInput);
+		if (parser == NULL)
+			printErr(INVALID_COMMAND);
+
+		if (getProgramQuantity(parser) == 1) {
+			ShellProgram *program = getProgram(parser, 0);
+			int index = getCommandIndex(program->name);
+			if (index == -1) {
 				printErr(INVALID_COMMAND);
-			continue;
+				continue;
+			}
+			int16_t pid = createProcess((void *) commands[index].code, program->params, program->name, 4);
+			waitpid(pid);
 		}
-		int funcParams = commands[index].ftype;
-		if (qtyParams - 1 != funcParams) {
-			printErr(WRONG_PARAMS);
-			printf(CHECK_MAN, command);
-			continue;
-		}
-		switch (commands[index].ftype) {
-			case NO_PARAMS:
-				commands[index].f();
-				break;
-			case SINGLE_PARAM:
-				commands[index].g(arg1);
-				break;
-			case DUAL_PARAM:
-				commands[index].h(arg1, arg2);
-				break;
-		}
+
+		freeParser(parser);
 	}
 }
 
@@ -154,26 +114,38 @@ static int getCommandIndex(char *command) {
 	return -1;
 }
 
-static void help() {
+static void help(int argc, char **argv) {
+	if (argc != 1) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
 	for (int i = 0; i < QTY_COMMANDS; i++)
-		printf("%s: %s\r\n", commands[i].name, commands[i].description);
+		printf("%s: %s\n", commands[i].name, commands[i].description);
 }
 
-static int div(char *num, char *div) {
-	printf("%s/%s=%d\r\n", num, div, atoi(num) / atoi(div));
-	return 1;
+static void div(int argc, char **argv) {
+	if (argc != 3) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	char *num = argv[1], *div = argv[2];
+	printf("%s/%s=%d\n", num, div, atoi(num) / atoi(div));
 }
 
-static void time() {
+static void time(int argc, char **argv) {
 	uint32_t secs = getSeconds();
 	uint32_t h = secs / 3600, m = secs % 3600 / 60, s = secs % 3600 % 60;
-	printf("%2d:%2d:%2d\r\n", h, m, s);
+	printf("%2d:%2d:%2d\n", h, m, s);
 }
 
-static void fontSize(char *size) {
-	int s = atoi(size);
+static void fontSize(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	int s = atoi(argv[1]);
 	if (s >= MIN_FONT_SIZE && s <= MAX_FONT_SIZE)
-		setFontSize((uint8_t) atoi(size));
+		setFontSize((uint8_t) atoi(argv[1]));
 	else {
 		printErr(INVALID_FONT_SIZE);
 		puts(CHECK_MAN_FONT);
@@ -192,10 +164,14 @@ static void tronZen() {
 	setFontSize(1);
 }
 
-static void printMem(char *pos) {
+static void printMem(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
 	uint8_t resp[QTY_BYTES];
 	char *end;
-	getMemory(strtoh(pos, &end), resp);
+	getMemory(strtoh(argv[1], &end), resp);
 	for (int i = 0; i < QTY_BYTES; i++) {
 		printf("0x%2x ", resp[i]);
 		if (i % 4 == 3)
@@ -206,7 +182,7 @@ static void printMem(char *pos) {
 static char *_regNames[] = {"RIP", "RSP", "RAX", "RBX", "RCX", "RDX",
 							"RBP", "RDI", "RSI", "R8", "R9", "R10",
 							"R11", "R12", "R13", "R14", "R15"};
-static void printInfoReg() {
+static void printInfoReg(int argc, char **argv) {
 	int len = sizeof(_regNames) / sizeof(char *);
 	uint64_t regSnapshot[len];
 	getInfoReg(regSnapshot);
@@ -214,15 +190,25 @@ static void printInfoReg() {
 		printf("%s: 0x%x\n", _regNames[i], regSnapshot[i]);
 }
 
-static void man(char *command) {
-	int idx = getCommandIndex(command);
+static void man(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	int idx = getCommandIndex(argv[1]);
 	if (idx != -1)
 		printf("%s\n", usages[idx]);
 	else
 		printErr(INVALID_COMMAND);
 }
 
-static void test(char *name, char *param) {
+static void test(int argc, char **argv) {
+	if (argc != 3) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	char *name = argv[1];
+	char *param = argv[2];
 	if (!strcmp(name, "test-mm")) {
 		char *args[] = {"test_mm", param, NULL};
 		createProcess(&test_mm, args, "test_mm", 4);
@@ -262,12 +248,6 @@ static void test(char *name, char *param) {
 		char *args[] = {"ZombieCreator", NULL};
 		createProcess(&testProgram, args, "ZombieCreator", (uint8_t) 4);
 	}
-}
-
-static void runLoop(char *delay) {
-	char *args[] = {"loop", delay, NULL};
-	uint16_t pid = createProcess(&loop, args, "loop", (uint8_t) 4);
-	waitpid(pid);
 }
 
 static void runKill(char *pid) {

@@ -14,7 +14,8 @@
 #define C_HEX 0x2E
 #define D_HEX 0x20
 #define R_HEX 0x13
-#define RELEASED 0x80						  /* Mascara para detectar si se solto una tecla */
+#define RELEASED 0x80 /* Mascara para detectar si se solto una tecla */
+#define SHIFTED 0x80
 static uint8_t _bufferStart = 0;			  /* Indice del comienzo de la cola */
 static uint8_t _bufferSize = 0;				  /* Longitud de la cola */
 static int8_t _buffer[BUFFER_CAPACITY] = {0}; /* Vector ciclico que guarda las teclas
@@ -63,7 +64,7 @@ void keyboardHandler() {
 		}
 		else if (_bufferSize < BUFFER_CAPACITY - 1) {
 			if (_shift)
-				key = 0x80 | key;
+				key = SHIFTED | key;
 			writeKey(key);
 		}
 	}
@@ -96,7 +97,7 @@ int8_t getAscii() {
 	int scanCode = getScancode();
 	if (scanCode == EOF)
 		return EOF;
-	if (0x80 & scanCode) {
+	if (SHIFTED & scanCode) {
 		scanCode &= 0x7F;
 		return toShiftKey(charHexMap[scanCode]);
 	}

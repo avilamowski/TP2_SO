@@ -30,4 +30,6 @@ int strcpychar(char *dest, const char *origin, char limit);
 int strcpy(char *dest, const char *origin);
 
 int strlen(const char *str);
+
+int strcpycharlimited(char *dest, const char *origin, char limitChar, int limitIndex);
 #endif

@@ -29,3 +29,13 @@ int strcpychar(char *dest, const char *origin, char limit) {
 	dest[idx] = 0;
 	return idx;
 }
+
+int strcpycharlimited(char *dest, const char *origin, char limitChar, int limitIndex) {
+	int idx = 0;
+	while (origin[idx] != limitChar && idx < limitIndex && origin[idx] != '\0') {
+		dest[idx] = origin[idx];
+		idx++;
+	}
+	dest[idx] = 0;
+	return idx;
+}
