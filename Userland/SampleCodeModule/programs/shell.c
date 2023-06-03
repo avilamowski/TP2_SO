@@ -62,7 +62,7 @@ static int getCommandIndex(char *command);
 static void createSingleProcess(InputParserADT parser);
 static void createPipedProcesses(InputParserADT parser);
 
-const static Command commands[QTY_COMMANDS] = {
+const static Command commands[] = {
 	{"help", "Listado de comandos", (MainFunction) help},
 	{"man", "Manual de uso de los comandos", (MainFunction) man},
 	{"inforeg", "Informacion de los registos que fueron capturados en un momento arbitrario de ejecucion del sistema", (MainFunction) printInfoReg},
@@ -81,8 +81,9 @@ const static Command commands[QTY_COMMANDS] = {
 	{"nice", "69", (MainFunction) runNice},
 	{"block", "bloquea el proceso con el pid recibido", (MainFunction) runBlock},
 	{"unblock", "desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},
-	{"yield", "desbloquea el proceso con el pid recibido", (MainFunction) unblock},
 	{"echo", "imprime por pantalla su primer parametro", (MainFunction) echo},
+	{"wc", "cuenta la cantidad de lineas del input", (MainFunction) wc},
+	{"cat", "imprime el STDIN tal como lo recibe", (MainFunction) cat},
 	{"filter", "filtra las vocales del input", (MainFunction) filter},
 	{"test-mm", "test_mm", (MainFunction) test_mm},
 	{"test-prio", "test_prio", (MainFunction) test_prio},

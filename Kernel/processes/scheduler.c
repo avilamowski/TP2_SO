@@ -173,6 +173,8 @@ int32_t killProcess(uint16_t pid, int32_t retValue) {
 	if (processToKill->status == ZOMBIE || processToKill->unkillable)
 		return -1;
 
+	closeFileDescriptors(processToKill);
+
 	uint8_t priorityIndex = processToKill->status != BLOCKED ? processToKill->priority : BLOCKED_INDEX;
 	removeNode(scheduler->levels[priorityIndex], processToKillNode);
 	processToKill->retValue = retValue;

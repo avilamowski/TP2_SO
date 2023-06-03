@@ -27,5 +27,5 @@ ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process);
 int processIsWaiting(Process *process, uint16_t pidToWait);
 int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess);
 void freeProcess(Process *process);
-
+void closeFileDescriptors(Process *process);
 #endif

@@ -14,17 +14,12 @@
 
 static char **allocArguments();
 static void assignFileDescriptor(Process *process, uint8_t fdIndex, int16_t fdValue, uint8_t mode);
-static void closeFileDescriptor(int16_t fdValue);
+static void closeFileDescriptor(uint16_t pid, int16_t fdValue);
 
 void processWrapper(MainFunction code, char **args) {
 	int len = stringArrayLen(args);
 	// printf("qty: %d, argv[0]: %s, argv[1]: %s\n", len, args[0], args[1]);
 	int retValue = code(len, args);
-
-	// giveForeground(processList[getCurrentPID()]->parent);
-	closeFileDescriptor(getCurrentProcessFileDescriptor(STDIN));
-	closeFileDescriptor(getCurrentProcessFileDescriptor(STDOUT));
-	closeFileDescriptor(getCurrentProcessFileDescriptor(STDERR));
 	killCurrentProcess(retValue);
 }
 
@@ -56,9 +51,15 @@ static void assignFileDescriptor(Process *process, uint8_t fdIndex, int16_t fdVa
 		pipeOpenForPid(process->pid, fdValue, mode);
 }
 
-static void closeFileDescriptor(int16_t fdValue) {
+void closeFileDescriptors(Process *process) {
+	closeFileDescriptor(process->pid, process->fileDescriptors[STDIN]);
+	closeFileDescriptor(process->pid, process->fileDescriptors[STDOUT]);
+	closeFileDescriptor(process->pid, process->fileDescriptors[STDERR]);
+}
+
+static void closeFileDescriptor(uint16_t pid, int16_t fdValue) {
 	if (fdValue >= BUILT_IN_DESCRIPTORS)
-		pipeClose(fdValue);
+		pipeCloseForPid(pid, fdValue);
 }
 
 static char **allocArguments(char **args) {

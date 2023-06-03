@@ -79,3 +79,19 @@ int filter(int argc, char **argv) {
 	putchar('\n');
 	return 0;
 }
+
+int wc(int argc, char **argv) {
+	char c;
+	int lineCounter = 0;
+	while ((c = getchar()) != EOF)
+		lineCounter += (c == '\n');
+	printf("La cantidad de lineas es: %d\n", lineCounter);
+	return 0;
+}
+
+int cat(int argc, char **argv) {
+	char c;
+	while ((c = getchar()) != EOF)
+		putchar(c);
+	return 0;
+}

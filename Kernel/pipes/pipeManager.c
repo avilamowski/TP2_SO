@@ -93,6 +93,11 @@ int8_t pipeOpenForPid(uint16_t pid, uint16_t id, uint8_t mode) {
 
 int8_t pipeClose(uint16_t id) {
 	PipeManagerADT pipeManager = getPipeManager();
+	return pipeCloseForPid(getpid(), id);
+}
+
+int8_t pipeCloseForPid(uint16_t pid, uint16_t id) {
+	PipeManagerADT pipeManager = getPipeManager();
 	int16_t index;
 	if ((index = getPipeIndexById(id)) == -1)
 		return -1;
@@ -100,10 +105,9 @@ int8_t pipeClose(uint16_t id) {
 	if (pipe == NULL)
 		return -1;
 
-	uint16_t pid = getpid();
 	if (pid == pipe->inputPid) {
 		char eofString[1] = {EOF};
-		writePipe(id, eofString, 1);
+		writePipe(pid, id, eofString, 1);
 	}
 	else if (pid == pipe->outputPid) {
 		freePipe(pipeManager->pipes[index]);
@@ -112,10 +116,8 @@ int8_t pipeClose(uint16_t id) {
 	}
 	else
 		return -1;
-
 	return 0;
 }
-
 static void freePipe(Pipe *pipe) {
 	free(pipe);
 }
@@ -132,11 +134,11 @@ static Pipe *createPipe() {
 	return pipe;
 }
 
-int64_t writePipe(uint16_t id, char *sourceBuffer, uint64_t len) {
+int64_t writePipe(uint16_t pid, uint16_t id, char *sourceBuffer, uint64_t len) {
 	PipeManagerADT pipeManager = getPipeManager();
 	Pipe *pipe = getPipeById(pipeManager, id);
 	if (pipe == NULL ||
-		pipe->inputPid != getpid() ||
+		pipe->inputPid != pid ||
 		len == 0)
 		return -1;
 

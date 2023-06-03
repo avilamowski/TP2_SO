@@ -77,9 +77,8 @@ static int64_t syscall_write(int16_t fd, char *sourceBuffer, uint64_t len) {
 	else if (fd < DEV_NULL)
 		return -1;
 	int16_t fdValue = fd < BUILT_IN_DESCRIPTORS ? getCurrentProcessFileDescriptor(fd) : fd;
-	if (fdValue >= BUILT_IN_DESCRIPTORS) {
-		return writePipe(fdValue, sourceBuffer, len);
-	}
+	if (fdValue >= BUILT_IN_DESCRIPTORS)
+		return writePipe(getpid(), fdValue, sourceBuffer, len);
 	else if (fdValue == STDOUT || fdValue == STDERR) {
 		Color prevColor = getFontColor();
 		if (fd == STDERR)
