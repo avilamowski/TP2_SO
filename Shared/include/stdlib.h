@@ -48,6 +48,7 @@ int stringArrayLen(char **array);
 void *memset(void *destiation, int32_t c, uint64_t length);
 
 #define toLower(n) ((n) >= 'A' && (n) <= 'Z' ? (n) - ('A' - 'a') : (n))
+#define toUpper(n) ((n) >= 'a' && (n) <= 'z' ? (n) - ('a' - 'A') : (n))
 #define isNumber(n) ((n) >= '0' && (n) <= '9')
 #define isHex(n) ((n) >= 'a' && (n) <= 'f')
 

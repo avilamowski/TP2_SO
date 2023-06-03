@@ -7,8 +7,10 @@
 #include <time.h>
 #include <video.h>
 
+#define toShiftKey(x) (isNumber(x) ? numbersSymbolsMap[(x) - '0'] : toUpper(x))
 #define BUFFER_CAPACITY 64 /* Longitud maxima del vector _buffer */
 #define LCTRL 29
+#define LSHIFT 42
 #define C_HEX 0x2E
 #define D_HEX 0x20
 #define R_HEX 0x13
@@ -18,12 +20,14 @@ static uint8_t _bufferSize = 0;				  /* Longitud de la cola */
 static int8_t _buffer[BUFFER_CAPACITY] = {0}; /* Vector ciclico que guarda las teclas
 											   * que se van leyendo del teclado */
 static uint8_t _ctrl = 0;					  /* Flag para detectar si se presiono ctrl */
+static uint8_t _shift = 0;					  /* Flag para detectar si se presiono shift */
 static const char charHexMap[256] =			  /* Mapa de scancode a ASCII */
 	{0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-',
 	 '=', '\b', ' ', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
 	 '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	 ';', '\'', 0, 0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',',
 	 '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0};
+static const char numbersSymbolsMap[] = {')', '!', '@', '#', '$', '%', '^', '&', '*', '('};
 
 static void writeKey(uint8_t key);
 
@@ -45,6 +49,8 @@ void keyboardHandler() {
 	if (!(key & RELEASED)) {
 		if (key == LCTRL)
 			_ctrl = 1;
+		else if (key == LSHIFT)
+			_shift = 1;
 		else if (_ctrl) {
 			if (key == C_HEX) {
 				_bufferStart = _bufferSize = 0;
@@ -55,12 +61,17 @@ void keyboardHandler() {
 			else if (key == D_HEX && _bufferSize < BUFFER_CAPACITY - 1)
 				writeKey(EOF);
 		}
-		else if (_bufferSize < BUFFER_CAPACITY - 1)
+		else if (_bufferSize < BUFFER_CAPACITY - 1) {
+			if (_shift)
+				key = 0x80 | key;
 			writeKey(key);
+		}
 	}
 	else {
 		if (key == (LCTRL | RELEASED))
 			_ctrl = 0;
+		else if (key == (LSHIFT | RELEASED))
+			_shift = 0;
 	}
 }
 
@@ -85,5 +96,9 @@ int8_t getAscii() {
 	int scanCode = getScancode();
 	if (scanCode == EOF)
 		return EOF;
+	if (0x80 & scanCode) {
+		scanCode &= 0x7F;
+		return toShiftKey(charHexMap[scanCode]);
+	}
 	return charHexMap[scanCode];
 }
