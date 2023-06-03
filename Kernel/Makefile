@@ -1,13 +1,14 @@
 include Makefile.inc
 
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c drivers/*.c interruptions/*.c lib/*.c memory/*.c pipes/*.c processes/*.c scheduler/*.c semaphores/*.c syscalls/*.c )
+SOURCES=$(wildcard *.c drivers/*.c interruptions/*.c lib/*.c memory/registers.c memory/memoryManager2.c pipes/*.c processes/*.c scheduler/*.c semaphores/*.c syscalls/*.c )
 SOURCES_ASM=$(wildcard asm/*.asm)
 SOURCES_SHARED=$(wildcard ../Shared/*.c)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
 OBJECTS_SHARED=$(SOURCES_SHARED:.c=.o)
 LOADERSRC=loader.asm
+
 
 LOADEROBJECT=$(LOADERSRC:.asm=.o)
 STATICLIBS=

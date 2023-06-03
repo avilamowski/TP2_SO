@@ -48,7 +48,7 @@ void initializeKernelBinary() {
 	uint64_t availableMem =
 		1 << log(memAmountBytes - (uint64_t) (sampleDataModuleAddress + userlandSize), 2);
 
-	createMemoryManager((void *) MEMORY_MANAGER_ADDRESS, sampleDataModuleAddress + userlandSize, availableMem);
+	createMemoryManager(sampleDataModuleAddress + userlandSize, availableMem);
 	createScheduler();
 	createSemaphoreManager();
 	createPipeManager();
