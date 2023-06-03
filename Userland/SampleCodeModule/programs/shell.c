@@ -44,10 +44,10 @@ static void tronZen();
 static void fontSize(int argc, char **argv);
 static void printMem(int argc, char **argv);
 static void test(int argc, char **argv);
-static void runKill(char *pid);
-static void runBlock(char *pid);
-static void runUnblock(char *pid);
-static void runNice(char *pid, char *priority);
+static void runKill(int argc, char **argv);
+static void runBlock(int argc, char **argv);
+static void runUnblock(int argc, char **argv);
+static void runNice(int argc, char **argv);
 
 static int getCommandIndex(char *command);
 
@@ -92,8 +92,14 @@ void run_shell() {
 				printErr(INVALID_COMMAND);
 				continue;
 			}
-			int16_t pid = createProcess((void *) commands[index].code, program->params, program->name, 4);
-			waitpid(pid);
+			if (isInBackground(parser)) {
+				int16_t fileDescriptors[] = {DEV_NULL, STDOUT, STDERR};
+				createProcessWithFds((void *) commands[index].code, program->params, program->name, 4, fileDescriptors);
+			}
+			else {
+				int16_t pid = createProcess((void *) commands[index].code, program->params, program->name, 4);
+				waitpid(pid);
+			}
 		}
 
 		freeParser(parser);
@@ -250,18 +256,34 @@ static void test(int argc, char **argv) {
 	}
 }
 
-static void runKill(char *pid) {
-	killProcess((uint16_t) atoi(pid));
+static void runKill(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	killProcess((uint16_t) atoi(argv[1]));
 }
 
-static void runUnblock(char *pid) {
-	unblock((uint16_t) atoi(pid));
+static void runUnblock(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	unblock((uint16_t) atoi(argv[1]));
 }
 
-static void runBlock(char *pid) {
-	block((uint16_t) atoi(pid));
+static void runBlock(int argc, char **argv) {
+	if (argc != 2) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	block((uint16_t) atoi(argv[1]));
 }
 
-static void runNice(char *pid, char *priority) {
-	nice((uint16_t) atoi(pid), (uint8_t) atoi(priority));
+static void runNice(int argc, char **argv) {
+	if (argc != 3) {
+		printErr(WRONG_PARAMS);
+		return;
+	}
+	nice((uint16_t) atoi(argv[1]), (uint8_t) atoi(argv[2]));
 }

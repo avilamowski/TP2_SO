@@ -7,7 +7,6 @@
 #include <time.h>
 #include <video.h>
 
-#define toShiftKey(x) (isNumber(x) ? numbersSymbolsMap[(x) - '0'] : toUpper(x))
 #define BUFFER_CAPACITY 64 /* Longitud maxima del vector _buffer */
 #define LCTRL 29
 #define LSHIFT 42
@@ -28,7 +27,12 @@ static const char charHexMap[256] =			  /* Mapa de scancode a ASCII */
 	 '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	 ';', '\'', 0, 0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',',
 	 '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0};
-static const char numbersSymbolsMap[] = {')', '!', '@', '#', '$', '%', '^', '&', '*', '('};
+static const char charHexMapShift[256] = /* Mapa de scancode con shift a ASCII */
+	{0, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_',
+	 '+', '\b', ' ', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+	 '{', '}', '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
+	 ';', '\'', 0, 0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<',
+	 '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0};
 
 static void writeKey(uint8_t key);
 
@@ -99,7 +103,7 @@ int8_t getAscii() {
 		return EOF;
 	if (SHIFTED & scanCode) {
 		scanCode &= 0x7F;
-		return toShiftKey(charHexMap[scanCode]);
+		return charHexMapShift[scanCode];
 	}
 	return charHexMap[scanCode];
 }
