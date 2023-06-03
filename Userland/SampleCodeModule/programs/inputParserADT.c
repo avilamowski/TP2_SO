@@ -35,6 +35,7 @@ InputParserADT parseInput(char *input) {
 	if (*input == PIPE) {
 		input++;
 		cleanSpaces(&input);
+		secondProgram = parseProgram(inputParserADT, &input);
 		inputParserADT->qtyPrograms++;
 	}
 

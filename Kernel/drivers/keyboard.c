@@ -31,7 +31,7 @@ static const char charHexMapShift[256] = /* Mapa de scancode con shift a ASCII *
 	{0, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_',
 	 '+', '\b', ' ', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
 	 '{', '}', '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
-	 ';', '\'', 0, 0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<',
+	 ';', '"', 0, 0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<',
 	 '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0};
 
 static void writeKey(uint8_t key);
