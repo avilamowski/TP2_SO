@@ -163,8 +163,6 @@ int32_t killCurrentProcess(int32_t retValue) {
 }
 
 int32_t killProcess(uint16_t pid, int32_t retValue) {
-	if (pid == IDLE_PID)
-		return -1;
 	SchedulerADT scheduler = getSchedulerADT();
 	Node *processToKillNode = scheduler->processes[pid];
 	if (processToKillNode == NULL)
@@ -238,11 +236,13 @@ int32_t getZombieRetValue(uint16_t pid) {
 	Process *zombieProcess = (Process *) zombieNode->data;
 	if (zombieProcess->parentPid != scheduler->currentPid)
 		return -1;
+
+	Process *parent = (Process *) scheduler->processes[scheduler->currentPid]->data;
+	parent->waitingForPid = pid;
 	if (zombieProcess->status != ZOMBIE) {
-		setStatus(scheduler->currentPid, BLOCKED);
+		setStatus(parent->pid, BLOCKED);
 		yield();
 	}
-	Process *parent = (Process *) scheduler->processes[zombieProcess->parentPid]->data;
 	removeNode(parent->zombieChildren, zombieNode);
 	destroyZombie(scheduler, zombieProcess);
 	return zombieProcess->retValue;

@@ -26,7 +26,6 @@ void psPrint() {
 int loop(int argc, char **argv) {
 	uint16_t pid = getpid();
 	int seconds = atoi(argv[1]);
-	// printf("sec: %d", seconds);
 	int currentTime = 0, oldTime = 0, initialTime = getSeconds();
 	while (1) {
 		currentTime = getSeconds();

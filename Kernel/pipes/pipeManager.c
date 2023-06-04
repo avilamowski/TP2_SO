@@ -64,7 +64,7 @@ int16_t getLastFreePipe() {
 	Pipe *pipe = createPipe();
 	pipeManager->pipes[pipeManager->lastFreePipe] = pipe;
 	pipeManager->qtyPipes++;
-	return pipeManager->lastFreePipe;
+	return pipeManager->lastFreePipe + BUILT_IN_DESCRIPTORS;
 }
 
 int8_t pipeOpen(uint16_t id, uint8_t mode) {
@@ -143,7 +143,7 @@ int64_t writePipe(uint16_t pid, uint16_t id, char *sourceBuffer, uint64_t len) {
 
 	uint64_t writtenBytes = 0;
 	while (writtenBytes < len && pipe->buffer[bufferPosition(pipe)] != EOF) {
-		if (pipe->currentSize == PIPE_SIZE) {
+		if (pipe->currentSize >= PIPE_SIZE) {
 			pipe->isBlocking = 1;
 			setStatus((uint16_t) pipe->inputPid, BLOCKED);
 			yield();

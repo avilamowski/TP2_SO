@@ -102,7 +102,7 @@ ProcessSnapshot *loadSnapshot(ProcessSnapshot *snapshot, Process *process) {
 }
 
 int processIsWaiting(Process *process, uint16_t pidToWait) {
-	return process->waitingForPid = pidToWait && process->status == BLOCKED;
+	return process->waitingForPid == pidToWait && process->status == BLOCKED;
 }
 
 int getZombiesSnapshots(int processIndex, ProcessSnapshot psArray[], Process *nextProcess) {

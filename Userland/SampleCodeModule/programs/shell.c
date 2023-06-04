@@ -143,12 +143,10 @@ static void createPipedProcesses(InputParserADT parser) {
 	int16_t firstPid = createProcessWithFds((void *) commands[firstIndex].code, firstProgram->params, firstProgram->name, 4, fileDescriptors1);
 
 	int16_t fileDescriptors2[] = {newPipeId, STDOUT, STDERR};
-	int16_t secondPid = createProcessWithFds((void *) commands[secondIndex].code, secondProgram->params, secondProgram->name, 4, fileDescriptors2);
+	createProcessWithFds((void *) commands[secondIndex].code, secondProgram->params, secondProgram->name, 4, fileDescriptors2);
 
-	if (!isInBackground(parser)) {
+	if (!isInBackground(parser))
 		waitpid(firstPid);
-		waitpid(secondPid);
-	}
 }
 
 /**
