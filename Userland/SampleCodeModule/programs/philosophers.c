@@ -7,7 +7,6 @@
 
 #define MAX_QTY 32
 #define MIN_QTY 3
-#define BASE_QTY 5
 #define MUTEX_SEM_ID 42
 #define MAX_PHILO_NUMBER_BUFFER 3
 
@@ -52,7 +51,7 @@ int runPhilosophers(int argc, char **argv) {
 		philosopherPids[i] = -1;
 	}
 
-	for (int i = 0; i < BASE_QTY; i++)
+	for (int i = 0; i < MIN_QTY; i++)
 		addPhilosopher(i);
 
 	char command = '\0';
@@ -63,14 +62,14 @@ int runPhilosophers(int argc, char **argv) {
 					if (addPhilosopher(qtyPhilosophers) == -1)
 						printErr("No se pudo agregar un filosofo\n");
 				}
-				else {
-					printf("La mesa esta llena");
-				}
+				else
+					printf("La mesa esta llena\n");
 				break;
 			case COMMAND_REMOVE:
-				if (qtyPhilosophers > MIN_QTY) {
+				if (qtyPhilosophers > MIN_QTY)
 					removePhilosopher(qtyPhilosophers - 1);
-				}
+				else
+					printf("Como minimo debe haber %d filosofos para empezar el banquete\n", MIN_QTY);
 				break;
 			case COMMAND_PS:
 				psPrint();
@@ -91,12 +90,12 @@ int runPhilosophers(int argc, char **argv) {
 static void render() {
 	if (singleLine)
 		clear();
-	const static char letters[] = {' ', 'E', '_', '.'};
+	const static char letters[] = {' ', 'E', '.', '.'};
 	uint8_t somethingToWrite = 0;
 	for (int i = 0; i < qtyPhilosophers; i++) {
 		if (letters[philosopherStates[i]] != ' ') {
 			somethingToWrite = 1;
-			printf("%c   ", letters[philosopherStates[i]]);
+			printf("%c%2s", letters[philosopherStates[i]], "");
 		}
 	}
 	if (somethingToWrite)
@@ -124,7 +123,7 @@ static int8_t removePhilosopher(int index) {
 	semWait(MUTEX_SEM_ID);
 	killProcess(philosopherPids[index]);
 	waitpid(philosopherPids[index]);
-	// printf("se retiro el filosofo %d\n", index);
+	printf("se retira el filosofo %d\n", index);
 	semClose(philosopherSemaphore(index));
 	philosopherPids[index] = -1;
 	philosopherStates[index] = NONE;
@@ -151,7 +150,6 @@ static void takeForks(int i) {
 	semWait(MUTEX_SEM_ID);
 	philosopherStates[i] = HUNGRY;
 	test(i);
-	render();
 	semPost(MUTEX_SEM_ID);
 	semWait(philosopherSemaphore(i));
 }
