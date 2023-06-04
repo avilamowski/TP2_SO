@@ -76,16 +76,18 @@ int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 		return -1;
 	if (newStatus == process->status)
 		return newStatus;
+
+	process->status = newStatus;
 	if (newStatus == BLOCKED) {
 		removeNode(scheduler->levels[process->priority], node);
 		appendNode(scheduler->levels[BLOCKED_INDEX], node);
+		setPriority(pid, process->priority == MAX_PRIORITY ? MAX_PRIORITY : process->priority + 1);
 	}
 	else if (oldStatus == BLOCKED) {
 		removeNode(scheduler->levels[BLOCKED_INDEX], node);
 		// Se asume que ya tiene un nivel predefinido
 		appendNode(scheduler->levels[process->priority], node);
 	}
-	process->status = newStatus;
 	return newStatus;
 }
 
@@ -257,12 +259,6 @@ int32_t processIsAlive(uint16_t pid) {
 void yield() {
 	SchedulerADT scheduler = getSchedulerADT();
 	scheduler->remainingQuantum = 0;
-
-	Node *processNode = scheduler->processes[scheduler->currentPid];
-	if (processNode != NULL) {
-		Process *process = (Process *) processNode->data;
-		setPriority(scheduler->currentPid, process->priority == MAX_PRIORITY ? MAX_PRIORITY : process->priority + 1);
-	}
 	forceTimerTick();
 }
 

@@ -6,6 +6,7 @@
 #include <pipeManager.h>
 #include <process.h>
 #include <registers.h>
+#include <rtc.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
 #include <speaker.h>
@@ -16,7 +17,6 @@
 
 static int64_t syscall_read(int16_t fd, char *destinationBuffer, uint64_t len);
 static int64_t syscall_write(int16_t fd, char *sourceBuffer, uint64_t len);
-static uint32_t syscall_seconds();
 static uint64_t *syscall_registerArray(uint64_t *regarr);
 static void syscall_fontSize(uint8_t size);
 static void syscall_drawRect(uint16_t x, uint16_t y, uint16_t width,
@@ -27,7 +27,6 @@ static uint32_t syscall_getFontColor();
 static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]);
 static int32_t syscall_killProcess(uint16_t pid);
 static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status);
-static void syscall_sleep(int seconds);
 
 typedef uint64_t (*Syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 
@@ -36,7 +35,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 						   uint64_t arg5) {
 	static Syscall syscalls[] = {
 		(Syscall) syscall_read, (Syscall) syscall_write, (Syscall) videoClear,
-		(Syscall) syscall_seconds, (Syscall) syscall_registerArray, (Syscall) syscall_fontSize,
+		(Syscall) getSeconds, (Syscall) syscall_registerArray, (Syscall) syscall_fontSize,
 		(Syscall) getScreenResolution, (Syscall) syscall_drawRect, (Syscall) ticksElapsed,
 		(Syscall) syscall_getMemory, (Syscall) playSound, (Syscall) syscall_setFontColor,
 		(Syscall) syscall_getFontColor, (Syscall) allocMemory, (Syscall) free,
@@ -45,7 +44,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		(Syscall) setPriority, (Syscall) yield, (Syscall) getZombieRetValue, // waitpid
 		(Syscall) semInit, (Syscall) semOpen, (Syscall) semClose,
 		(Syscall) semPost, (Syscall) semWait, (Syscall) pipeOpen,
-		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) syscall_sleep, (Syscall) getMemoryInfo};
+		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) sleep, (Syscall) getMemoryInfo};
 	return syscalls[nr](arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
@@ -90,19 +89,6 @@ static int64_t syscall_write(int16_t fd, char *sourceBuffer, uint64_t len) {
 		return len;
 	}
 	return -1;
-}
-
-// Get time in seconds
-static uint32_t syscall_seconds() {
-	uint8_t h, m, s;
-	getTime(&h, &m, &s);
-	return s + m * 60 + ((h + 24 - 3) % 24) * 3600;
-}
-
-static void syscall_sleep(int seconds) {
-	uint32_t limit = syscall_seconds() + seconds;
-	while (syscall_seconds() < limit)
-		yield();
 }
 
 // Get register snapshot array
