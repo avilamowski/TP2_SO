@@ -44,7 +44,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		(Syscall) setPriority, (Syscall) yield, (Syscall) getZombieRetValue, // waitpid
 		(Syscall) semInit, (Syscall) semOpen, (Syscall) semClose,
 		(Syscall) semPost, (Syscall) semWait, (Syscall) pipeOpen,
-		(Syscall) pipeClose, (Syscall) getLastFreePipe};
+		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) sleep};
 	return syscalls[nr](arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
@@ -96,6 +96,12 @@ static uint32_t syscall_seconds() {
 	uint8_t h, m, s;
 	getTime(&h, &m, &s);
 	return s + m * 60 + ((h + 24 - 3) % 24) * 3600;
+}
+
+void sleep(int seconds) {
+	uint32_t limit = syscall_seconds() + seconds;
+	while (syscall_seconds() < limit)
+		yield();
 }
 
 // Get register snapshot array

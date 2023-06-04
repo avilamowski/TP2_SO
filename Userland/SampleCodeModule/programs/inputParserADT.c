@@ -59,21 +59,16 @@ static ShellProgram *parseProgram(InputParserADT parser, char **input) {
 	program->params[qtyParams] = malloc(MAX_COMMAND_LENGTH);
 	strcpy(program->params[qtyParams++], program->name);
 
-	int lastParamCopiedLength;
-	do {
+	int lastParamCopiedLength = 1;
+	while (lastParamCopiedLength > 0 && **input != AMPERSAND && **input != PIPE && **input != '\n') {
 		program->params[qtyParams] = malloc(MAX_PARAM_LENGTH);
 		lastParamCopiedLength = strcpycharlimited(program->params[qtyParams], *input, ' ', MAX_PARAM_LENGTH);
-
-		if (lastParamCopiedLength <= 0 || program->params[qtyParams][0] == AMPERSAND || program->params[qtyParams][0] == PIPE) {
-			free(program->params[qtyParams]);
-			break;
-		}
-		else {
+		if (lastParamCopiedLength > 0) {
 			*input += lastParamCopiedLength;
 			cleanSpaces(input);
 			qtyParams++;
 		}
-	} while (lastParamCopiedLength > 0);
+	}
 
 	program->params[qtyParams] = NULL;
 	return program;

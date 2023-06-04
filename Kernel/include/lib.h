@@ -48,12 +48,6 @@ void stopSound();
  */
 void saveRegisters();
 
-/**
- * @brief  Detiene la ejecucion del programa hasta que se produzca una
- * interrupcion
- */
-void _hlt();
-
 void forceTimerTick();
 
 int _xchg(int *lock, int value);

@@ -31,6 +31,7 @@ GLOBAL semWait
 GLOBAL pipeOpen
 GLOBAL pipeClose
 GLOBAL pipeGet
+GLOBAL sleep
 
 read:
     mov rax, 0
@@ -190,5 +191,10 @@ pipeClose:
 
 pipeGet:
     mov rax, 31
+    int 80h
+    ret
+
+sleep:
+    mov rax, 32
     int 80h
     ret

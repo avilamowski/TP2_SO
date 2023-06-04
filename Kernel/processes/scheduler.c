@@ -257,7 +257,12 @@ int32_t processIsAlive(uint16_t pid) {
 void yield() {
 	SchedulerADT scheduler = getSchedulerADT();
 	scheduler->remainingQuantum = 0;
-	setPriority(scheduler->currentPid, MAX_PRIORITY);
+
+	Node *processNode = scheduler->processes[scheduler->currentPid];
+	if (processNode != NULL) {
+		Process *process = (Process *) processNode->data;
+		setPriority(scheduler->currentPid, process->priority == MAX_PRIORITY ? MAX_PRIORITY : process->priority + 1);
+	}
 	forceTimerTick();
 }
 

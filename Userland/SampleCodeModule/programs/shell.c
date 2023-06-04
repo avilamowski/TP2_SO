@@ -30,7 +30,6 @@
 #define continueIfInvalid(parser, index) \
 	;                                    \
 	if ((index) == -1) {                 \
-		freeParser(parser);              \
 		printErr(INVALID_COMMAND);       \
 		return;                          \
 	}

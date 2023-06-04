@@ -24,15 +24,14 @@ void psPrint() {
 }
 
 int loop(int argc, char **argv) {
+	if (argc != 2) {
+		printErr("Argumentos invalidos\n"); // TODO: Uniformizar?
+		return -1;
+	}
 	uint16_t pid = getpid();
-	int seconds = atoi(argv[1]);
-	int currentTime = 0, oldTime = 0, initialTime = getSeconds();
 	while (1) {
-		currentTime = getSeconds();
-		if (currentTime != oldTime && !((currentTime - initialTime) % seconds)) {
-			printf("Hola, soy el proceso: %d\n", pid);
-		}
-		oldTime = currentTime;
+		sleep(atoi(argv[1]));
+		printf("Hola, soy el proceso: %d\n", pid);
 	}
 	return 0;
 }

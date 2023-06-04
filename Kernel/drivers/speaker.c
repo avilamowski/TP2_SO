@@ -1,4 +1,4 @@
-#include <lib.h>
+#include <interrupts.h>
 #include <speaker.h>
 #include <time.h>
 void playSound(uint64_t frequency, uint64_t ticks) {
