@@ -35,10 +35,10 @@ typedef struct MemoryInfo {
 	uint64_t totalMemory;
 	uint64_t freeMemory;
 	uint64_t usedMemory;
-	uint64_t maxUsedBlockSize;
-	uint64_t minUsedBlockSize;
-	uint64_t maxFreeBlockSize;
-	uint64_t minFreeBlockSize;
+	// uint64_t maxUsedBlockSize;
+	// uint64_t minUsedBlockSize;
+	// uint64_t maxFreeBlockSize;
+	// uint64_t minFreeBlockSize;
 } MemoryInfo;
 
 /* File Descriptors*/
