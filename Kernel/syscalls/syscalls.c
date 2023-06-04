@@ -27,6 +27,7 @@ static uint32_t syscall_getFontColor();
 static int16_t syscall_createProcess(MainFunction code, char **args, char *name, uint8_t priority, int16_t fileDescriptors[]);
 static int32_t syscall_killProcess(uint16_t pid);
 static int8_t syscall_changeProcessStatus(uint16_t pid, uint8_t status);
+static void syscall_sleep(int seconds);
 
 typedef uint64_t (*Syscall)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 
@@ -44,7 +45,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		(Syscall) setPriority, (Syscall) yield, (Syscall) getZombieRetValue, // waitpid
 		(Syscall) semInit, (Syscall) semOpen, (Syscall) semClose,
 		(Syscall) semPost, (Syscall) semWait, (Syscall) pipeOpen,
-		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) sleep};
+		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) syscall_sleep};
 	return syscalls[nr](arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
@@ -98,7 +99,7 @@ static uint32_t syscall_seconds() {
 	return s + m * 60 + ((h + 24 - 3) % 24) * 3600;
 }
 
-void sleep(int seconds) {
+static void syscall_sleep(int seconds) {
 	uint32_t limit = syscall_seconds() + seconds;
 	while (syscall_seconds() < limit)
 		yield();
