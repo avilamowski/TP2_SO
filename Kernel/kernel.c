@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <defs.h>
 #include <interrupts.h>
 #include <keyboard.h>
@@ -46,7 +48,7 @@ void initializeKernelBinary() {
 	uint64_t memAmountBytes = *((uint32_t *) memAmount) * (1 << 20);
 
 	uint64_t availableMem =
-		1 << log(memAmountBytes - (uint64_t) (sampleDataModuleAddress + userlandSize), 2);
+		1L << log(memAmountBytes - (uint64_t) (sampleDataModuleAddress + userlandSize), 2);
 
 	createMemoryManager(sampleDataModuleAddress + userlandSize, availableMem);
 	createScheduler();

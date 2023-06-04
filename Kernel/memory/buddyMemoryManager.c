@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #ifdef BUDDY
 
 #include <defs.h>
@@ -63,7 +65,7 @@ void *allocMemory(const uint64_t size) {
 
 	idxToAlloc = idxToAlloc < MIN_EXP - 1 ? MIN_EXP - 1 : idxToAlloc;
 
-	if (idxToAlloc < MIN_EXP - 1 || idxToAlloc >= memoryManager->maxExp)
+	if (idxToAlloc >= memoryManager->maxExp)
 		return NULL;
 
 	if (memoryManager->blocks[idxToAlloc] == NULL) {
@@ -83,7 +85,7 @@ void *allocMemory(const uint64_t size) {
 	block->next = NULL;
 
 	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
-	uint64_t blockSize = 1 << block->exp;
+	uint64_t blockSize = 1L << block->exp;
 	memoryInfo->usedMemory += blockSize;
 	memoryInfo->freeMemory -= blockSize;
 	memoryInfo->usedBlocks++;
@@ -97,7 +99,7 @@ static void split(MemoryManagerADT memoryManager, uint8_t idx) {
 	MemoryBlock *block = memoryManager->blocks[idx];
 	removeMemoryBlock(memoryManager->blocks, block);
 	MemoryBlock *buddyBlock =
-		(MemoryBlock *) ((void *) block + (1 << idx)); // TODO: Si se rompe es por el & xd
+		(MemoryBlock *) ((void *) block + (1L << idx)); // TODO: Si se rompe es por el & xd
 	createMemoryBlock(memoryManager, buddyBlock, idx, memoryManager->blocks[idx - 1]);
 	memoryManager->blocks[idx - 1] = createMemoryBlock(memoryManager, block, idx, buddyBlock);
 }
@@ -108,7 +110,7 @@ void free(void *ptrAllocatedMemory) {
 	block->used = FREE;
 
 	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
-	uint64_t blockSize = 1 << block->exp;
+	uint64_t blockSize = 1L << block->exp;
 	memoryInfo->freeMemory += blockSize;
 	memoryInfo->usedMemory -= blockSize;
 	memoryInfo->freeBlocks++;

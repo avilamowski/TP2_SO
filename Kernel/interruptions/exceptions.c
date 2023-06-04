@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <registers.h>
 #include <stdint.h>
 #include <video.h>
@@ -12,6 +14,7 @@ char *ZERO_EXCEPTION_DESCRIPTION = "Division por cero";
 char *OPCODE_EXCEPTION_DESCRIPTION = "Operacion invalida";
 char *GENERAL_PROTECTION_DESCRIPTION = "Proteccion general";
 char *PAGE_FAULT_DESCRIPTION = "Fallo de pagina";
+char *UNKNOWN_DESCRIPTION = "Error desconocido";
 
 void exceptionDispatcher(int ex, uint64_t *rip, uint64_t *rsp) {
 	char *msg;
@@ -27,6 +30,9 @@ void exceptionDispatcher(int ex, uint64_t *rip, uint64_t *rsp) {
 			break;
 		case PAGE_FAULT_ID:
 			msg = PAGE_FAULT_DESCRIPTION;
+			break;
+		default:
+			msg = UNKNOWN_DESCRIPTION;
 			break;
 	}
 	printError(msg, *rip, rsp);

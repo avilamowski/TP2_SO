@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <inputParserADT.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -16,10 +18,19 @@ typedef struct InputParserCDT {
 
 static ShellProgram *parseProgram(InputParserADT parser, char **input);
 static void cleanSpaces(char **input);
+static void freeProgram(ShellProgram *program);
 
 InputParserADT parseInput(char *input) {
-	InputParserADT inputParserADT = malloc(sizeof(InputParserCDT));
-	inputParserADT->shellPrograms = malloc(MAX_CHAINED_PROGRAMS * sizeof(ShellProgram *));
+	InputParserADT inputParserADT = (InputParserADT) malloc(sizeof(InputParserCDT));
+	if (inputParserADT == NULL)
+		return NULL;
+
+	inputParserADT->shellPrograms = (ShellProgram **) malloc(MAX_CHAINED_PROGRAMS * sizeof(ShellProgram *));
+	if (inputParserADT->shellPrograms == NULL) {
+		free(inputParserADT);
+		return NULL;
+	}
+
 	for (int i = 0; i < MAX_CHAINED_PROGRAMS; i++)
 		inputParserADT->shellPrograms[i] = NULL;
 	inputParserADT->qtyPrograms = 1;
@@ -49,19 +60,41 @@ InputParserADT parseInput(char *input) {
 
 static ShellProgram *parseProgram(InputParserADT parser, char **input) {
 	uint8_t qtyParams = 0;
-	ShellProgram *program = malloc(sizeof(ShellProgram));
-	program->params = malloc((MAX_PARAM_LENGTH + 2) * sizeof(char *));
+	ShellProgram *program = (ShellProgram *) malloc(sizeof(ShellProgram));
+	if (program == NULL)
+		return NULL;
 
-	program->name = malloc(MAX_COMMAND_LENGTH);
+	program->params = (char **) malloc((MAX_PARAM_LENGTH + 2) * sizeof(char *));
+	if (program->params == NULL) {
+		free(program);
+		return NULL;
+	}
+
+	program->name = (char *) malloc(MAX_COMMAND_LENGTH);
+	if (program->name == NULL) {
+		free(program);
+		free(program->params);
+		return NULL;
+	}
+
 	*input += strcpycharlimited(program->name, *input, ' ', MAX_COMMAND_LENGTH);
 	cleanSpaces(input);
 
 	program->params[qtyParams] = malloc(MAX_COMMAND_LENGTH);
+	if (program->params[qtyParams] == NULL) {
+		freeProgram(program);
+		return NULL;
+	}
+
 	strcpy(program->params[qtyParams++], program->name);
 
 	int lastParamCopiedLength = 1;
 	while (lastParamCopiedLength > 0 && **input != AMPERSAND && **input != PIPE && **input != '\n') {
 		program->params[qtyParams] = malloc(MAX_PARAM_LENGTH);
+		if (program->params[qtyParams] == NULL) {
+			freeProgram(program);
+			return NULL;
+		}
 		lastParamCopiedLength = strcpycharlimited(program->params[qtyParams], *input, ' ', MAX_PARAM_LENGTH);
 		if (lastParamCopiedLength > 0) {
 			*input += lastParamCopiedLength;
@@ -101,6 +134,7 @@ static void freeProgram(ShellProgram *program) {
 	while (program->params[i] != NULL)
 		free(program->params[i++]);
 	free(program->params);
+	free(program);
 }
 
 void freeParser(InputParserADT parser) {
