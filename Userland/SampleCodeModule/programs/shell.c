@@ -54,8 +54,7 @@ static void fontSize(int argc, char **argv);
 static void printMem(int argc, char **argv);
 static void test(int argc, char **argv);
 static void runKill(int argc, char **argv);
-static void runBlock(int argc, char **argv);
-static void runUnblock(int argc, char **argv);
+static void toggleBlock(int argc, char **argv);
 static void runNice(int argc, char **argv);
 
 static int getCommandIndex(char *command);
@@ -80,8 +79,7 @@ const static Command commands[] = {
 	{"ps", "Muestra la informacion de los procesos vivos y zombificados", (MainFunction) psPrint},
 	{"mem", "Muestra informacion del MemoryManager", (MainFunction) mem},
 	{"nice", "Cambia la prioridad de un proceso dado su ID y la nueva prioridad", (MainFunction) runNice},
-	{"block", "Bloquea el proceso con el pid recibido", (MainFunction) runBlock},
-	{"unblock", "Desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},
+	{"block", "Bloquea el proceso con el pid recibido", (MainFunction) toggleBlock},
 	{"echo", "Imprime por pantalla su primer parametro", (MainFunction) echo},
 	{"wc", "Cuenta la cantidad de lineas del input", (MainFunction) wc},
 	{"cat", "Imprime el STDIN tal como lo recibe", (MainFunction) cat},
@@ -317,20 +315,19 @@ static void runKill(int argc, char **argv) {
 	killProcess((uint16_t) atoi(argv[1]));
 }
 
-static void runUnblock(int argc, char **argv) {
+static void toggleBlock(int argc, char **argv) {
 	if (argc != 2) {
 		printErr(WRONG_PARAMS);
 		return;
 	}
-	unblock((uint16_t) atoi(argv[1]));
-}
-
-static void runBlock(int argc, char **argv) {
-	if (argc != 2) {
-		printErr(WRONG_PARAMS);
-		return;
-	}
-	block((uint16_t) atoi(argv[1]));
+	uint16_t pid = (uint16_t) atoi(argv[1]);
+	ProcessStatus status = getProcessStatus(pid);
+	if (status == BLOCKED)
+		changeProcessStatus(pid, READY);
+	else if (status == READY)
+		changeProcessStatus(pid, BLOCKED);
+	else
+		printErr("El proceso no se encuentra en un estado donde se pueda alternar entre READY y BLOCKED\n");
 }
 
 static void runNice(int argc, char **argv) {

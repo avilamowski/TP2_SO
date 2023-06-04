@@ -9,7 +9,8 @@
 typedef enum { BLOCKED = 0,
 			   READY,
 			   RUNNING,
-			   ZOMBIE } ProcessStatus;
+			   ZOMBIE,
+			   DEAD } ProcessStatus;
 typedef int (*MainFunction)(int argc, char **args);
 
 typedef struct ProcessSnapshot {

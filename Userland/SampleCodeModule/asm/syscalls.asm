@@ -33,6 +33,7 @@ GLOBAL pipeClose
 GLOBAL pipeGet
 GLOBAL sleep
 GLOBAL getMemoryInfo
+GLOBAL getProcessStatus
 
 read:
     mov rax, 0
@@ -202,5 +203,10 @@ sleep:
 
 getMemoryInfo:
     mov rax, 33
+    int 80h
+    ret
+
+getProcessStatus:
+    mov rax, 34
     int 80h
     ret

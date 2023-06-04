@@ -2,6 +2,7 @@
 #define _SYSCALLS_H
 
 #include <color.h>
+#include <globals.h>
 #include <stdint.h>
 
 int64_t write(int16_t fd, char *sourceBuffer, uint64_t len);
@@ -110,7 +111,7 @@ int8_t changeProcessStatus(uint16_t pid, uint8_t status);
 
 void yield();
 
-int32_t waitpid();
+int32_t waitpid(uint16_t pid);
 
 int8_t semInit(uint16_t id, uint32_t initialValue);
 
@@ -131,6 +132,8 @@ int16_t pipeGet();
 void sleep(int seconds);
 
 void *getMemoryInfo();
+
+ProcessStatus getProcessStatus(uint16_t pid);
 
 // wrappers
 

@@ -94,6 +94,14 @@ int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 	return newStatus;
 }
 
+ProcessStatus getProcessStatus(uint16_t pid) {
+	SchedulerADT scheduler = getSchedulerADT();
+	Node *processNode = scheduler->processes[pid];
+	if (processNode == NULL)
+		return DEAD;
+	return ((Process *) processNode->data)->status;
+}
+
 void *schedule(void *prevStackPointer) {
 	static int firstTime = 1;
 	SchedulerADT scheduler = getSchedulerADT();
