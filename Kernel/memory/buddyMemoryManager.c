@@ -1,3 +1,5 @@
+#ifdef BUDDY
+
 #include <defs.h>
 #include <globals.h>
 #include <lib.h>
@@ -31,7 +33,6 @@ static void split(MemoryManagerADT memoryManager, uint8_t idx);
 static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrToAllocate, uint8_t exp, MemoryBlock *prev);
 static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memoryBlock);
 static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *block, MemoryBlock *buddy);
-static void processMemoryBlockInfo(MemoryBlock *block, MemoryInfo *memoryInfo);
 
 MemoryManagerADT createMemoryManager(void *const restrict managedMemory, uint64_t memAmount) {
 	MemoryManagerADT memoryManager = (MemoryManagerADT) MEMORY_MANAGER_ADDRESS;
@@ -165,53 +166,7 @@ static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrT
 
 MemoryInfo *getMemoryInfo() {
 	MemoryManagerADT memoryManager = getMemoryManager();
-	// MemoryInfo *memoryInfo = (MemoryInfo *) allocMemory(sizeof(MemoryInfo));
-
-	// memoryInfo->totalBlocks = 0;
-	// memoryInfo->freeBlocks = 0;
-	// memoryInfo->usedBlocks = 0;
-	// memoryInfo->totalMemory = 0;
-	// memoryInfo->freeMemory = 0;
-	// memoryInfo->usedMemory = 0;
-	// // memoryInfo->maxUsedBlockSize = 0;
-	// // memoryInfo->minUsedBlockSize = 1 << memoryManager->maxExp;
-	// // memoryInfo->maxFreeBlockSize = 0;
-	// // memoryInfo->minFreeBlockSize = 1 << memoryManager->maxExp;
-
-	// for (int i = 0; i < LEVELS; i++) {
-	// 	MemoryBlock *block = memoryManager->blocks[i];
-	// 	while (block != NULL) {
-	// 		processMemoryBlockInfo(block, memoryInfo);
-	// 		uint64_t relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
-	// 		MemoryBlock *buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1 << block->exp)));
-	// 		if (buddyBlock->exp == block->exp)
-	// 			processMemoryBlockInfo(buddyBlock, memoryInfo);
-	// 		block = block->next;
-	// 	}
-	// }
-
-	// printf("\ntotalBlocks:%d    freeBlocks:%d    usedBlocks:%d    totalMemory:%d o %d    freeMemory:%d    usedMemory:%d    maxUsedBlockSize:%d    minUsedBlockSize:%d    maxFreeBlockSize:%d    minFreeBlockSize:%d\n", memoryInfo->totalBlocks, memoryInfo->freeBlocks, memoryInfo->usedBlocks, memoryInfo->totalMemory, 1 << memoryManager->maxExp, memoryInfo->freeMemory, memoryInfo->usedMemory); //, memoryInfo->maxUsedBlockSize, memoryInfo->minUsedBlockSize, memoryInfo->maxFreeBlockSize, memoryInfo->minFreeBlockSize);
-
-	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
-	printf("\ntotalBlocks:%d    freeBlocks:%d    usedBlocks:%d    totalMemory:%d    freeMemory:%d    usedMemory:%d", memoryInfo->totalBlocks, memoryInfo->freeBlocks, memoryInfo->usedBlocks, memoryInfo->totalMemory, memoryInfo->freeMemory, memoryInfo->usedMemory); //, memoryInfo->maxUsedBlockSize, memoryInfo->minUsedBlockSize, memoryInfo->maxFreeBlockSize, memoryInfo->minFreeBlockSize);
-
-	return createMemoryInfoCopy(memoryInfo);
+	return createMemoryInfoCopy(&(memoryManager->memoryInfo));
 }
 
-static void processMemoryBlockInfo(MemoryBlock *block, MemoryInfo *memoryInfo) {
-	uint64_t blockSize = (1 << block->exp);
-	memoryInfo->totalBlocks++;
-	memoryInfo->totalMemory += blockSize;
-	if (block->used == FREE) {
-		memoryInfo->freeBlocks++;
-		memoryInfo->freeMemory += blockSize;
-		// memoryInfo->maxFreeBlockSize = blockSize > memoryInfo->maxFreeBlockSize ? blockSize : memoryInfo->maxFreeBlockSize;
-		// memoryInfo->minFreeBlockSize = blockSize < memoryInfo->minFreeBlockSize ? blockSize : memoryInfo->minFreeBlockSize;
-	}
-	else if (block->used == USED) {
-		memoryInfo->usedBlocks++;
-		memoryInfo->usedMemory += blockSize;
-		// memoryInfo->maxUsedBlockSize = blockSize > memoryInfo->maxUsedBlockSize ? blockSize : memoryInfo->maxUsedBlockSize;
-		// memoryInfo->minUsedBlockSize = blockSize < memoryInfo->minUsedBlockSize ? blockSize : memoryInfo->minUsedBlockSize;
-	}
-}
+#endif

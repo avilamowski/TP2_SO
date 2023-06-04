@@ -77,6 +77,7 @@ const static Command commands[] = {
 	{"loop", "El proceso imprime su ID con un saludo cada una determinada cantidad de segundos", (MainFunction) loop},
 	{"kill", "Mata a un proceso dado su PID", (MainFunction) runKill},
 	{"ps", "Muestra la informacion de los procesos vivos y zombificados", (MainFunction) psPrint},
+	{"mem", "Muestra informacion del MemoryManager", (MainFunction) mem},
 	{"nice", "Cambia la prioridad de un proceso dado su ID y la nueva prioridad", (MainFunction) runNice},
 	{"block", "Bloquea el proceso con el pid recibido", (MainFunction) runBlock},
 	{"unblock", "Desbloquea el proceso con el pid recibido", (MainFunction) runUnblock},

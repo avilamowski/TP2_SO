@@ -23,6 +23,13 @@ void psPrint() {
 	free(snapshots);
 }
 
+int mem(int argc, char **argv) {
+	MemoryInfo *memoryInfo = getMemoryInfo();
+	printf("%s MemoryManager:\ntotalBlocks:%d    freeBlocks:%d    usedBlocks:%d    totalMemory:%d    freeMemory:%d    usedMemory:%d\n", memoryInfo->name, memoryInfo->totalBlocks, memoryInfo->freeBlocks, memoryInfo->usedBlocks, memoryInfo->totalMemory, memoryInfo->freeMemory, memoryInfo->usedMemory);
+	free(memoryInfo);
+	return 0;
+}
+
 int loop(int argc, char **argv) {
 	if (argc != 2) {
 		printErr("Argumentos invalidos\n"); // TODO: Uniformizar?

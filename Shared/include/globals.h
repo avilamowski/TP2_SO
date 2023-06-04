@@ -29,6 +29,7 @@ typedef struct ProcessSnapshotList {
 } ProcessSnapshotList;
 
 typedef struct MemoryInfo {
+	char name[16];
 	uint64_t totalBlocks;
 	uint64_t freeBlocks;
 	uint64_t usedBlocks;

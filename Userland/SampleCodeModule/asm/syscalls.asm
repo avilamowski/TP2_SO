@@ -32,6 +32,7 @@ GLOBAL pipeOpen
 GLOBAL pipeClose
 GLOBAL pipeGet
 GLOBAL sleep
+GLOBAL getMemoryInfo
 
 read:
     mov rax, 0
@@ -196,5 +197,10 @@ pipeGet:
 
 sleep:
     mov rax, 32
+    int 80h
+    ret
+
+getMemoryInfo:
+    mov rax, 33
     int 80h
     ret

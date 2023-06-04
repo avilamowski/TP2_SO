@@ -1,9 +1,10 @@
 #include <globals.h>
 #include <memoryInfo.h>
 #include <memoryManager.h>
-
+#include <string.h>
 MemoryInfo *createMemoryInfoCopy(MemoryInfo *memoryInfo) {
 	MemoryInfo *copy = allocMemory(sizeof(MemoryInfo));
+	strcpy(copy->name, memoryInfo->name);
 	copy->totalBlocks = memoryInfo->totalBlocks;
 	copy->freeBlocks = memoryInfo->freeBlocks;
 	copy->usedBlocks = memoryInfo->usedBlocks;
@@ -14,14 +15,17 @@ MemoryInfo *createMemoryInfoCopy(MemoryInfo *memoryInfo) {
 }
 
 void initMemoryInfo(MemoryInfo *memoryInfo) {
+#if defined BUDDY
+	strcpy(memoryInfo->name, "Buddy");
+#elif defined MAD
+	strcpy(memoryInfo->name, "Mad");
+#else
+	strcpy(memoryInfo->name, "Linear");
+#endif
 	memoryInfo->totalBlocks = 0;
 	memoryInfo->freeBlocks = 0;
 	memoryInfo->usedBlocks = 0;
 	memoryInfo->totalMemory = 0;
 	memoryInfo->freeMemory = 0;
 	memoryInfo->usedMemory = 0;
-	// memoryInfo->maxUsedBlockSize = 0;
-	// memoryInfo->minUsedBlockSize = memoryManager->totalSize;
-	// memoryInfo->maxFreeBlockSize = 0;
-	// memoryInfo->minFreeBlockSize = memoryManager->totalSize;
 }

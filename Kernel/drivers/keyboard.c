@@ -1,5 +1,7 @@
+#include <globals.h>
 #include <keyboard.h>
 #include <lib.h>
+#include <memoryManager.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
 #include <stdint.h>
@@ -13,6 +15,7 @@
 #define C_HEX 0x2E
 #define D_HEX 0x20
 #define R_HEX 0x13
+#define M_HEX 0x32
 #define RELEASED 0x80 /* Mascara para detectar si se solto una tecla */
 #define SHIFTED 0x80
 static uint8_t _bufferStart = 0;			  /* Indice del comienzo de la cola */
@@ -65,6 +68,11 @@ void keyboardHandler() {
 				saveRegisters();
 			else if (key == D_HEX && _bufferSize < BUFFER_CAPACITY - 1)
 				writeKey(EOF);
+			else if (key == M_HEX) {
+				MemoryInfo *memoryInfo = getMemoryInfo();
+				printf("%s MemoryManager:\ntotalBlocks:%d    freeBlocks:%d    usedBlocks:%d    totalMemory:%d    freeMemory:%d    usedMemory:%d\n", memoryInfo->name, memoryInfo->totalBlocks, memoryInfo->freeBlocks, memoryInfo->usedBlocks, memoryInfo->totalMemory, memoryInfo->freeMemory, memoryInfo->usedMemory);
+				free(memoryInfo);
+			}
 		}
 		else if (_bufferSize < BUFFER_CAPACITY - 1) {
 			if (_shift)

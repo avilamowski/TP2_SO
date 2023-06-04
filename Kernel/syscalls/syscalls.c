@@ -45,7 +45,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		(Syscall) setPriority, (Syscall) yield, (Syscall) getZombieRetValue, // waitpid
 		(Syscall) semInit, (Syscall) semOpen, (Syscall) semClose,
 		(Syscall) semPost, (Syscall) semWait, (Syscall) pipeOpen,
-		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) syscall_sleep};
+		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) syscall_sleep, (Syscall) getMemoryInfo};
 	return syscalls[nr](arg0, arg1, arg2, arg3, arg4, arg5);
 }
 

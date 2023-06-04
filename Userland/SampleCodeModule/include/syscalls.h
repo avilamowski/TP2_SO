@@ -130,4 +130,6 @@ int16_t pipeGet();
 
 void sleep(int seconds);
 
+void *getMemoryInfo();
+
 #endif

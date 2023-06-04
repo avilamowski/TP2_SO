@@ -1,3 +1,5 @@
+#if defined MAD || defined LINEAR
+
 #include <defs.h>
 #include <globals.h>
 #include <lib.h>
@@ -11,8 +13,6 @@
 #define MIN_SIZE 32
 #define FREE 0
 #define USED 1
-
-#define MADNESS 1
 
 typedef struct MemoryBlock {
 	uint8_t used;
@@ -45,7 +45,6 @@ static MemoryManagerADT getMemoryManager();
 static MemoryBlock *split(MemoryManagerADT memoryManager, MemoryBlock *block, uint64_t realSize);
 static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *left, MemoryBlock *right);
 static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrToAllocate, MemoryBlock *prev);
-static void processMemoryBlockInfo(MemoryManagerADT memoryManager, MemoryBlock *block, MemoryInfo *memoryInfo);
 
 MemoryManagerADT
 createMemoryManager(void *const restrict managedMemory, uint64_t memAmount) {
@@ -99,20 +98,19 @@ void *allocMemory(const uint64_t size) {
 static MemoryBlock *split(MemoryManagerADT memoryManager, MemoryBlock *block, uint64_t realSize) {
 	uint64_t blockSize = getBlockSize(memoryManager, block);
 	if (blockSize > realSize) {
-		if (!MADNESS) { // lineal
-			block->next = createMemoryBlock(memoryManager, (void *) block + realSize, block);
-		}
-		else { // loco
-			uint64_t randomUnit = (uint64_t) getUniform((blockSize - realSize) / MIN_SIZE);
-			MemoryBlock *randomBlock;
-			if (randomUnit > 0)
-				randomBlock = createMemoryBlock(memoryManager, (((void *) block) + (randomUnit * MIN_SIZE)), block);
-			else
-				randomBlock = block;
-			if (getBlockSize(memoryManager, randomBlock) > realSize)
-				randomBlock->next = createMemoryBlock(memoryManager, ((void *) randomBlock) + realSize, randomBlock);
-			block = randomBlock;
-		}
+#ifdef LINEAR
+		block->next = createMemoryBlock(memoryManager, (void *) block + realSize, block);
+#elif defined MAD
+		uint64_t randomUnit = (uint64_t) getUniform((blockSize - realSize) / MIN_SIZE);
+		MemoryBlock *randomBlock;
+		if (randomUnit > 0)
+			randomBlock = createMemoryBlock(memoryManager, (((void *) block) + (randomUnit * MIN_SIZE)), block);
+		else
+			randomBlock = block;
+		if (getBlockSize(memoryManager, randomBlock) > realSize)
+			randomBlock->next = createMemoryBlock(memoryManager, ((void *) randomBlock) + realSize, randomBlock);
+		block = randomBlock;
+#endif
 	}
 	return block;
 }
@@ -167,35 +165,6 @@ static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrT
 
 MemoryInfo *getMemoryInfo() {
 	MemoryManagerADT memoryManager = getMemoryManager();
-	MemoryInfo *memoryInfo = (MemoryInfo *) allocMemory(sizeof(MemoryInfo));
-	initMemoryInfo(memoryInfo);
-
-	MemoryBlock *block = memoryManager->firstAddress;
-	while (block != NULL) {
-		processMemoryBlockInfo(memoryManager, block, memoryInfo);
-		block = block->next;
-	}
-	printf("\ntotalBlocks:%d    freeBlocks:%d    usedBlocks:%d    totalMemory:%d o %d    freeMemory:%d    usedMemory:%d    maxUsedBlockSize:%d    minUsedBlockSize:%d    maxFreeBlockSize:%d    minFreeBlockSize:%d\n", memoryInfo->totalBlocks, memoryInfo->freeBlocks, memoryInfo->usedBlocks, memoryInfo->totalMemory, memoryManager->totalSize, memoryInfo->freeMemory, memoryInfo->usedMemory); //, memoryInfo->maxUsedBlockSize, memoryInfo->minUsedBlockSize, memoryInfo->maxFreeBlockSize, memoryInfo->minFreeBlockSize);
-	free(memoryInfo);
-	printf("\ntotalBlocks:%d    freeBlocks:%d    usedBlocks:%d    totalMemory:%d o    freeMemory:%d    usedMemory:%d", memoryInfo->totalBlocks, memoryInfo->freeBlocks, memoryInfo->usedBlocks, memoryInfo->totalMemory, memoryInfo->freeMemory, memoryInfo->usedMemory); //, memoryInfo->maxUsedBlockSize, memoryInfo->minUsedBlockSize, memoryInfo->maxFreeBlockSize, memoryInfo->minFreeBlockSize);
-
-	return createMemoryInfoCopy(memoryInfo);
+	createMemoryInfoCopy(&(memoryManager->memoryInfo));
 }
-
-static void processMemoryBlockInfo(MemoryManagerADT memoryManager, MemoryBlock *block, MemoryInfo *memoryInfo) {
-	uint64_t blockSize = getBlockSize(memoryManager, block);
-	memoryInfo->totalBlocks++;
-	memoryInfo->totalMemory += blockSize;
-	if (block->used == FREE) {
-		memoryInfo->freeBlocks++;
-		memoryInfo->freeMemory += blockSize;
-		// memoryInfo->maxFreeBlockSize = blockSize > memoryInfo->maxFreeBlockSize ? blockSize : memoryInfo->maxFreeBlockSize;
-		// memoryInfo->minFreeBlockSize = blockSize < memoryInfo->minFreeBlockSize ? blockSize : memoryInfo->minFreeBlockSize;
-	}
-	else if (block->used == USED) {
-		memoryInfo->usedBlocks++;
-		memoryInfo->usedMemory += blockSize;
-		// memoryInfo->maxUsedBlockSize = blockSize > memoryInfo->maxUsedBlockSize ? blockSize : memoryInfo->maxUsedBlockSize;
-		// memoryInfo->minUsedBlockSize = blockSize < memoryInfo->minUsedBlockSize ? blockSize : memoryInfo->minUsedBlockSize;
-	}
-}
+#endif

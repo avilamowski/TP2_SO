@@ -2,6 +2,7 @@
 #define _PROCESS_H
 #include <stdint.h>
 void psPrint();
+int mem(int argc, char **argv);
 int loop(int argc, char **argv);
 void nice(uint16_t pid, uint8_t priority);
 int8_t block(uint16_t pid);
