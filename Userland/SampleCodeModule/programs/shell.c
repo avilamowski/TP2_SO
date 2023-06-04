@@ -2,6 +2,7 @@
 #include <inputParserADT.h>
 #include <libasm.h>
 #include <man.h>
+#include <philosophers.h>
 #include <process.h>
 #include <shell.h>
 #include <stdint.h>
@@ -85,6 +86,7 @@ const static Command commands[] = {
 	{"wc", "Cuenta la cantidad de lineas del input", (MainFunction) wc},
 	{"cat", "Imprime el STDIN tal como lo recibe", (MainFunction) cat},
 	{"filter", "Filtra las vocales del input", (MainFunction) filter},
+	{"phylo", "Los phylozofox", (MainFunction) runPhilosophers},
 	{"test-mm", "Test_mm", (MainFunction) test_mm},
 	{"test-prio", "Test_prio", (MainFunction) test_prio},
 	{"test-processes", "Test_processes", (MainFunction) test_processes}};

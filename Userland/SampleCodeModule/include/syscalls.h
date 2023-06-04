@@ -132,4 +132,18 @@ void sleep(int seconds);
 
 void *getMemoryInfo();
 
+// wrappers
+
+int16_t createProcess(void *code, char **args, char *name, uint8_t priority);
+
+void nice(uint16_t pid, uint8_t priority);
+
+int8_t block(uint16_t pid);
+
+int8_t unblock(uint16_t pid);
+
+void psPrint();
+
+int mem(int argc, char **argv);
+
 #endif

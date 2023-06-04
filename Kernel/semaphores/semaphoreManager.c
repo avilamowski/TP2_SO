@@ -124,6 +124,10 @@ static void releaseMutex(Semaphore *sem) {
 static int up(Semaphore *sem) {
 	acquireMutex(sem);
 	sem->value++;
+	if (sem->value == 0) {
+		releaseMutex(sem);
+		return -1;
+	}
 	resumeFirstAvailableProcess(sem->semaphoreQueue);
 	releaseMutex(sem);
 	return 0;

@@ -12,6 +12,7 @@ typedef struct Node {
 LinkedListADT createLinkedListADT();
 Node *appendElement(LinkedListADT list, void *data);
 Node *appendNode(LinkedListADT list, Node *node);
+Node *prependNode(LinkedListADT list, Node *node);
 void *removeNode(LinkedListADT list, Node *node);
 Node *getFirst(LinkedListADT list);
 int isEmpty(LinkedListADT list);

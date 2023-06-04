@@ -28,7 +28,7 @@ int strtoh(char *s, char **end);
 
 /**
  * @brief Convierte un numero en una base en una cadena de caracteres
- * @param n: Numero que se desea convertilib.hr
+ * @param n: Numero que se desea convertir
  * @param buffer: Buffer para ir guardando la conversion
  * @param base: Base del numero que se desea convertir
  * @return Longitud del buffer (numero que se convirtio en cadena de caracteres)

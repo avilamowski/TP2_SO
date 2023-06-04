@@ -41,6 +41,20 @@ Node *appendNode(LinkedListADT list, Node *node) {
 	return node;
 }
 
+Node *prependNode(LinkedListADT list, Node *node) {
+	if (list == NULL)
+		return NULL;
+	node->prev = NULL;
+	if (list->len > 0)
+		list->first->prev = node;
+	else
+		list->last = node;
+	node->next = list->first;
+	list->first = node;
+	list->len++;
+	return node;
+}
+
 Node *getFirst(LinkedListADT list) {
 	if (list == NULL)
 		return NULL;

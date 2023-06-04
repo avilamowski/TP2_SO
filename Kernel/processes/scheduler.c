@@ -81,12 +81,15 @@ int8_t setStatus(uint16_t pid, uint8_t newStatus) {
 	if (newStatus == BLOCKED) {
 		removeNode(scheduler->levels[process->priority], node);
 		appendNode(scheduler->levels[BLOCKED_INDEX], node);
-		setPriority(pid, process->priority == MAX_PRIORITY ? MAX_PRIORITY : process->priority + 1);
+		// setPriority(pid, process->priority == MAX_PRIORITY ? MAX_PRIORITY : process->priority + 1);
 	}
 	else if (oldStatus == BLOCKED) {
 		removeNode(scheduler->levels[BLOCKED_INDEX], node);
 		// Se asume que ya tiene un nivel predefinido
-		appendNode(scheduler->levels[process->priority], node);
+		// appendNode(scheduler->levels[process->priority], node);
+		process->priority = MAX_PRIORITY;
+		prependNode(scheduler->levels[process->priority], node);
+		scheduler->remainingQuantum = 0;
 	}
 	return newStatus;
 }
@@ -123,7 +126,7 @@ void *schedule(void *prevStackPointer) {
 		if (killCurrentProcess(-1) != -1)
 			forceTimerTick();
 	}
-	scheduler->remainingQuantum = QUANTUM_COEF * (MAX_PRIORITY - currentProcess->priority);
+	scheduler->remainingQuantum = (MAX_PRIORITY - currentProcess->priority);
 	currentProcess->status = RUNNING;
 	return currentProcess->stackPos;
 }
@@ -252,8 +255,8 @@ int32_t getZombieRetValue(uint16_t pid) {
 
 int32_t processIsAlive(uint16_t pid) {
 	SchedulerADT scheduler = getSchedulerADT();
-	Process *process = scheduler->processes[pid]->data;
-	return process != NULL && process->status != ZOMBIE;
+	Node *processNode = scheduler->processes[pid];
+	return processNode != NULL && ((Process *) processNode->data)->status != ZOMBIE;
 }
 
 void yield() {

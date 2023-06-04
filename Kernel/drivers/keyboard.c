@@ -24,18 +24,18 @@ static int8_t _buffer[BUFFER_CAPACITY] = {0}; /* Vector ciclico que guarda las t
 											   * que se van leyendo del teclado */
 static uint8_t _ctrl = 0;					  /* Flag para detectar si se presiono ctrl */
 static uint8_t _shift = 0;					  /* Flag para detectar si se presiono shift */
-static const char charHexMap[256] =			  /* Mapa de scancode a ASCII */
+static const char charHexMap[] =			  /* Mapa de scancode a ASCII */
 	{0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-',
 	 '=', '\b', ' ', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
 	 '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	 ';', '\'', 0, 0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',',
-	 '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0};
-static const char charHexMapShift[256] = /* Mapa de scancode con shift a ASCII */
+	 '.', '/', 0, '*', 0, ' '};
+static const char charHexMapShift[] = /* Mapa de scancode con shift a ASCII */
 	{0, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_',
 	 '+', '\b', ' ', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
 	 '{', '}', '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
 	 ';', '"', 0, 0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<',
-	 '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0};
+	 '>', '?', 0, '*', 0, ' '};
 
 static void writeKey(uint8_t key);
 
@@ -89,9 +89,11 @@ void keyboardHandler() {
 }
 
 static void writeKey(uint8_t key) {
-	_buffer[getBufferIndex(_bufferSize)] = key;
-	_bufferSize++;
-	semPost(IO_SEM_ID);
+	if ((key & 0x7F) < sizeof(charHexMap) && charHexMap[key & 0x7F] != 0) {
+		_buffer[getBufferIndex(_bufferSize)] = key;
+		_bufferSize++;
+		semPost(IO_SEM_ID);
+	}
 }
 
 int8_t getScancode() {
