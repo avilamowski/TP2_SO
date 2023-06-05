@@ -41,14 +41,14 @@ static int spawnAndBlock(int argc, char **argv) {
 #define TEST_PIPE 200
 static int testWriter(int argc, char **argv) {
 	pipeOpen(TEST_PIPE, WRITE);
-	char *message = "Secreto";
+	char *message = "***Secreto***";
 	puts("Soy el escritor, enviando mensaje...\n");
 	write(TEST_PIPE, message, strlen(message) + 1);
 	pipeClose(TEST_PIPE, WRITE);
 	return 0;
 }
 
-#define TEST_BUFFER_LEN 8
+#define TEST_BUFFER_LEN 100
 static int testReader(int argc, char **argv) {
 	pipeOpen(TEST_PIPE, READ);
 	char received[TEST_BUFFER_LEN] = {0};
