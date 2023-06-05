@@ -13,7 +13,7 @@
 int64_t global; // shared memory
 
 void slowInc(int64_t *p, int64_t inc) {
-	uint64_t aux = *p;
+	int64_t aux = *p;
 	yield(); // This makes the race condition highly probable
 	aux += inc;
 	*p = aux;
@@ -34,11 +34,12 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
 	if ((use_sem = satoi(argv[3])) < 0)
 		return -1;
 
-	if (use_sem)
+	if (use_sem) {
 		if (semOpen(SEM_ID) == -1) {
 			printf("test_sync: ERROR opening semaphore\n");
 			return -1;
 		}
+	}
 
 	uint64_t i;
 	for (i = 0; i < n; i++) {
@@ -48,10 +49,6 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
 		if (use_sem)
 			semPost(SEM_ID);
 	}
-
-	// if (use_sem)
-	//   semClose(SEM_ID);
-
 	return 0;
 }
 
@@ -77,8 +74,8 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
 
 	uint64_t i;
 	for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-		pids[i] = createProcess(&my_process_inc, argvDec, "my_process_dec", 4);
-		pids[i + TOTAL_PAIR_PROCESSES] = createProcess(&my_process_inc, argvInc, "my_process_inc", 4);
+		pids[i] = createProcess(&my_process_inc, argvInc, "my_process_inc", 4);
+		pids[i + TOTAL_PAIR_PROCESSES] = createProcess(&my_process_inc, argvDec, "my_process_dec", 4);
 	}
 
 	for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
@@ -88,7 +85,7 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
 
 	printf("Final value: %d\n", global);
 
-	if (useSem) // TODO: Preguntar por el foro si el cambio es valido
+	if (useSem)
 		semClose(SEM_ID);
 
 	return 0;

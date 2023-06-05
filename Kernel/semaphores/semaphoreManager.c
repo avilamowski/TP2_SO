@@ -97,9 +97,9 @@ static void freeSemaphore(Semaphore *sem) {
 }
 
 static void acquireMutex(Semaphore *sem) {
-	if (_xchg(&(sem->mutex), 1)) {
+	while (_xchg(&(sem->mutex), 1)) {
 		uint16_t pid = getpid();
-		appendElement(sem->semaphoreQueue, (void *) ((uint64_t) pid));
+		appendElement(sem->mutexQueue, (void *) ((uint64_t) pid));
 		setStatus(pid, BLOCKED);
 		yield();
 	}
@@ -132,12 +132,13 @@ static int up(Semaphore *sem) {
 	}
 	resumeFirstAvailableProcess(sem->semaphoreQueue);
 	releaseMutex(sem);
+	// yield();
 	return 0;
 }
 
 static int down(Semaphore *sem) {
 	acquireMutex(sem);
-	if (sem->value <= 0) {
+	while (sem->value == 0) {
 		uint16_t pid = getpid();
 		appendElement(sem->semaphoreQueue, (void *) ((uint64_t) pid));
 		setStatus(pid, BLOCKED);
