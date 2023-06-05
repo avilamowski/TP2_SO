@@ -91,7 +91,7 @@ void keyboardHandler() {
 }
 
 static void writeKey(int8_t key) {
-	if (((key & 0x7F) < sizeof(charHexMap) && charHexMap[key & 0x7F] != 0) || key == EOF) {
+	if (((key & 0x7F) < sizeof(charHexMap) && charHexMap[key & 0x7F] != 0) || (int) key == EOF) {
 		_buffer[getBufferIndex(_bufferSize)] = key;
 		_bufferSize++;
 		semPost(IO_SEM_ID);
