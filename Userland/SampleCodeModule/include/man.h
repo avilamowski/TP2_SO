@@ -73,7 +73,7 @@ char *usages[QTY_COMMANDS] = {
 
 	"Uso: test_prio - ejecuta el test de prioridades",
 
-	"Uso: test_sync [CANT_PROCESOS][USE_SEM]- ejecuta el test de sincronizacion",
+	"Uso: test_sync [N][USE_SEM]- ejecuta el test de sincronizacion",
 
 	"Uso: test_processes [CANT_PROCESOS] - ejecuta el test de procesos",
 

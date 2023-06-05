@@ -90,7 +90,7 @@ const static Command commands[] = {
 	{"test-prio", "Ejecuta el test de prioridades", (MainFunction) test_prio},
 	{"test-sync", "Ejecutar el test de sincronizacion", (MainFunction) test_sync},
 	{"test-processes", "Ejecuta el test de procesos", (MainFunction) test_processes},
-	{"test", "Ejecuta uno de los siguientes programas de prueba: test-filter, test-zombies y test-named-pipes. Ninguno recibe parametros", (MainFunction) test}};
+	{"test", "Ejecuta uno de los siguientes programas de prueba: test-filter, test-zombies y test-named-pipes", (MainFunction) test}};
 
 void run_shell() {
 	puts(WELCOME);
