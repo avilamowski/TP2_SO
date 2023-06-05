@@ -133,8 +133,13 @@ static int8_t addPhilosopher(int index) {
 
 static int8_t removePhilosopher(int index) {
 	printf("Se invita a retirarse a %s\n", philosopherNames[index]);
-	if (philosopherStates[left(index)] == EATING && philosopherStates[right(index)] == EATING) // Estado invalido para remover
-		semWait(philosopherSemaphore(index));												   // Bloquearse hasta que el filosofo este comiendo
+	semWait(MUTEX_SEM_ID);
+	if (philosopherStates[left(index)] == EATING && philosopherStates[right(index)] == EATING) { // Estado invalido para remover
+		semPost(MUTEX_SEM_ID);																	 // Bloquearse hasta que el filosofo este comiendo
+		semWait(philosopherSemaphore(index));
+	}
+	else
+		semPost(MUTEX_SEM_ID);
 	semWait(MUTEX_SEM_ID);
 	killProcess(philosopherPids[index]);
 	waitpid(philosopherPids[index]);
