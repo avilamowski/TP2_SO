@@ -39,7 +39,7 @@ static int spawnAndBlock(int argc, char **argv) {
 
 int filter(int argc, char **argv) {
 	char c;
-	while ((c = getchar()) != EOF) {
+	while ((int) (c = getchar()) != EOF) {
 		if (toLower(c) == 'a' || toLower(c) == 'e' || toLower(c) == 'i' || toLower(c) == 'o' || toLower(c) == 'u')
 			putchar(c);
 	}
@@ -50,7 +50,7 @@ int filter(int argc, char **argv) {
 int wc(int argc, char **argv) {
 	char c;
 	int lineCounter = 0;
-	while ((c = getchar()) != EOF)
+	while ((int) (c = getchar()) != EOF)
 		lineCounter += (c == '\n');
 	printf("La cantidad de lineas es: %d\n", lineCounter);
 	return 0;
@@ -58,7 +58,7 @@ int wc(int argc, char **argv) {
 
 int cat(int argc, char **argv) {
 	char c;
-	while ((c = getchar()) != EOF)
+	while ((int) (c = getchar()) != EOF)
 		putchar(c);
 	return 0;
 }

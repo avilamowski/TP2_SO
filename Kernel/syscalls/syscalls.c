@@ -66,7 +66,7 @@ static int64_t syscall_read(int16_t fd, char *destinationBuffer, uint64_t len) {
 	else if (fdValue == STDIN) {
 		for (uint64_t i = 0; i < len; i++) {
 			destinationBuffer[i] = getAscii();
-			if (destinationBuffer[i] == EOF)
+			if ((int) destinationBuffer[i] == EOF)
 				return i + 1;
 		}
 		return len;

@@ -167,6 +167,6 @@ static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrT
 
 MemoryInfo *getMemoryInfo() {
 	MemoryManagerADT memoryManager = getMemoryManager();
-	createMemoryInfoCopy(&(memoryManager->memoryInfo));
+	return createMemoryInfoCopy(&(memoryManager->memoryInfo));
 }
 #endif

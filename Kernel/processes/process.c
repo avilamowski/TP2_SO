@@ -64,7 +64,7 @@ static void closeFileDescriptor(uint16_t pid, int16_t fdValue) {
 }
 
 static char **allocArguments(char **args) {
-	int argc = stringArrayLen(args), totalArgsLen;
+	int argc = stringArrayLen(args), totalArgsLen = 0;
 	int argsLen[argc];
 	for (int i = 0; i < argc; i++) {
 		argsLen[i] = strlen(args[i]) + 1;

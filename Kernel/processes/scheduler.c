@@ -57,7 +57,7 @@ int32_t setPriority(uint16_t pid, uint8_t newPriority) {
 	if (node == NULL || pid == IDLE_PID)
 		return -1;
 	Process *process = (Process *) node->data;
-	if (newPriority < 0 || newPriority >= QTY_READY_LEVELS)
+	if (newPriority >= QTY_READY_LEVELS)
 		return -1;
 	if (process->status == READY || process->status == RUNNING) {
 		removeNode(scheduler->levels[process->priority], node);

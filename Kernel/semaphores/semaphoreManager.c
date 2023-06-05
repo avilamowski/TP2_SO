@@ -54,7 +54,7 @@ int8_t semInit(uint16_t id, uint32_t initialValue) {
 
 int8_t semOpen(uint16_t id) {
 	SemaphoreManagerADT semManager = getSemaphoreManager();
-	return -(semManager->semaphores[id] == NULL);
+	return -1 * (semManager->semaphores[id] == NULL);
 }
 
 int8_t semClose(uint16_t id) {

@@ -36,7 +36,7 @@ static PipeManagerADT getPipeManager() {
 
 static int16_t getPipeIndexById(uint16_t id) {
 	int16_t index = (int16_t) id - BUILT_IN_DESCRIPTORS;
-	if (index < 0 || index > MAX_PIPES)
+	if (index < 0 || index >= MAX_PIPES)
 		return -1;
 	return index;
 }
@@ -144,7 +144,7 @@ int64_t writePipe(uint16_t pid, uint16_t id, char *sourceBuffer, uint64_t len) {
 		return -1;
 
 	uint64_t writtenBytes = 0;
-	while (writtenBytes < len && pipe->buffer[bufferPosition(pipe)] != EOF) {
+	while (writtenBytes < len && (int) pipe->buffer[bufferPosition(pipe)] != EOF) {
 		if (pipe->currentSize >= PIPE_SIZE) {
 			pipe->isBlocking = 1;
 			setStatus((uint16_t) pipe->inputPid, BLOCKED);
@@ -155,7 +155,7 @@ int64_t writePipe(uint16_t pid, uint16_t id, char *sourceBuffer, uint64_t len) {
 
 		while (pipe->currentSize < PIPE_SIZE && writtenBytes < len) {
 			pipe->buffer[bufferPosition(pipe)] = sourceBuffer[writtenBytes];
-			if (sourceBuffer[writtenBytes++] == EOF)
+			if ((int) sourceBuffer[writtenBytes++] == EOF)
 				break;
 			pipe->currentSize++;
 		}
@@ -177,14 +177,14 @@ int64_t readPipe(uint16_t id, char *destinationBuffer, uint64_t len) {
 	uint8_t eofRead = 0;
 	uint64_t readBytes = 0;
 	while (readBytes < len && !eofRead) {
-		if (pipe->currentSize == 0 && pipe->buffer[pipe->startPosition] != EOF) {
+		if (pipe->currentSize == 0 && (int) pipe->buffer[pipe->startPosition] != EOF) {
 			pipe->isBlocking = 1;
 			setStatus((uint16_t) pipe->outputPid, BLOCKED);
 			yield();
 		}
-		while ((pipe->currentSize > 0 || pipe->buffer[pipe->startPosition] == EOF) && readBytes < len) {
+		while ((pipe->currentSize > 0 || (int) pipe->buffer[pipe->startPosition] == EOF) && readBytes < len) {
 			destinationBuffer[readBytes] = pipe->buffer[pipe->startPosition];
-			if (destinationBuffer[readBytes++] == EOF) {
+			if ((int) destinationBuffer[readBytes++] == EOF) {
 				eofRead = 1;
 				break;
 			}

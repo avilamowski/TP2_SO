@@ -118,7 +118,7 @@ static int8_t addPhilosopher(int index) {
 		qtyPhilosophers++;
 	render();
 	semPost(MUTEX_SEM_ID);
-	return -!(philosopherPids[index] + 1);
+	return -1 * !(philosopherPids[index] + 1);
 }
 
 static int8_t removePhilosopher(int index) {

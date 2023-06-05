@@ -72,8 +72,8 @@ static ShellProgram *parseProgram(InputParserADT parser, char **input) {
 
 	program->name = (char *) malloc(MAX_COMMAND_LENGTH);
 	if (program->name == NULL) {
-		free(program);
 		free(program->params);
+		free(program);
 		return NULL;
 	}
 
