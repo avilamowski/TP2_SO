@@ -6,31 +6,33 @@
 #include <stdio.h>
 #include <syscalls.h>
 
-#define MINOR_WAIT 1000000 // TODO: Change this value to prevent a process from flooding the screen
-#define WAIT 1000000000	   // TODO: Change this value to make the wait long enough to see theese processes beeing run at least twice
+#define MINOR_WAIT "500000000"
+#define WAIT 1000000000
 
 #define TOTAL_PROCESSES 3
-#define LOWEST 0  // TODO: Change as required
-#define MEDIUM 1  // TODO: Change as required
-#define HIGHEST 2 // TODO: Change as required
+#define LOWEST 0
+#define MEDIUM 2
+#define HIGHEST 4
 
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
 
 void test_prio() {
 	int64_t pids[TOTAL_PROCESSES];
-	char *argv[] = {0};
+	char *argv[] = {"endless_loop_print", MINOR_WAIT, 0};
 	uint64_t i;
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
 		pids[i] = createProcess(&endless_loop_print, argv, "endless_loop_print", 0);
 
 	bussy_wait(WAIT);
+	clear();
 	printf("\nCHANGING PRIORITIES...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
 		nice(pids[i], prio[i]);
 
 	bussy_wait(WAIT);
+	clear();
 	printf("\nBLOCKING...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)
@@ -47,6 +49,7 @@ void test_prio() {
 		unblock(pids[i]);
 
 	bussy_wait(WAIT);
+	clear();
 	printf("\nKILLING...\n");
 
 	for (i = 0; i < TOTAL_PROCESSES; i++)

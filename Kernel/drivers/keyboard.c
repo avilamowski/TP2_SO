@@ -39,7 +39,7 @@ static const char charHexMapShift[] = /* Mapa de scancode con shift a ASCII */
 	 ';', '"', 0, 0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<',
 	 '>', '?', 0, '*', 0, ' '};
 
-static void writeKey(uint8_t key);
+static void writeKey(int8_t key);
 
 /**
  * @brief  Obtiene el indice del elemento en la cola dado un corrimiento
@@ -90,8 +90,8 @@ void keyboardHandler() {
 	}
 }
 
-static void writeKey(uint8_t key) {
-	if ((key & 0x7F) < sizeof(charHexMap) && charHexMap[key & 0x7F] != 0) {
+static void writeKey(int8_t key) {
+	if (((key & 0x7F) < sizeof(charHexMap) && charHexMap[key & 0x7F] != 0) || key == EOF) {
 		_buffer[getBufferIndex(_bufferSize)] = key;
 		_bufferSize++;
 		semPost(IO_SEM_ID);

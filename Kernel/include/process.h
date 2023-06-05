@@ -11,7 +11,6 @@ typedef struct Process { // PCB
 	uint16_t waitingForPid;
 	void *stackBase; // MemoryBlock
 	void *stackPos;
-	// void * heap;  // Lista de MemoryBlocks
 	char **argv;
 	char *name;
 	uint8_t unkillable;

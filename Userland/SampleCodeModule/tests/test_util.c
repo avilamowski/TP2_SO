@@ -66,11 +66,13 @@ void endless_loop() {
 		;
 }
 
-void endless_loop_print(uint64_t wait) {
+void endless_loop_print(int argc, char **argv) {
 	int64_t pid = getpid();
 
+	uint64_t wait = satoi(argv[1]);
 	while (1) {
 		printf("%d ", pid);
+		// psPrint();
 		bussy_wait(wait);
 	}
 }

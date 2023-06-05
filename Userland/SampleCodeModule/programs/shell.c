@@ -75,7 +75,6 @@ const static Command commands[] = {
 	{"font-size", "Cambio de dimensiones de la fuente. Para hacerlo escribir el comando seguido de un numero", (MainFunction) fontSize},
 	{"printmem", "Realiza un vuelco de memoria de los 32 bytes posteriores a una direccion de memoria en formato hexadecimal enviada por parametro", (MainFunction) printMem},
 	{"clear", "Limpia toda la pantalla", (MainFunction) clear},
-	{"test", "Permite ejecutar un programa de prueba", (MainFunction) test},
 	{"loop", "El proceso imprime su ID con un saludo cada una determinada cantidad de segundos", (MainFunction) loop},
 	{"kill", "Mata a un proceso dado su PID", (MainFunction) runKill},
 	{"ps", "Muestra la informacion de los procesos vivos y zombificados", (MainFunction) psPrint},
@@ -89,7 +88,9 @@ const static Command commands[] = {
 	{"phylo", "Los phylozofox", (MainFunction) runPhilosophers},
 	{"test-mm", "Test_mm", (MainFunction) test_mm},
 	{"test-prio", "Test_prio", (MainFunction) test_prio},
-	{"test-processes", "Test_processes", (MainFunction) test_processes}};
+	{"test-sync", "Test_sync", (MainFunction) test_sync},
+	{"test-processes", "Test_processes", (MainFunction) test_processes},
+	{"test", "Permite ejecutar un programa de prueba miscelaneo", (MainFunction) test}};
 
 void run_shell() {
 	puts(WELCOME);
@@ -262,50 +263,33 @@ static void man(int argc, char **argv) {
 }
 
 static void test(int argc, char **argv) {
-	if (argc != 3) {
+	if (argc != 2) {
 		printErr(WRONG_PARAMS);
 		return;
 	}
 	char *name = argv[1];
-	char *param = argv[2];
-	if (!strcmp(name, "test-mm")) {
-		char *args[] = {"test_mm", param, NULL};
-		createProcess(&test_mm, args, "test_mm", 4);
-		// test_mm(1, (char *[]){param});
-	}
-	else if (!strcmp(name, "test-processes")) {
-		char *args[] = {"test_processes", param, NULL};
-		createProcess(&test_processes, args, "test_processes", 4);
-		// test_processes(1, (char *[]){param});
-	}
-	else if (!strcmp(name, "test-prio")) {
-		char *args[] = {"test_prio", param, NULL};
-		createProcess(&test_prio, args, "test_prio", 4);
-	}
-	else if (!strcmp(name, "test-sync")) {
-		char *args[] = {"test_sync", param, "1", NULL};
-		createProcess(&test_sync, args, "test_sync", 4);
-	}
-	else if (!strcmp(name, "test-no-sync")) {
-		char *args[] = {"test_sync", param, "0", NULL};
-		createProcess(&test_sync, args, "test_no_sync", 4);
-	}
-	else if (!strcmp(name, "test-filter")) {
+	if (!strcmp(name, "test-filter")) {
 		uint16_t filterPid, echoPid;
 		char *argsFilter[] = {"test_filter", NULL};
 		int16_t fdsFilter[3] = {404, STDOUT, STDERR};
 		filterPid = createProcessWithFds(&filter, argsFilter, "test_filter", 4, fdsFilter);
 		int16_t fdsEcho[3] = {DEV_NULL, 404, STDERR};
-		char *argsEcho[] = {"test_echo", param, NULL};
+		char *argsEcho[] = {"test_echo", "hola", NULL};
 		echoPid = createProcessWithFds(&echo, argsEcho, "test_echo", 4, fdsEcho);
 		waitpid(filterPid);
 		waitpid(echoPid);
 	}
+	else if (!strcmp(name, "test-zombies")) {
+		char *args[] = {"zombie_creator", NULL};
+		createProcess(&zombieCreator, args, "zombie_creator", (uint8_t) 4);
+	}
+	else if (!strcmp(name, "test-named-pipes")) {
+		char *args[] = {"named_pipes", NULL};
+		int16_t pid = createProcess(&testNamedPipes, args, "", (uint8_t) 4);
+		waitpid(pid);
+	}
 	else {
 		printErr(INVALID_COMMAND);
-		// TODO: Mover?
-		char *args[] = {"ZombieCreator", NULL};
-		createProcess(&testProgram, args, "ZombieCreator", (uint8_t) 4);
 	}
 }
 
