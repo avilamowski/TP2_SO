@@ -25,8 +25,8 @@ char *usages[QTY_COMMANDS] = {
 	"misma velocidad, y deben evitar "
 	"chocarse con las paredes, con la cola de ellos mismos y la del "
 	"adversario.\n El jugador numero 1 se movera con "
-	"las flechas, mientras que el jugador numero 2 con las teclas W A S D. Con "
-	"la tecla z, el jugador podra activar el modo turbo, que "
+	"las flechas, mientras que el jugador numero 2 con las teclas W A S D. \n"
+	"Con la tecla z, el jugador podra activar el modo turbo, que "
 	"aumenta su velocidad. El juegador 2 lo hara con la tecla / \n"
 	"El primer jugador que se choque, pierde",
 
@@ -42,9 +42,7 @@ char *usages[QTY_COMMANDS] = {
 	"de una direccion de memoria enviada como parametro\n"
 	"Ejemplo: printmem 10ff8c",
 
-	"Uso: clear - limpia la pantalla. No recibe parametros\n",
-
-	"Uso: test [TEST] [PARAM] - permite ejecutar un programa de prueba",
+	"Uso: clear - limpia la pantalla. No recibe parametros",
 
 	"Uso: loop [INTERVALO] - muestra su PID cada una cierta cantidad de tiempo\n"
 	"Ejemplo: loop 1",
@@ -54,11 +52,11 @@ char *usages[QTY_COMMANDS] = {
 	"Uso: ps - muestra la informacion de los procesos vivos y zombificados.\n"
 	"No recibe parametros",
 
+	"Uso: mem - muestra informacion del MemoryManager",
+
 	"Uso: nice [PID] [PRIORIDAD] - cambia la prioridad de un proceso dado su ID y la nueva prioridad",
 
-	"Uso: block - ", // TODO
-
-	"Uso: unblock - ", // TODO
+	"Uso: block [PID] - cambia el estado de un proceso entre bloqueado y listo dado su ID",
 
 	"Uso: echo [PARAM] - imprime por pantalla su primer parametro\n"
 	"Ejemplo: echo hola",
@@ -69,10 +67,18 @@ char *usages[QTY_COMMANDS] = {
 
 	"Uso: filter - filtra las vocales del input",
 
+	"Uso: phylo - ejecuta la simulacion del problema de los filosofos comensales",
+
 	"Uso: test_mm [BYTES] - ejecuta el test de memory manager utilizando una cierta cantidad de bytes",
 
-	"Uso: test_prio [] - ejecuta el test de prioridades", // TODO
+	"Uso: test_prio - ejecuta el test de prioridades",
 
-	"Uso: test_processes - ejecuta el test de procesos" // TODO
+	"Uso: test_sync [CANT_PROCESOS][USE_SEM]- ejecuta el test de sincronizacion",
+
+	"Uso: test_processes [CANT_PROCESOS] - ejecuta el test de procesos",
+
+	"Uso: test [NOMBRE_TEST]- ejecuta alguno de los siguientes programas de prueba:\n"
+	"test-filter, test-zombies o test-named-pipes. Ninguno recibe parametros"
+
 };
 #endif

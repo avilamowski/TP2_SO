@@ -85,12 +85,12 @@ const static Command commands[] = {
 	{"wc", "Cuenta la cantidad de lineas del input", (MainFunction) wc},
 	{"cat", "Imprime el STDIN tal como lo recibe", (MainFunction) cat},
 	{"filter", "Filtra las vocales del input", (MainFunction) filter},
-	{"phylo", "Los phylozofox", (MainFunction) runPhilosophers},
-	{"test-mm", "Test_mm", (MainFunction) test_mm},
-	{"test-prio", "Test_prio", (MainFunction) test_prio},
-	{"test-sync", "Test_sync", (MainFunction) test_sync},
-	{"test-processes", "Test_processes", (MainFunction) test_processes},
-	{"test", "Permite ejecutar un programa de prueba miscelaneo", (MainFunction) test}};
+	{"phylo", "Ejecuta la simulacion del problema de los filosofos comensales", (MainFunction) runPhilosophers},
+	{"test-mm", "Ejecuta el test de memory manager", (MainFunction) test_mm},
+	{"test-prio", "Ejecuta el test de prioridades", (MainFunction) test_prio},
+	{"test-sync", "Ejecutar el test de sincronizacion", (MainFunction) test_sync},
+	{"test-processes", "Ejecuta el test de procesos", (MainFunction) test_processes},
+	{"test", "Ejecuta uno de los siguientes programas de prueba: test-filter, test-zombies y test-named-pipes. Ninguno recibe parametros", (MainFunction) test}};
 
 void run_shell() {
 	puts(WELCOME);
