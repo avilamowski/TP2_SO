@@ -44,6 +44,16 @@ static void takeForks(int i);
 static void putForks(int i);
 static void test(int i);
 
+static const char *philosopherNames[] = {
+	"Aristoteles", "Kant", "Spinoza", "Marx",
+	"Russell", "Kierkegaard", "Wittgenstein", "Locke",
+	"Hume", "Descartes", "Confucio", "Socrates",
+	"Epicuro", "Platon", "Nietzsche", "Hegel",
+	"Aquinas", "Bunge", "Sartre", "Thoreau",
+	"de Beauvoir", "Foucault", "Leibniz", "Rawls",
+	"Hobbes", "Bentham", "Mill", "Kripke",
+	"Frege", "Popper", "Montesquieu", "Rousseau"};
+
 int runPhilosophers(int argc, char **argv) {
 	if (semInit(MUTEX_SEM_ID, 1) == -1)
 		return -1;
@@ -122,10 +132,13 @@ static int8_t addPhilosopher(int index) {
 }
 
 static int8_t removePhilosopher(int index) {
+	printf("Se invita a retirarse a %s\n", philosopherNames[index]);
+	if (philosopherStates[left(index)] == EATING && philosopherStates[right(index)] == EATING) // Estado invalido para remover
+		semWait(philosopherSemaphore(index));												   // Bloquearse hasta que el filosofo este comiendo
 	semWait(MUTEX_SEM_ID);
 	killProcess(philosopherPids[index]);
 	waitpid(philosopherPids[index]);
-	printf("se retira el filosofo %d\n", index);
+	printf("Se retira %s\n", philosopherNames[index]);
 	semClose(philosopherSemaphore(index));
 	philosopherPids[index] = -1;
 	philosopherStates[index] = NONE;
@@ -137,7 +150,7 @@ static int8_t removePhilosopher(int index) {
 
 static int philosopher(int argc, char **argv) {
 	int i = atoi(argv[1]);
-	printf("entra el filosofo %d\n", i);
+	printf("Entra %s\n", philosopherNames[i]);
 	philosopherStates[i] = THINKING;
 	while (1) {
 		sleep(THINK_TIME);
