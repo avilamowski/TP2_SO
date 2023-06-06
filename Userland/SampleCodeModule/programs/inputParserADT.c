@@ -101,6 +101,9 @@ static ShellProgram *parseProgram(InputParserADT parser, char **input) {
 			cleanSpaces(input);
 			qtyParams++;
 		}
+		else {
+			free(program->params[qtyParams]);
+		}
 	}
 
 	program->params[qtyParams] = NULL;

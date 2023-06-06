@@ -115,13 +115,10 @@ SECTION .text
 %endmacro
 
 _initialize_stack_frame:
-	; TODO: Alineamiento???
 	mov r8, rsp 	; Preservar rsp
 	mov r9, rbp		; Preservar rbp
 	mov rsp, rdx 	; Carga sp del proceso
 	mov rbp, rdx
-	;push 0x0		; Alineamiento????
-	;and rsp, -16
 	push 0x0
 	push rdx
 	push 0x202
@@ -129,8 +126,6 @@ _initialize_stack_frame:
 	push rdi
 	mov rdi, rsi 		; Primer argumento de wrapper, RIP
 	mov rsi, rcx		; Segundo argumento, args
-	;push 0x0
-	;pushStateNoRax
 	pushState
 	mov rax, rsp
 	mov rsp, r8

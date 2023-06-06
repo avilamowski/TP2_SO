@@ -117,7 +117,7 @@ static void render() {
 
 static int8_t addPhilosopher(int index) {
 	semWait(MUTEX_SEM_ID);
-	char philoNumberBuffer[MAX_PHILO_NUMBER_BUFFER] = {0}; // TODO: nombres de filosofos
+	char philoNumberBuffer[MAX_PHILO_NUMBER_BUFFER] = {0};
 	if (semInit(philosopherSemaphore(index), 0) == -1)
 		return -1;
 	itoa(index, philoNumberBuffer, 10);

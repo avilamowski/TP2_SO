@@ -12,7 +12,7 @@ static int spawnAndBlock(int argc, char **argv);
 
 int loop(int argc, char **argv) {
 	if (argc != 2) {
-		printErr("Argumentos invalidos\n"); // TODO: Uniformizar?
+		printErr("Argumentos invalidos\n");
 		return -1;
 	}
 	uint16_t pid = getpid();

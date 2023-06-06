@@ -101,7 +101,7 @@ void exit();
 
 uint16_t getpid();
 
-void *ps(); // TODO cambiar a ProcessSnapshot
+void *ps();
 
 int32_t killProcess(uint16_t pid);
 

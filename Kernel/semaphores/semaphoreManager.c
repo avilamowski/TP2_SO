@@ -29,14 +29,12 @@ static int down(Semaphore *sem);
 
 typedef struct SemaphoreManagerCDT {
 	Semaphore *semaphores[MAX_SEMAPHORES];
-	uint16_t qtySemaphores; // TODO: Sacar?
 } SemaphoreManagerCDT;
 
 SemaphoreManagerADT createSemaphoreManager() {
 	SemaphoreManagerADT semManager = (SemaphoreManagerADT) SEMAPHORE_MANAGER_ADDRESS;
 	for (int i = 0; i < MAX_SEMAPHORES; i++)
 		semManager->semaphores[i] = NULL;
-	semManager->qtySemaphores = 0;
 	return semManager;
 }
 

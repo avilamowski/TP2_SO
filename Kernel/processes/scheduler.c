@@ -164,7 +164,6 @@ int16_t createProcess(MainFunction code, char **args, char *name, uint8_t priori
 }
 
 static void destroyZombie(SchedulerADT scheduler, Process *zombie) {
-	// TODO: free heap?
 	Node *zombieNode = scheduler->processes[zombie->pid];
 	scheduler->qtyProcesses--;
 	scheduler->processes[zombie->pid] = NULL;

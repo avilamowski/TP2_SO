@@ -138,7 +138,6 @@ static void createPipedProcesses(InputParserADT parser) {
 	int16_t newPipeId = pipeGet();
 	if (newPipeId == -1) {
 		printErr(FATAL_ERROR_PIPES);
-		freeParser(parser);
 		return;
 	}
 
