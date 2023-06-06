@@ -73,12 +73,10 @@ char *usages[QTY_COMMANDS] = {
 
 	"Uso: test_prio - ejecuta el test de prioridades",
 
-	"Uso: test_sync [N][USE_SEM]- ejecuta el test de sincronizacion",
+	"Uso: test_sync [N] [USE_SEM] - ejecuta el test de sincronizacion",
 
 	"Uso: test_processes [CANT_PROCESOS] - ejecuta el test de procesos",
 
-	"Uso: test [NOMBRE_TEST]- ejecuta alguno de los siguientes programas de prueba:\n"
-	"test-filter, test-zombies o test-named-pipes. Ninguno recibe parametros"
-
-};
+	"Uso: test-named-pipes - ejecuta el test de pipes con nombre, creando un proceso escritor que envia\n"
+	"un mensaje secreto a un lector a traves de un pipe"};
 #endif

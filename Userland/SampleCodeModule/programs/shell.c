@@ -54,7 +54,6 @@ static void tron();
 static void tronZen();
 static void fontSize(int argc, char **argv);
 static void printMem(int argc, char **argv);
-static void test(int argc, char **argv);
 static void runKill(int argc, char **argv);
 static void toggleBlock(int argc, char **argv);
 static void runNice(int argc, char **argv);
@@ -90,7 +89,7 @@ const static Command commands[] = {
 	{"test-prio", "Ejecuta el test de prioridades", (MainFunction) test_prio},
 	{"test-sync", "Ejecutar el test de sincronizacion", (MainFunction) test_sync},
 	{"test-processes", "Ejecuta el test de procesos", (MainFunction) test_processes},
-	{"test", "Ejecuta uno de los siguientes programas de prueba: test-filter, test-zombies y test-named-pipes", (MainFunction) test}};
+	{"test-named-pipes", "Crea dos procesos que se comunican por un pipe con nombre", (MainFunction) testNamedPipes}};
 
 void run_shell() {
 	puts(WELCOME);
@@ -259,37 +258,6 @@ static void man(int argc, char **argv) {
 		printf("%s\n", usages[idx]);
 	else
 		printErr(INVALID_COMMAND);
-}
-
-static void test(int argc, char **argv) {
-	if (argc != 2) {
-		printErr(WRONG_PARAMS);
-		return;
-	}
-	char *name = argv[1];
-	if (!strcmp(name, "test-filter")) {
-		uint16_t filterPid, echoPid;
-		char *argsFilter[] = {"test_filter", NULL};
-		int16_t fdsFilter[3] = {404, STDOUT, STDERR};
-		filterPid = createProcessWithFds(&filter, argsFilter, "test_filter", 4, fdsFilter);
-		int16_t fdsEcho[3] = {DEV_NULL, 404, STDERR};
-		char *argsEcho[] = {"test_echo", "hola", NULL};
-		echoPid = createProcessWithFds(&echo, argsEcho, "test_echo", 4, fdsEcho);
-		waitpid(filterPid);
-		waitpid(echoPid);
-	}
-	else if (!strcmp(name, "test-zombies")) {
-		char *args[] = {"zombie_creator", NULL};
-		createProcess(&zombieCreator, args, "zombie_creator", (uint8_t) 4);
-	}
-	else if (!strcmp(name, "test-named-pipes")) {
-		char *args[] = {"named_pipes", NULL};
-		int16_t pid = createProcess(&testNamedPipes, args, "", (uint8_t) 4);
-		waitpid(pid);
-	}
-	else {
-		printErr(INVALID_COMMAND);
-	}
 }
 
 static void runKill(int argc, char **argv) {

@@ -23,7 +23,7 @@ int16_t createProcess(void *code, char **args, char *name, uint8_t priority) {
 }
 
 void psPrint() {
-	char *statusNames[4] = {"BLOCKED", "READY", "RUNNING", "WALKER"};
+	char *statusNames[4] = {"BLOCKED", "READY", "RUNNING", "ZOMBIE"};
 	ProcessSnapshotList *snapshots = ps();
 	for (int i = 0; i < snapshots->length; i++) {
 		ProcessSnapshot *snapshot = &snapshots->snapshotList[i];
