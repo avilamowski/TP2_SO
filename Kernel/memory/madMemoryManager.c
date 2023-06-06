@@ -120,6 +120,9 @@ static MemoryBlock *split(MemoryManagerADT memoryManager, MemoryBlock *block, ui
 void free(void *ptrAllocatedMemory) {
 	MemoryManagerADT memoryManager = getMemoryManager();
 	MemoryBlock *block = (MemoryBlock *) (ptrAllocatedMemory - sizeof(MemoryBlock));
+	if (block->used == FREE)
+		return;
+
 	block->used = FREE;
 
 	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);

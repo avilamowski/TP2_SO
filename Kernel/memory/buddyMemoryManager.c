@@ -1,6 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-#ifdef BUDDY
+//#ifdef BUDDY
 
 #include <defs.h>
 #include <globals.h>
@@ -32,7 +32,7 @@ typedef struct MemoryManagerCDT {
 
 static MemoryManagerADT getMemoryManager();
 static void split(MemoryManagerADT memoryManager, uint8_t idx);
-static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrToAllocate, uint8_t exp, MemoryBlock *prev);
+static MemoryBlock *createMemoryBlock(void *ptrToAllocate, uint8_t exp, MemoryBlock *prev);
 static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memoryBlock);
 static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *block, MemoryBlock *buddy);
 
@@ -51,7 +51,7 @@ MemoryManagerADT createMemoryManager(void *const restrict managedMemory, uint64_
 	memoryManager->memoryInfo.totalMemory = memAmount;
 
 	memoryManager->blocks[memoryManager->maxExp - 1] =
-		createMemoryBlock(memoryManager, managedMemory, memoryManager->maxExp, NULL);
+		createMemoryBlock(managedMemory, memoryManager->maxExp, NULL);
 	return memoryManager;
 }
 
@@ -99,14 +99,20 @@ static void split(MemoryManagerADT memoryManager, uint8_t idx) {
 	MemoryBlock *block = memoryManager->blocks[idx];
 	removeMemoryBlock(memoryManager->blocks, block);
 	MemoryBlock *buddyBlock =
-		(MemoryBlock *) ((void *) block + (1L << idx)); // TODO: Si se rompe es por el & xd
-	createMemoryBlock(memoryManager, buddyBlock, idx, memoryManager->blocks[idx - 1]);
-	memoryManager->blocks[idx - 1] = createMemoryBlock(memoryManager, block, idx, buddyBlock);
+		(MemoryBlock *) ((void *) block + (1L << idx));
+	createMemoryBlock((void *) buddyBlock, idx, memoryManager->blocks[idx - 1]);
+	memoryManager->blocks[idx - 1] = createMemoryBlock((void *) block, idx, buddyBlock);
+
+	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
+	memoryInfo->freeBlocks++;
+	memoryInfo->totalBlocks++;
 }
 
 void free(void *ptrAllocatedMemory) {
 	MemoryManagerADT memoryManager = getMemoryManager();
 	MemoryBlock *block = (MemoryBlock *) (ptrAllocatedMemory - sizeof(MemoryBlock));
+	if (block->used == FREE)
+		return;
 	block->used = FREE;
 
 	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
@@ -117,13 +123,13 @@ void free(void *ptrAllocatedMemory) {
 	memoryInfo->usedBlocks--;
 
 	uint64_t relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
-	MemoryBlock *buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1 << block->exp)));
-	while (buddyBlock->used == FREE && buddyBlock->exp == block->exp) {
+	MemoryBlock *buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1L << block->exp)));
+	while (buddyBlock->used == FREE && buddyBlock->exp == block->exp && block->exp < memoryManager->maxExp) {
 		block = merge(memoryManager, block, buddyBlock);
 		relativePosition = (uint64_t) ((void *) block - memoryManager->firstAddress);
-		buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1 << block->exp)));
+		buddyBlock = (MemoryBlock *) ((uint64_t) memoryManager->firstAddress + (((uint64_t) relativePosition) ^ (1L << block->exp)));
 	}
-	memoryManager->blocks[block->exp - 1] = createMemoryBlock(memoryManager, (void *) block, block->exp, memoryManager->blocks[block->exp - 1]);
+	memoryManager->blocks[block->exp - 1] = createMemoryBlock((void *) block, block->exp, memoryManager->blocks[block->exp - 1]);
 }
 
 static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *block, MemoryBlock *buddy) {
@@ -138,7 +144,7 @@ static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *block, Me
 	return leftBlock;
 }
 
-static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memoryBlock) {
+static MemoryBlock *removeMemoryBlock(MemoryBlock **blocks, MemoryBlock *memoryBlock) {
 	if (memoryBlock->prev != NULL)
 		memoryBlock->prev->next = memoryBlock->next;
 	else
@@ -149,7 +155,7 @@ static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memory
 	return memoryBlock->next;
 }
 
-static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrToAllocate, uint8_t exp,
+static MemoryBlock *createMemoryBlock(void *ptrToAllocate, uint8_t exp,
 									  MemoryBlock *next) {
 	MemoryBlock *memoryBlock = (MemoryBlock *) ptrToAllocate;
 	memoryBlock->exp = exp;
@@ -159,10 +165,6 @@ static MemoryBlock *createMemoryBlock(MemoryManagerADT memoryManager, void *ptrT
 	if (next != NULL) {
 		next->prev = memoryBlock;
 	}
-
-	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
-	memoryInfo->freeBlocks++;
-	memoryInfo->totalBlocks++;
 	return memoryBlock;
 }
 
@@ -171,4 +173,4 @@ MemoryInfo *getMemoryInfo() {
 	return createMemoryInfoCopy(&(memoryManager->memoryInfo));
 }
 
-#endif
+//#endif

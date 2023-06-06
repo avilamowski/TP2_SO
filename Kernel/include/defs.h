@@ -22,8 +22,8 @@
 /* Direccion del MemoryManager */
 #define SYSTEM_VARIABLES 0x5A00
 #define MEMORY_MANAGER_ADDRESS 0x50000	  // MemoryManagerCDT
-#define SCHEDULER_ADDRESS 0x51000		  // SchedulerCDT
-#define SEMAPHORE_MANAGER_ADDRESS 0x60000 // SemaphoreCDT
-#define PIPE_MANAGER_ADDRESS 0x70000	  // PipeManagerCDT
+#define SCHEDULER_ADDRESS 0x60000		  // SchedulerCDT
+#define SEMAPHORE_MANAGER_ADDRESS 0x70000 // SemaphoreCDT
+#define PIPE_MANAGER_ADDRESS 0x80000	  // PipeManagerCDT
 
 #endif
