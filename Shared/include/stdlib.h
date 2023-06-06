@@ -52,7 +52,9 @@ void *memset(void *destiation, int32_t c, uint64_t length);
 #define isNumber(n) ((n) >= '0' && (n) <= '9')
 #define isHex(n) ((n) >= 'a' && (n) <= 'f')
 
-#define NULL ((void *) 0)
+// clang-format off
+#define NULL ((void *)0)
 #define EOF (-1)
+// clang-format on
 
 #endif

@@ -22,6 +22,7 @@ typedef struct MemoryBlock {
 	struct MemoryBlock *next;
 } MemoryBlock;
 
+#ifdef MAD
 // Random
 static uint32_t m_z = 362436069;
 static uint32_t m_w = 521288629;
@@ -36,6 +37,7 @@ static uint32_t getUniform(uint32_t max) {
 	uint32_t u = getUint();
 	return (u + 1.0) * 2.328306435454494e-10 * max;
 }
+#endif
 
 typedef struct MemoryManagerCDT {
 	uint64_t totalSize;
@@ -64,7 +66,13 @@ static MemoryManagerADT getMemoryManager() {
 }
 
 static uint64_t getBlockSize(MemoryManagerADT memoryManager, MemoryBlock *block) {
-	uint64_t end = block->next != NULL ? (uint64_t) block->next : ((uint64_t) memoryManager->firstAddress) + memoryManager->totalSize;
+	uint64_t end;
+	if (block->next != NULL) {
+		end = (uint64_t) block->next;
+	}
+	else {
+		end = ((uint64_t) memoryManager->firstAddress) + memoryManager->totalSize;
+	}
 	return end - (uint64_t) block;
 }
 
@@ -79,7 +87,6 @@ void *allocMemory(const uint64_t size) {
 	MemoryBlock *block = memoryManager->firstAddress;
 	while (block != NULL && (block->used == USED || getBlockSize(memoryManager, block) < realSize)) {
 		block = block->next;
-		uint64_t end = block->next != NULL ? (uint64_t) block->next : ((uint64_t) memoryManager->firstAddress) + memoryManager->totalSize;
 	}
 	if (block == NULL)
 		return NULL;
@@ -132,20 +139,23 @@ void free(void *ptrAllocatedMemory) {
 	memoryInfo->freeBlocks++;
 	memoryInfo->usedBlocks--;
 
-	while (block->next != NULL && block->next->used == FREE)
+	while (block->next != NULL && block->next->used == FREE) {
 		block = merge(memoryManager, block, block->next);
-
-	while (block->prev != NULL && block->prev->used == FREE)
+	}
+	while (block->prev != NULL && block->prev->used == FREE) {
 		block = merge(memoryManager, block->prev, block);
+	}
 }
 
 static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *left, MemoryBlock *right) {
 	left->next = right->next;
+	if (right->next != NULL) {
+		right->next->prev = left;
+	}
 
 	MemoryInfo *memoryInfo = &(memoryManager->memoryInfo);
 	memoryInfo->freeBlocks--;
 	memoryInfo->totalBlocks--;
-
 	return left;
 }
 
