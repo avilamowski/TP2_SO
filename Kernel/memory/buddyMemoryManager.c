@@ -1,6 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-//#ifdef BUDDY
+#ifdef BUDDY
 
 #include <defs.h>
 #include <globals.h>
@@ -14,7 +14,7 @@
 #define MIN_EXP 5 // Tamaño del MemoryBlock
 #define FREE 0
 #define USED 1
-#define LEVELS 64
+#define LEVELS 32
 
 typedef struct MemoryBlock {
 	uint8_t exp;
@@ -33,7 +33,7 @@ typedef struct MemoryManagerCDT {
 static MemoryManagerADT getMemoryManager();
 static void split(MemoryManagerADT memoryManager, uint8_t idx);
 static MemoryBlock *createMemoryBlock(void *ptrToAllocate, uint8_t exp, MemoryBlock *prev);
-static MemoryBlock *removeMemoryBlock(MemoryBlock *blocks[], MemoryBlock *memoryBlock);
+static MemoryBlock *removeMemoryBlock(MemoryBlock **blocks, MemoryBlock *memoryBlock);
 static MemoryBlock *merge(MemoryManagerADT memoryManager, MemoryBlock *block, MemoryBlock *buddy);
 
 MemoryManagerADT createMemoryManager(void *const restrict managedMemory, uint64_t memAmount) {
@@ -49,6 +49,8 @@ MemoryManagerADT createMemoryManager(void *const restrict managedMemory, uint64_
 	initMemoryInfo(&(memoryManager->memoryInfo));
 	memoryManager->memoryInfo.freeMemory = memAmount;
 	memoryManager->memoryInfo.totalMemory = memAmount;
+	memoryManager->memoryInfo.totalBlocks = 1;
+	memoryManager->memoryInfo.freeBlocks = 1;
 
 	memoryManager->blocks[memoryManager->maxExp - 1] =
 		createMemoryBlock(managedMemory, memoryManager->maxExp, NULL);
@@ -173,4 +175,4 @@ MemoryInfo *getMemoryInfo() {
 	return createMemoryInfoCopy(&(memoryManager->memoryInfo));
 }
 
-//#endif
+#endif

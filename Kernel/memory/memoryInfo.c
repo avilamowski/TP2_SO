@@ -24,8 +24,8 @@ void initMemoryInfo(MemoryInfo *memoryInfo) {
 #else
 	strcpy(memoryInfo->name, "Linear");
 #endif
-	memoryInfo->totalBlocks = 1;
-	memoryInfo->freeBlocks = 1;
+	memoryInfo->totalBlocks = 0;
+	memoryInfo->freeBlocks = 0;
 	memoryInfo->usedBlocks = 0;
 	memoryInfo->totalMemory = 0;
 	memoryInfo->freeMemory = 0;

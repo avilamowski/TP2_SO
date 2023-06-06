@@ -30,17 +30,13 @@ typedef struct ProcessSnapshotList {
 } ProcessSnapshotList;
 
 typedef struct MemoryInfo {
+	int64_t totalBlocks;
+	int64_t freeBlocks;
+	int64_t usedBlocks;
+	int64_t totalMemory;
+	int64_t freeMemory;
+	int64_t usedMemory;
 	char name[16];
-	uint64_t totalBlocks;
-	uint64_t freeBlocks;
-	uint64_t usedBlocks;
-	uint64_t totalMemory;
-	uint64_t freeMemory;
-	uint64_t usedMemory;
-	// uint64_t maxUsedBlockSize;
-	// uint64_t minUsedBlockSize;
-	// uint64_t maxFreeBlockSize;
-	// uint64_t minFreeBlockSize;
 } MemoryInfo;
 
 /* File Descriptors*/
