@@ -62,6 +62,9 @@ static int getCommandIndex(char *command);
 static void createSingleProcess(InputParserADT parser);
 static void createPipedProcesses(InputParserADT parser);
 
+static void testSharedMemory(int argc, char **argv);
+static void testProcessShm(int argc, char **argv);
+
 const static Command commands[] = {
 	{"help", "Listado de comandos", (MainFunction) help},
 	{"man", "Manual de uso de los comandos", (MainFunction) man},
@@ -89,7 +92,8 @@ const static Command commands[] = {
 	{"test-prio", "Ejecuta el test de prioridades", (MainFunction) test_prio},
 	{"test-sync", "Ejecutar el test de sincronizacion", (MainFunction) test_sync},
 	{"test-processes", "Ejecuta el test de procesos", (MainFunction) test_processes},
-	{"test-named-pipes", "Crea dos procesos que se comunican por un pipe con nombre", (MainFunction) testNamedPipes}};
+	{"test-named-pipes", "Crea dos procesos que se comunican por un pipe con nombre", (MainFunction) testNamedPipes},
+	{"defensa", "Hola", (MainFunction) testSharedMemory}};
 
 void run_shell() {
 	puts(WELCOME);
@@ -289,4 +293,24 @@ static void runNice(int argc, char **argv) {
 		return;
 	}
 	nice((uint16_t) atoi(argv[1]), (uint8_t) atoi(argv[2]));
+}
+
+#define SHARED_MEMORY_ID 50
+
+static void testSharedMemory(int argc, char **argv) {
+	char *params[] = {"test-process-shm", NULL};
+	int *mem = (int *) openSharedMemory(SHARED_MEMORY_ID);
+	createProcess(testProcessShm, params, "test-process-shm", 4);
+	for (int i = 0; i < 10; i++) {
+		*mem = i;
+		sleep(2);
+	}
+}
+
+static void testProcessShm(int argc, char **argv) {
+	int *mem = (int *) openSharedMemory(SHARED_MEMORY_ID);
+	while (1) {
+		printf("%d\n", *mem);
+		sleep(2);
+	}
 }

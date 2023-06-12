@@ -9,6 +9,7 @@
 #include <pipeManager.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
+#include <sharedMemory.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <video.h>
@@ -54,6 +55,7 @@ void initializeKernelBinary() {
 	createScheduler();
 	createSemaphoreManager();
 	createPipeManager();
+	initSharedMemory();
 	initializeKeyboardDriver();
 }
 

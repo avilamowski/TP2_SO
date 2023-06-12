@@ -11,6 +11,7 @@
 #include <rtc.h>
 #include <scheduler.h>
 #include <semaphoreManager.h>
+#include <sharedMemory.h>
 #include <speaker.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -47,7 +48,7 @@ uint64_t syscallDispatcher(uint64_t nr, uint64_t arg0, uint64_t arg1,
 		(Syscall) semInit, (Syscall) semOpen, (Syscall) semClose,
 		(Syscall) semPost, (Syscall) semWait, (Syscall) pipeOpen,
 		(Syscall) pipeClose, (Syscall) getLastFreePipe, (Syscall) sleep,
-		(Syscall) getMemoryInfo, (Syscall) getProcessStatus};
+		(Syscall) getMemoryInfo, (Syscall) getProcessStatus, (Syscall) openSharedMemory};
 	return syscalls[nr](arg0, arg1, arg2, arg3, arg4, arg5);
 }
 

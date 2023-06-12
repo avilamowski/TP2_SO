@@ -149,4 +149,6 @@ void psPrint();
 
 int mem(int argc, char **argv);
 
+void *openSharedMemory(uint16_t id);
+
 #endif

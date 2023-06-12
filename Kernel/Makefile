@@ -1,7 +1,7 @@
 include Makefile.inc
 
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c drivers/*.c interruptions/*.c lib/*.c memory/*.c pipes/*.c processes/*.c scheduler/*.c semaphores/*.c syscalls/*.c )
+SOURCES=$(wildcard *.c drivers/*.c interruptions/*.c lib/*.c memory/*.c pipes/*.c processes/*.c scheduler/*.c semaphores/*.c syscalls/*.c shared-memory/*.c )
 SOURCES_ASM=$(wildcard asm/*.asm)
 SOURCES_SHARED=$(wildcard ../Shared/*.c)
 OBJECTS=$(SOURCES:.c=.o)
